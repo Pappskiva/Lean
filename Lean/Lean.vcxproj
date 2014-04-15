@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SystemClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="SystemClass.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
