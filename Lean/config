@@ -8,3 +8,9 @@
 	sharedrepository = 2
 [receive]
 	denyNonFastforwards = true
+[remote "Grupp9"]
+	url = https://github.com/Pappskiva/Lean.git
+	fetch = +refs/heads/*:refs/remotes/Grupp9/*
+[branch "master"]
+	remote = Grupp9
+	merge = refs/heads/master

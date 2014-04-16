@@ -4,5 +4,6 @@ class Menu
 public:
 	Menu();
 	~Menu();
+	bool Initialize();
 };
 
