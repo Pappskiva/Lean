@@ -3,7 +3,6 @@
 
 Menu::Menu()
 {
-	//Hej hopp
 }
 
 

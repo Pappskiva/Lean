@@ -10,8 +10,6 @@ public:
 	void Render();
 	void Shutdown();
 
-	//Mjao mjaoa
-	//lulz
 private:
 };
 
