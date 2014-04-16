@@ -15,6 +15,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SystemClass.cpp" />
   </ItemGroup>
@@ -22,6 +23,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
   </ItemGroup>
