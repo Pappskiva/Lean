@@ -5,14 +5,6 @@
 Texture2D shaderTexture;
 SamplerState SampleType;
 
-cbuffer PixelBuffer /*Multiple of 16... so dumb...*/
-{
-    float textureOffsetX;
-	float textureOffsetY;
-	float padding1; //Not used
-	float padding2; //Not used
-};
-
 //////////////
 // TYPEDEFS //
 //////////////
@@ -20,7 +12,7 @@ struct PixelInputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-	float4 color : COLOR;
+	float3 normal : NORMAL;
 };
 
 
@@ -29,16 +21,10 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 float4 BallPixelShader(PixelInputType input) : SV_TARGET
 {
-
     float4 textureColor;
-	float2 offsetTexture;
-	
-	offsetTexture.x = input.tex.x + textureOffsetX;
-	//offsetTexture.x = 0.5f - offsetTexture.x; //How to reverse a texture. Not necessary, but nice to just have.
-	offsetTexture.y = input.tex.y + textureOffsetY;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, offsetTexture);
+    textureColor = shaderTexture.Sample(SampleType, input.tex);
 
     return textureColor;
 }

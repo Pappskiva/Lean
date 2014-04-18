@@ -148,9 +148,9 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
-	polygonLayout[2].SemanticName = "COLOR";
+	polygonLayout[2].SemanticName = "NORMAL";
 	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[2].InputSlot = 0;
 	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -329,7 +329,6 @@ bool BallShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
-	PixelBufferType* dataPtr2;
 
 	// Transpose the matrices to prepare them for the shader.
 	D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
@@ -362,32 +361,6 @@ bool BallShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
-
-	// Lock the pixel constant buffer so it can be written to.
-	result = deviceContext->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Get a pointer to the data in the pixel constant buffer.
-	dataPtr2 = (PixelBufferType*)mappedResource.pData;
-
-	D3DXVECTOR2 offset = D3DXVECTOR2(0.0f, 0.0f);
-
-	// Copy the pixel color into the pixel constant buffer.
-	dataPtr2->textureOffsetX = offset.x;
-	dataPtr2->textureOffsetY = offset.y;
-
-	// Unlock the pixel constant buffer.
-	deviceContext->Unmap(m_pixelBuffer, 0);
-
-	// Set the position of the pixel constant buffer in the pixel shader.
-	bufferNumber = 0;
-
-	// Now set the pixel constant buffer in the pixel shader with the updated value.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_pixelBuffer);
-
 
 	return true;
 }

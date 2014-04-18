@@ -15,7 +15,7 @@ protected:
 	{
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;
-		D3DXVECTOR4 color;
+		D3DXVECTOR3 normal;
 	};
 
 public:

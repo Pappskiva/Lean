@@ -21,14 +21,14 @@ struct VertexInputType
 {
     float4 position : POSITION;
     float2 tex : TEXCOORD0;
-	float4 color : COLOR;
+	float3 normal : NORMAL;
 };
 
 struct PixelInputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-	float4 color : COLOR;
+	float3 normal : NORMAL;
 };
 
 
@@ -51,7 +51,7 @@ PixelInputType BallVertexShader(VertexInputType input)
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;
 
-	output.color = input.color;
+	output.normal = input.normal;
 
     return output;
 }
