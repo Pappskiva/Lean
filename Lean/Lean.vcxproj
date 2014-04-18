@@ -12,7 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="BallShaderClass.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="D3D.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
@@ -21,11 +26,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="BallShaderClass.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="D3D.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ball.ps" />
+    <None Include="ball.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F638B05-F9B3-4238-A88C-F4A6FC99C859}</ProjectGuid>
@@ -72,7 +86,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
