@@ -10,15 +10,20 @@
 #include "D3D.h"
 #include "Input.h"
 #include "Camera.h"
+#include "ApplicationTimer.h"
+#include "Ball.h"
 
 //Shaders
 #include "BallShaderClass.h"
+
+//FPS checker for debug
+#include "FPSClass.h"
 
 /////////////
 // GLOBALS //
 /////////////
 const bool FULL_SCREEN = false;
-const bool VSYNC_ENABLED = true;
+const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
@@ -47,6 +52,12 @@ private:
 	D3D* m_Direct3D;
 	Input* m_Input;
 	Camera* m_Camera;
+	ApplicationTimer* m_AppTimer;
+	Ball* m_Ball;
+
+	FPSClass m_fps;
+
+
 
 	BallShaderClass* m_BallShader;
 

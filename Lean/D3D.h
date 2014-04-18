@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: d3d.h
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +19,7 @@
 #include <d3d11.h>
 #include "..\\Include\\d3dx10math.h"
 
+
 class D3D
 {
 public:
@@ -31,8 +33,6 @@ public:
 	void BeginScene(float, float, float, float);
 	void EndScene();
 
-	void Reset();
-
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
 
@@ -40,15 +40,15 @@ public:
 	void GetWorldMatrix(D3DXMATRIX&);
 	void GetOrthoMatrix(D3DXMATRIX&);
 
-
-
 	void TurnZBufferOn();
 	void TurnZBufferOff();
+
 	void TurnOnAlphaBlending();
 	void TurnOffAlphaBlending();
 
 private:
 	bool m_vsync_enabled;
+
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;
@@ -57,13 +57,16 @@ private:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterState;
-	ID3D11DepthStencilState* m_depthDisabledStencilState;
-	ID3D11BlendState* m_alphaEnableBlendingState;
-	ID3D11BlendState* m_alphaDisableBlendingState;
 
 	D3DXMATRIX m_projectionMatrix;
 	D3DXMATRIX m_worldMatrix;
 	D3DXMATRIX m_orthoMatrix;
 
+	ID3D11DepthStencilState* m_depthDisabledStencilState;
+
+	ID3D11BlendState* m_alphaEnableBlendingState;
+	ID3D11BlendState* m_alphaDisableBlendingState;
 };
+
 #endif
+

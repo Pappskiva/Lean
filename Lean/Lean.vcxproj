@@ -17,12 +17,14 @@
     <ClCompile Include="BallShaderClass.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />
+    <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SystemClass.cpp" />
+    <ClCompile Include="TextureClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -31,11 +33,13 @@
     <ClInclude Include="BallShaderClass.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="D3D.h" />
+    <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
+    <ClInclude Include="TextureClass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ball.ps" />

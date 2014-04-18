@@ -1,14 +1,13 @@
-#include "ballshaderclass.h"
-
+#include "BallShaderClass.h"
 
 BallShaderClass::BallShaderClass()
 {
 	m_vertexShader = 0;
 	m_pixelShader = 0;
 	m_layout = 0;
-	m_sampleState = 0;
 	m_matrixBuffer = 0;
-	m_lightBuffer = 0;
+	m_sampleState = 0;
+	m_pixelBuffer = 0;
 }
 
 
@@ -21,11 +20,9 @@ BallShaderClass::~BallShaderClass()
 {
 }
 
-
 bool BallShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
-
 
 	// Initialize the vertex and pixel shaders.
 	result = InitializeShader(device, hwnd, L"ball.vs", L"ball.ps");
@@ -37,7 +34,6 @@ bool BallShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
 	return true;
 }
 
-
 void BallShaderClass::Shutdown()
 {
 	// Shutdown the vertex and pixel shaders as well as the related objects.
@@ -46,15 +42,14 @@ void BallShaderClass::Shutdown()
 	return;
 }
 
-bool BallShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection,
-	ID3D11ShaderResourceView* texture)
+bool BallShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
 {
 	bool result;
 
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, ambientColor, diffuseColor, lightDirection, texture);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture);
 	if (!result)
 	{
 		return false;
@@ -66,20 +61,17 @@ bool BallShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount,
 	return true;
 }
 
-
 bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 	unsigned int numElements;
-	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC matrixBufferDesc;
-	D3D11_BUFFER_DESC lightBufferDesc;
-
+	D3D11_SAMPLER_DESC samplerDesc;
+	D3D11_BUFFER_DESC pixelBufferDesc;
 
 	// Initialize the pointers this function will use to null.
 	errorMessage = 0;
@@ -115,7 +107,7 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 		{
 			OutputShaderErrorMessage(errorMessage, hwnd, psFilename);
 		}
-		// If there was nothing in the error message then it simply could not find the file itself.
+		// If there was  nothing in the error message then it simply could not find the file itself.
 		else
 		{
 			MessageBox(hwnd, psFilename, L"Missing Shader File", MB_OK);
@@ -138,7 +130,8 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 		return false;
 	}
 
-	// Create the vertex input layout description.
+	// Now setup the layout of the data that goes into the shader.
+	// This setup needs to match the VertexType stucture in the ModelClass and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -146,8 +139,6 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	polygonLayout[0].AlignedByteOffset = 0;
 	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
-
-	//4. The polygon layout for the terrain has changed. It now has an additional element called TEXCOORD which will be used for tu and tv texture coordinates. The normals have been moved to the third element in the polygon layout.
 
 	polygonLayout[1].SemanticName = "TEXCOORD";
 	polygonLayout[1].SemanticIndex = 0;
@@ -157,9 +148,9 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
-	polygonLayout[2].SemanticName = "NORMAL";
+	polygonLayout[2].SemanticName = "COLOR";
 	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	polygonLayout[2].InputSlot = 0;
 	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -169,8 +160,8 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
 	// Create the vertex input layout.
-	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(),
-		&m_layout);
+	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
+		vertexShaderBuffer->GetBufferSize(), &m_layout);
 	if (FAILED(result))
 	{
 		return false;
@@ -183,8 +174,28 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = 0;
 
+	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+
+
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	//samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+	//samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -205,48 +216,37 @@ bool BallShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 		return false;
 	}
 
-	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
 
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+
+	//Setup the dynamix offset constant buffer that is in the pixel shader
+	pixelBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	pixelBufferDesc.ByteWidth = sizeof(PixelBufferType);
+	pixelBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	pixelBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	pixelBufferDesc.MiscFlags = 0;
+	pixelBufferDesc.StructureByteStride = 0;
+
+	// Create the pixel constant buffer pointer so we can access the pixel shader constant buffer from within this class.
+	result = device->CreateBuffer(&pixelBufferDesc, NULL, &m_pixelBuffer);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
-	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
-	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
-	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
 
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	result = device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
+
+
 
 	return true;
 }
 
-
 void BallShaderClass::ShutdownShader()
 {
-	// Release the light constant buffer.
-	if (m_lightBuffer)
+	// Release the sampler state.
+	if (m_sampleState)
 	{
-		m_lightBuffer->Release();
-		m_lightBuffer = 0;
+		m_sampleState->Release();
+		m_sampleState = 0;
 	}
 
 	// Release the matrix constant buffer.
@@ -256,11 +256,11 @@ void BallShaderClass::ShutdownShader()
 		m_matrixBuffer = 0;
 	}
 
-	// Release the sampler state.
-	if (m_sampleState)
+	// Release the offset constant buffer.
+	if (m_pixelBuffer)
 	{
-		m_sampleState->Release();
-		m_sampleState = 0;
+		m_pixelBuffer->Release();
+		m_pixelBuffer = 0;
 	}
 
 	// Release the layout.
@@ -286,7 +286,6 @@ void BallShaderClass::ShutdownShader()
 
 	return;
 }
-
 
 void BallShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
 {
@@ -323,19 +322,14 @@ void BallShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hw
 	return;
 }
 
-
-//4. SetShaderParameters now takes as input the new terrain texture resource which it then sets in the pixel shader.
-
-bool BallShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-	D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection,
-	ID3D11ShaderResourceView* texture)
+bool BallShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	unsigned int bufferNumber;
 	MatrixBufferType* dataPtr;
-	LightBufferType* dataPtr2;
-
+	unsigned int bufferNumber;
+	PixelBufferType* dataPtr2;
 
 	// Transpose the matrices to prepare them for the shader.
 	D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
@@ -363,43 +357,40 @@ bool BallShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3
 	// Set the position of the constant buffer in the vertex shader.
 	bufferNumber = 0;
 
-	// Now set the constant buffer in the vertex shader with the updated values.
+	// Finanly set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
-	// Lock the light constant buffer so it can be written to.
-	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	// Set shader texture resource in the pixel shader.
+	deviceContext->PSSetShaderResources(0, 1, &texture);
+
+	// Lock the pixel constant buffer so it can be written to.
+	result = deviceContext->Map(m_pixelBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	// Get a pointer to the data in the constant buffer.
-	dataPtr2 = (LightBufferType*)mappedResource.pData;
+	// Get a pointer to the data in the pixel constant buffer.
+	dataPtr2 = (PixelBufferType*)mappedResource.pData;
 
-	// Copy the lighting variables into the constant buffer.
-	dataPtr2->ambientColor = ambientColor;
-	dataPtr2->diffuseColor = diffuseColor;
-	dataPtr2->lightDirection = lightDirection;
-	dataPtr2->padding = 0.0f;
+	D3DXVECTOR2 offset = D3DXVECTOR2(0.0f, 0.0f);
 
-	// Unlock the constant buffer.
-	deviceContext->Unmap(m_lightBuffer, 0);
+	// Copy the pixel color into the pixel constant buffer.
+	dataPtr2->textureOffsetX = offset.x;
+	dataPtr2->textureOffsetY = offset.y;
 
-	// Set the position of the light constant buffer in the pixel shader.
+	// Unlock the pixel constant buffer.
+	deviceContext->Unmap(m_pixelBuffer, 0);
+
+	// Set the position of the pixel constant buffer in the pixel shader.
 	bufferNumber = 0;
 
-	// Finally set the light constant buffer in the pixel shader with the updated values.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	// Now set the pixel constant buffer in the pixel shader with the updated value.
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_pixelBuffer);
 
-
-	// We set the terrain texture in the pixel shader here.
-
-	// Set shader texture resource in the pixel shader.
-	deviceContext->PSSetShaderResources(0, 1, &texture);
 
 	return true;
 }
-
 
 void BallShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
@@ -408,7 +399,6 @@ void BallShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int index
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->GSSetShader(NULL, NULL, 0);
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.
