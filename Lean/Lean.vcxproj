@@ -19,6 +19,7 @@
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="D3D.h" />
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Sound.h" />

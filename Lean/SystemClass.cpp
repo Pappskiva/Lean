@@ -7,6 +7,7 @@
 SystemClass::SystemClass()
 {
 	m_Application = 0;
+	m_AppTimer = 0;
 }
 
 
@@ -47,6 +48,13 @@ bool SystemClass::Initialize()
 		return false;
 	}
 
+	//Create the application timer object
+	m_AppTimer = new ApplicationTimer;
+	if (!m_AppTimer)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -60,6 +68,13 @@ void SystemClass::Shutdown()
 		delete m_Application;
 		m_Application = 0;
 	}
+	
+	//Remove the application timer object
+	if (m_AppTimer)
+	{
+		delete m_AppTimer;
+		m_AppTimer = 0;
+	}
 
 	// Shutdown the window.
 	ShutdownWindows();
@@ -72,7 +87,9 @@ void SystemClass::Run()
 {
 	MSG msg;
 	bool done, result;
+	float deltaTime;
 
+	m_AppTimer->Reset();
 
 	// Initialize the message structure.
 	ZeroMemory(&msg, sizeof(MSG));
@@ -95,8 +112,10 @@ void SystemClass::Run()
 		}
 		else
 		{
+			m_AppTimer->Tick();
+			deltaTime = m_AppTimer->DeltaTime();
 			// Otherwise do the frame processing.
-			result = Frame();
+			result = Frame(deltaTime);
 			if (!result)
 			{
 				done = true;
@@ -109,13 +128,13 @@ void SystemClass::Run()
 }
 
 
-bool SystemClass::Frame()
+bool SystemClass::Frame(float deltaTime)
 {
 	bool result;
 
 
 	// Do the frame processing for the application object.
-	result = m_Application->Frame();
+	result = m_Application->Frame(deltaTime);
 	if (!result)
 	{
 		return false;

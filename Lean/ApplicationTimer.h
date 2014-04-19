@@ -1,23 +1,22 @@
-//=======================================================================================
-// Frank Luna (C) 2008 All Rights Reserved.
-//=======================================================================================
+//***************************************************************************************
+// GameTimer.h by Frank Luna (C) 2011 All Rights Reserved.
+//***************************************************************************************
 
 #ifndef APPLICATIONTIMER_H
 #define APPLICATIONTIMER_H
-
 
 class ApplicationTimer
 {
 public:
 	ApplicationTimer();
 
-	float getGameTime()const;  // in seconds
-	float getDeltaTime()const; // in seconds
+	float TotalTime()const;  // in seconds
+	float DeltaTime()const; // in seconds
 
-	void reset(); // Call before message loop.
-	void start(); // Call when unpaused.
-	void stop();  // Call when paused.
-	void tick();  // Call every frame.
+	void Reset(); // Call before message loop.
+	void Start(); // Call when unpaused.
+	void Stop();  // Call when paused.
+	void Tick();  // Call every frame.
 
 private:
 	double mSecondsPerCount;
@@ -32,4 +31,4 @@ private:
 	bool mStopped;
 };
 
-#endif // APPLICATIONTIMER_H
+#endif

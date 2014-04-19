@@ -7,10 +7,17 @@ Ball::Ball()
 
 	m_Texture = 0;
 
-	sizeX = 1.2f;
-	sizeY = 2.0f;
+	m_positionX = 0.0f;
+	m_positionY = 0.0f;
+	m_positionZ = 5.0f;
 
-	position = D3DXVECTOR3(0.0f, 0.0f, 5.0f);
+	m_rotationX = 0.0f;
+	m_rotationY = 0.0f;
+	m_rotationZ = 0.0f;
+
+	m_scale = 1.0f;
+	m_radius = m_scale/2.0f;
+
 	D3DXMatrixIdentity(&worldMatrix);
 }
 
@@ -57,7 +64,7 @@ void Ball::Shutdown()
 
 void Ball::Update(float deltaTime)
 {
-
+	this->m_positionZ = this->m_positionZ + 1.0f * deltaTime;
 }
 
 void Ball::Render(ID3D11DeviceContext* deviceContext)
@@ -78,45 +85,61 @@ ID3D11ShaderResourceView* Ball::GetTexture()
 	return m_Texture->GetTexture();
 }
 
-float Ball::GetSizeX()
+void Ball::SetPosition(float positionX, float positionY, float positionZ)
 {
-	return sizeX;
+	m_positionX = positionX;
+	m_positionY = positionY;
+	m_positionZ = positionZ;
 }
 
-float Ball::GetSizeY()
+void Ball::GetPosition(D3DXVECTOR3& pos)
 {
-	return sizeY;
+	pos = D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
 }
 
-void Ball::SetSizeX(float sizeX)
+void Ball::SetRotation(float rotationX, float rotationY, float rotationZ)
 {
-	this->sizeX = sizeX;
+	m_rotationX = rotationX;
+	m_rotationY = rotationY;
+	m_rotationZ = rotationZ;
 }
 
-void Ball::SetSizeY(float sizeY)
+void Ball::GetRotation(D3DXVECTOR3& rot)
 {
-	this->sizeY = sizeY;
+	rot = D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
-void Ball::SetPosition(D3DXVECTOR3 position)
+void Ball::SetScale(float scale)
 {
-	this->position = position;
+	m_scale = scale;
+	m_radius = m_scale / 2;
 }
 
-D3DXVECTOR3 Ball::GetPosition()
+float Ball::GetScale()
 {
-	return this->position;
+	return m_scale;
+}
+
+void Ball::SetRadius(float radius)
+{
+	m_radius = radius;
+	m_scale = radius * 2.0f;
+}
+
+float Ball::GetRadius()
+{
+	return m_radius;
 }
 
 void Ball::UpdateWorldMatrix()
 {
-	//Change the worldMatrix based on the position.
+	//Change the worldMatrix based on the position, rotatio and scale.
 	D3DXMATRIX rotationMatrix;
-	D3DXMatrixRotationY(&rotationMatrix, 0.0f * 3.14f / 180.0f);
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, m_rotationX * 0.0174532925f, m_rotationY * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	D3DXMATRIX scaleMatrix;
-	D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
+	D3DXMatrixScaling(&scaleMatrix, m_scale, m_scale, m_scale);
 	D3DXMATRIX localSpace;
-	D3DXMatrixTranslation(&localSpace, position.x, position.y, position.z);
+	D3DXMatrixTranslation(&localSpace, m_positionX, m_positionY, m_positionZ);
 
 	D3DXMatrixMultiply(&worldMatrix, &rotationMatrix, &localSpace);
 
@@ -127,7 +150,6 @@ void Ball::GetWorldMatrix(D3DXMATRIX& worldMatrix)
 {
 	worldMatrix = this->worldMatrix;
 }
-
 
 bool Ball::InitializeBuffers(ID3D11Device* device)
 {
@@ -157,6 +179,8 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 		return false;
 	}
 
+	LoadSphere(vertices, indices);
+	
 	// Load the vertex array with data.
 	vertices[0].position = D3DXVECTOR3(0.0f, -1.0f, 0.0f);  // Bottom left.
 	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
@@ -173,7 +197,8 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	// Load the index array with data.
 	indices[0] = 0;  // Bottom left.
 	indices[1] = 1;  // Top middle.
-	indices[2] = 2;  // Bottom right.
+	indices[2] = 2;  // Bottom right.*/
+	
 
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -223,6 +248,11 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	indices = 0;
 
 	return true;
+}
+
+void Ball::LoadSphere(VertexType* vertices, unsigned long* indices)
+{
+
 }
 
 void Ball::ShutdownBuffers()

@@ -10,7 +10,6 @@
 #include "D3D.h"
 #include "Input.h"
 #include "Camera.h"
-#include "ApplicationTimer.h"
 #include "Ball.h"
 
 //Shaders
@@ -40,7 +39,7 @@ public:
 
 	bool Initialize(HINSTANCE, HWND, int, int);
 	void Shutdown();
-	bool Frame();
+	bool Frame(float);
 
 private:
 	void RenderGraphics();
@@ -52,7 +51,6 @@ private:
 	D3D* m_Direct3D;
 	Input* m_Input;
 	Camera* m_Camera;
-	ApplicationTimer* m_AppTimer;
 	Ball* m_Ball;
 
 	FPSClass m_fps;

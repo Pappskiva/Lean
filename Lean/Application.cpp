@@ -8,7 +8,6 @@ Application::Application()
 	m_Direct3D = 0;
 	m_Input = 0;
 	m_Camera = 0;
-	m_AppTimer = 0;
 	m_Ball = 0;
 
 	m_BallShader = 0;
@@ -96,13 +95,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	//Create the application timer object
-	m_AppTimer = new ApplicationTimer;
-	if (!m_AppTimer)
-	{
-		return false;
-	}
-
 	//Initialize the fpsclass object
 	m_fps.Initialize();
 		
@@ -144,13 +136,6 @@ void Application::Shutdown()
 		m_Ball = 0;
 	}
 
-	//Release the applicationtimer object
-	if(m_AppTimer) 
-	{
-		delete m_AppTimer;
-		m_AppTimer = 0;
-	}
-
 	//Release the ballshader object
 	if (m_BallShader)
 	{
@@ -162,14 +147,9 @@ void Application::Shutdown()
 }
 
 
-bool Application::Frame()
+bool Application::Frame(float deltaTime)
 {
-	float deltaTime = 0.0f;
-	m_AppTimer->reset();
-	m_AppTimer->tick();
-	deltaTime = m_AppTimer->getDeltaTime();
-
-	m_fps.Frame();	
+	//m_fps.Frame();	
 
 	//Sleep(3000);
 
@@ -184,7 +164,7 @@ bool Application::Frame()
 		return false;
 	}
 
-	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+	m_Camera->SetPosition(0.0f, 1.0f, -1.0f);
 
 	m_Ball->Update(deltaTime);
 

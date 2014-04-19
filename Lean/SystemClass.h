@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "Application.h"
+#include "ApplicationTimer.h"
 
 class SystemClass
 {
@@ -23,7 +24,7 @@ public:
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
 private:
-	bool Frame();
+	bool Frame(float);
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
 
@@ -32,6 +33,7 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 	Application* m_Application;
+	ApplicationTimer* m_AppTimer;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

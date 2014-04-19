@@ -1,9 +1,9 @@
-//=======================================================================================
-// Frank Luna (C) 2008 All Rights Reserved.
-//=======================================================================================
+//***************************************************************************************
+// GameTimer.cpp by Frank Luna (C) 2011 All Rights Reserved.
+//***************************************************************************************
 
-#include "ApplicationTimer.h"
 #include <windows.h>
+#include "ApplicationTimer.h"
 
 ApplicationTimer::ApplicationTimer()
 : mSecondsPerCount(0.0), mDeltaTime(-1.0), mBaseTime(0),
@@ -14,18 +14,22 @@ mPausedTime(0), mPrevTime(0), mCurrTime(0), mStopped(false)
 	mSecondsPerCount = 1.0 / (double)countsPerSec;
 }
 
-// Returns the total time elapsed since reset() was called, NOT counting any
+// Returns the total time elapsed since Reset() was called, NOT counting any
 // time when the clock is stopped.
-float ApplicationTimer::getGameTime()const
+float ApplicationTimer::TotalTime()const
 {
 	// If we are stopped, do not count the time that has passed since we stopped.
+	// Moreover, if we previously already had a pause, the distance 
+	// mStopTime - mBaseTime includes paused time, which we do not want to count.
+	// To correct this, we can subtract the paused time from mStopTime:  
 	//
-	// ----*---------------*------------------------------*------> time
-	//  mBaseTime       mStopTime                      mCurrTime
+	//                     |<--paused time-->|
+	// ----*---------------*-----------------*------------*------------*------> time
+	//  mBaseTime       mStopTime        startTime     mStopTime    mCurrTime
 
 	if (mStopped)
 	{
-		return (float)((mStopTime - mBaseTime)*mSecondsPerCount);
+		return (float)(((mStopTime - mPausedTime) - mBaseTime)*mSecondsPerCount);
 	}
 
 	// The distance mCurrTime - mBaseTime includes paused time,
@@ -34,7 +38,7 @@ float ApplicationTimer::getGameTime()const
 	//
 	//  (mCurrTime - mPausedTime) - mBaseTime 
 	//
-	//                     |<-------d------->|
+	//                     |<--paused time-->|
 	// ----*---------------*-----------------*------------*------> time
 	//  mBaseTime       mStopTime        startTime     mCurrTime
 
@@ -44,12 +48,12 @@ float ApplicationTimer::getGameTime()const
 	}
 }
 
-float ApplicationTimer::getDeltaTime()const
+float ApplicationTimer::DeltaTime()const
 {
 	return (float)mDeltaTime;
 }
 
-void ApplicationTimer::reset()
+void ApplicationTimer::Reset()
 {
 	__int64 currTime;
 	QueryPerformanceCounter((LARGE_INTEGER*)&currTime);
@@ -60,7 +64,7 @@ void ApplicationTimer::reset()
 	mStopped = false;
 }
 
-void ApplicationTimer::start()
+void ApplicationTimer::Start()
 {
 	__int64 startTime;
 	QueryPerformanceCounter((LARGE_INTEGER*)&startTime);
@@ -82,7 +86,7 @@ void ApplicationTimer::start()
 	}
 }
 
-void ApplicationTimer::stop()
+void ApplicationTimer::Stop()
 {
 	if (!mStopped)
 	{
@@ -94,7 +98,7 @@ void ApplicationTimer::stop()
 	}
 }
 
-void ApplicationTimer::tick()
+void ApplicationTimer::Tick()
 {
 	if (mStopped)
 	{
