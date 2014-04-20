@@ -175,10 +175,10 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	HRESULT result;
 
 	// Bestäm antalet vertexer i vertex arrayen
-	m_vertexCount = 3;
+	m_vertexCount = 300;
 
 	// Bestäm antalet index i index arrayen
-	m_indexCount = 3;
+	m_indexCount = 300;
 
 	// Skapa vertex arrayen
 	vertices = new VertexType[m_vertexCount];
@@ -196,7 +196,35 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 
 	//LoadSphere(vertices, indices);
 	
-	//En triangel för enkelt testning. Bollen behövs fortfarande göras.
+
+	//Väldigt enkel pointlist sfär för debug och tillfälligt föremål.
+	m_vertexCount = 300;
+	m_indexCount = 300;
+	for (int i = 0; i < 100; i++)
+	{
+		vertices[i].position = D3DXVECTOR3(cosf(i), sinf(i), 0.0f);
+		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
+		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		indices[i] = i;
+	}
+	for (int i = 100; i < 200; i++)
+	{
+		vertices[i].position = D3DXVECTOR3(0.0f, sinf(i), cosf(i));
+		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
+		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		indices[i] = i;
+	}
+	for (int i = 200; i < 300; i++)
+	{
+		vertices[i].position = D3DXVECTOR3(cosf(i), 0.0f, sinf(i));
+		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
+		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		indices[i] = i;
+	}
+
+
+	/*
+	//En triangel för enkelt trianglelist testning. Bollen behövs fortfarande göras.
 	// Fyller vertex arrayen med data
 	vertices[0].position = D3DXVECTOR3(-0.5f, -1.0f, 0.0f);  // Botten till vänster
 	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
@@ -211,9 +239,10 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// Fyll index array med data
-	indices[0] = 0;  // Bottom left.
-	indices[1] = 1;  // Top middle.
-	indices[2] = 2;  // Bottom right.*/
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	*/
 	
 
 	// Set up the description of the static vertex buffer.
@@ -307,7 +336,7 @@ void Ball::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	return;
 }
