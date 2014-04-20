@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: Ball.cpp
+////////////////////////////////////////////////////////////////////////////////
+
 #include "Ball.h"
 
 Ball::Ball()
@@ -35,14 +39,14 @@ bool Ball::Initialize(ID3D11Device* device, WCHAR* textureFileName)
 {
 	bool result;
 
-
-	// Initialize the vertex and index buffer that hold the geometry for the triangle.
+	// Initialisera vertex och index buffrarna för att skapa föremålets geometri.
 	result = InitializeBuffers(device);
 	if (!result)
 	{
 		return false;
 	}
 
+	//Ladda in texturen till föremålet.
 	result = LoadTexture(device, textureFileName);
 	if (!result)
 	{
@@ -54,9 +58,9 @@ bool Ball::Initialize(ID3D11Device* device, WCHAR* textureFileName)
 
 void Ball::Shutdown()
 {
-
+	// Release texturen
 	ReleaseTexture();
-	// Release the vertex and index buffers.
+	// Release vertex och index arrayen
 	ShutdownBuffers();
 
 	return;
@@ -64,12 +68,15 @@ void Ball::Shutdown()
 
 void Ball::Update(float deltaTime)
 {
-	this->m_positionZ = this->m_positionZ + 1.0f * deltaTime;
+	//Uppdatera bollen
+
+	//Testrotation
+	this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
 }
 
 void Ball::Render(ID3D11DeviceContext* deviceContext)
 {
-	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	// Lägg in vertex och index buffrarna på grafikpipelinen för att förbereda dem för rendering.
 	RenderBuffers(deviceContext);
 
 	return;
@@ -87,6 +94,7 @@ ID3D11ShaderResourceView* Ball::GetTexture()
 
 void Ball::SetPosition(float positionX, float positionY, float positionZ)
 {
+	//Sätt positionen
 	m_positionX = positionX;
 	m_positionY = positionY;
 	m_positionZ = positionZ;
@@ -94,11 +102,13 @@ void Ball::SetPosition(float positionX, float positionY, float positionZ)
 
 void Ball::GetPosition(D3DXVECTOR3& pos)
 {
+	//Få positionen
 	pos = D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
 }
 
 void Ball::SetRotation(float rotationX, float rotationY, float rotationZ)
 {
+	//Sätt rotationen
 	m_rotationX = rotationX;
 	m_rotationY = rotationY;
 	m_rotationZ = rotationZ;
@@ -106,48 +116,53 @@ void Ball::SetRotation(float rotationX, float rotationY, float rotationZ)
 
 void Ball::GetRotation(D3DXVECTOR3& rot)
 {
+	//Få rotationen
 	rot = D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
 void Ball::SetScale(float scale)
 {
+	//Sätt skalan, radien blir hälften av skalan
 	m_scale = scale;
 	m_radius = m_scale / 2;
 }
 
 float Ball::GetScale()
 {
+	//Få skalan
 	return m_scale;
 }
 
 void Ball::SetRadius(float radius)
 {
+	//Bestäm radien, skalan blir det dubbla av radien
 	m_radius = radius;
 	m_scale = radius * 2.0f;
 }
 
 float Ball::GetRadius()
 {
+	//Få radien
 	return m_radius;
 }
 
 void Ball::UpdateWorldMatrix()
 {
-	//Change the worldMatrix based on the position, rotatio and scale.
+	//Ändra worldmatrisen baserat på postion, rotation och skala.
 	D3DXMATRIX rotationMatrix;
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, m_rotationX * 0.0174532925f, m_rotationY * 0.0174532925f, m_rotationZ * 0.0174532925f);
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	D3DXMATRIX scaleMatrix;
 	D3DXMatrixScaling(&scaleMatrix, m_scale, m_scale, m_scale);
 	D3DXMATRIX localSpace;
 	D3DXMatrixTranslation(&localSpace, m_positionX, m_positionY, m_positionZ);
 
 	D3DXMatrixMultiply(&worldMatrix, &rotationMatrix, &localSpace);
-
 	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &worldMatrix);
 }
 
 void Ball::GetWorldMatrix(D3DXMATRIX& worldMatrix)
 {
+	//Få worldmatrisen
 	worldMatrix = this->worldMatrix;
 }
 
@@ -159,42 +174,43 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 
-	// Set the number of vertices in the vertex array.
+	// Bestäm antalet vertexer i vertex arrayen
 	m_vertexCount = 3;
 
-	// Set the number of indices in the index array.
+	// Bestäm antalet index i index arrayen
 	m_indexCount = 3;
 
-	// Create the vertex array.
+	// Skapa vertex arrayen
 	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
 	{
 		return false;
 	}
 
-	// Create the index array.
+	// Skapa index arrayen
 	indices = new unsigned long[m_indexCount];
 	if (!indices)
 	{
 		return false;
 	}
 
-	LoadSphere(vertices, indices);
+	//LoadSphere(vertices, indices);
 	
-	// Load the vertex array with data.
-	vertices[0].position = D3DXVECTOR3(0.0f, -1.0f, 0.0f);  // Bottom left.
+	//En triangel för enkelt testning. Bollen behövs fortfarande göras.
+	// Fyller vertex arrayen med data
+	vertices[0].position = D3DXVECTOR3(-0.5f, -1.0f, 0.0f);  // Botten till vänster
 	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
 	vertices[0].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);  // Top Left.
+	vertices[1].position = D3DXVECTOR3(-0.5f, 1.0f, 0.0f);  // Toppen till vänster
 	vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
 	vertices[1].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);  // Bottom right.
+	vertices[2].position = D3DXVECTOR3(0.5f, -1.0f, 0.0f);  // Botten till höger
 	vertices[2].texture = D3DXVECTOR2(1.0f, 1.0f);
 	vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	// Load the index array with data.
+	// Fyll index array med data
 	indices[0] = 0;  // Bottom left.
 	indices[1] = 1;  // Top middle.
 	indices[2] = 2;  // Bottom right.*/
@@ -252,19 +268,19 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 
 void Ball::LoadSphere(VertexType* vertices, unsigned long* indices)
 {
-
+	/*Det är tänkt att bollen ska laddas in från en fil, som .obj, men det har inte gjorts än*/
 }
 
 void Ball::ShutdownBuffers()
 {
-	// Release the index buffer.
+	// Release indexbuffern.
 	if (m_indexBuffer)
 	{
 		m_indexBuffer->Release();
 		m_indexBuffer = 0;
 	}
 
-	// Release the vertex buffer.
+	// Release vertexbuffern.
 	if (m_vertexBuffer)
 	{
 		m_vertexBuffer->Release();
@@ -301,14 +317,14 @@ bool Ball::LoadTexture(ID3D11Device* device, WCHAR* filename)
 	bool result;
 
 
-	// Create the texture object.
+	// Skapa texturobjektet.
 	m_Texture = new TextureClass;
 	if (!m_Texture)
 	{
 		return false;
 	}
 
-	// Initialize the texture object.
+	// Initialisera texturobjektet.
 	result = m_Texture->Initialize(device, filename);
 	if (!result)
 	{
@@ -320,7 +336,7 @@ bool Ball::LoadTexture(ID3D11Device* device, WCHAR* filename)
 
 void Ball::ReleaseTexture()
 {
-	// Release the texture object.
+	// Release texturobjektet.
 	if (m_Texture)
 	{
 		m_Texture->Shutdown();

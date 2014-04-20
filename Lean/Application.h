@@ -15,7 +15,7 @@
 //Shaders
 #include "BallShaderClass.h"
 
-//FPS checker for debug
+//FPS kollare för debug
 #include "FPSClass.h"
 
 /////////////
@@ -54,8 +54,6 @@ private:
 	Ball* m_Ball;
 
 	FPSClass m_fps;
-
-
 
 	BallShaderClass* m_BallShader;
 

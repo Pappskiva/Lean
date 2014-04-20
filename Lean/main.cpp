@@ -9,21 +9,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	bool result;
 
 
-	// Create the system object.
+	// Skapa systemobjektet
 	System = new SystemClass;
 	if (!System)
 	{
 		return 0;
 	}
 
-	// Initialize and run the system object.
+	// Initialisera och kör systemobjektet
 	result = System->Initialize();
 	if (result)
 	{
 		System->Run();
 	}
 
-	// Shutdown and release the system object.
+	// Stäng ner och release systemobjektet
 	System->Shutdown();
 	delete System;
 	System = 0;

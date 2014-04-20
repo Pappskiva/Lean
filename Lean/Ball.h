@@ -1,3 +1,6 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: Ball.h
+////////////////////////////////////////////////////////////////////////////////
 #pragma once
 #ifndef BALL_H
 #define BALL_H
@@ -48,7 +51,7 @@ public:
 	void GetWorldMatrix(D3DXMATRIX&);
 
 private:
-	bool InitializeBuffers(ID3D11Device*);
+	bool	InitializeBuffers(ID3D11Device*);
 	void	LoadSphere(VertexType*, unsigned long*);
 	void	ShutdownBuffers();
 	void	RenderBuffers(ID3D11DeviceContext*);

@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: Camera.h
+////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -12,16 +17,13 @@ public:
 	~Camera();
 
 	void		SetPosition(float, float, float);
+	void		GetPosition(D3DXVECTOR3&);
+
 	void		SetRotation(float, float, float);
-
-	D3DXVECTOR3 GetPosition();
-	D3DXVECTOR3 GetRotation();
-
+	void		GetRotation(D3DXVECTOR3&);
+	
 	void		Render();
-	void		BaseViewRender();
 	void		GetViewMatrix(D3DXMATRIX&);
-
-
 
 private:
 	float m_positionX, m_positionY, m_positionZ;
