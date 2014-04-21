@@ -69,6 +69,12 @@
     <ClCompile Include="LevelManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LevelShaderClass.cpp">
+      <Filter>Source Files\ShaderClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -113,12 +119,24 @@
     <ClInclude Include="LevelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LevelShaderClass.h">
+      <Filter>Header Files\ShaderClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ball.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="ball.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="level.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="level.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

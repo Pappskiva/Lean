@@ -26,7 +26,7 @@ private:
 		D3DXMATRIX projection;
 	};
 
-	struct PixelBufferType
+	struct PixelBufferType //Relik kod, men lämnad för senare behov
 	{
 		float textureOffsetX;
 		float textureOffsetY;

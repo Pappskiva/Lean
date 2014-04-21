@@ -21,6 +21,8 @@ public:
 
 	void		SetRotation(float, float, float);
 	void		GetRotation(D3DXVECTOR3&);
+
+	void		SetTargetToLookAt(float, float, float);
 	
 	void		Render();
 	void		GetViewMatrix(D3DXMATRIX&);
@@ -28,6 +30,7 @@ public:
 private:
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
+	float m_LookAtX, m_LookAtY, m_LookAtZ;
 	D3DXMATRIX m_viewMatrix;
 };
 

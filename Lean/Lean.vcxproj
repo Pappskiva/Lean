@@ -19,7 +19,9 @@
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
+    <ClCompile Include="LevelShaderClass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
@@ -36,7 +38,9 @@
     <ClInclude Include="D3D.h" />
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
+    <ClInclude Include="LevelShaderClass.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Sound.h" />
@@ -46,6 +50,8 @@
   <ItemGroup>
     <None Include="ball.ps" />
     <None Include="ball.vs" />
+    <None Include="level.ps" />
+    <None Include="level.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F638B05-F9B3-4238-A88C-F4A6FC99C859}</ProjectGuid>

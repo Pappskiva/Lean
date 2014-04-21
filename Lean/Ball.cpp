@@ -11,16 +11,16 @@ Ball::Ball()
 
 	m_Texture = 0;
 
-	m_positionX = 0.0f;
-	m_positionY = 0.0f;
-	m_positionZ = 5.0f;
+	m_scale = 1.0f;
+	m_radius = m_scale / 2.0f;
+
+	m_positionX = 2.0f;
+	m_positionY = 1.0f + m_radius;
+	m_positionZ = 2.0f;
 
 	m_rotationX = 0.0f;
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
-
-	m_scale = 1.0f;
-	m_radius = m_scale/2.0f;
 
 	D3DXMatrixIdentity(&worldMatrix);
 }
@@ -67,11 +67,11 @@ void Ball::Shutdown()
 }
 
 void Ball::Update(float deltaTime)
-{
-	//Uppdatera bollen
-
+{	
 	//Testrotation
-	this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
+	//this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
+	//this->m_rotationX = this->m_rotationX + 30.0f * deltaTime;
+	//this->m_rotationZ = this->m_rotationZ + 10.0f * deltaTime;
 }
 
 void Ball::Render(ID3D11DeviceContext* deviceContext)
@@ -149,14 +149,14 @@ float Ball::GetRadius()
 void Ball::UpdateWorldMatrix()
 {
 	//Ändra worldmatrisen baserat på postion, rotation och skala.
-	D3DXMATRIX rotationMatrix;
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
+	D3DXMATRIX rotationSphereMatrix;
+	D3DXMatrixRotationYawPitchRoll(&rotationSphereMatrix, m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	D3DXMATRIX scaleMatrix;
 	D3DXMatrixScaling(&scaleMatrix, m_scale, m_scale, m_scale);
 	D3DXMATRIX localSpace;
 	D3DXMatrixTranslation(&localSpace, m_positionX, m_positionY, m_positionZ);
 
-	D3DXMatrixMultiply(&worldMatrix, &rotationMatrix, &localSpace);
+	D3DXMatrixMultiply(&worldMatrix, &rotationSphereMatrix, &localSpace);
 	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &worldMatrix);
 }
 
@@ -202,21 +202,21 @@ bool Ball::InitializeBuffers(ID3D11Device* device)
 	m_indexCount = 300;
 	for (int i = 0; i < 100; i++)
 	{
-		vertices[i].position = D3DXVECTOR3(cosf(i), sinf(i), 0.0f);
+		vertices[i].position = D3DXVECTOR3(cosf(i)/2, sinf(i)/2, 0.0f);
 		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
 		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		indices[i] = i;
 	}
 	for (int i = 100; i < 200; i++)
 	{
-		vertices[i].position = D3DXVECTOR3(0.0f, sinf(i), cosf(i));
+		vertices[i].position = D3DXVECTOR3(0.0f, sinf(i)/2, cosf(i)/2);
 		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
 		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		indices[i] = i;
 	}
 	for (int i = 200; i < 300; i++)
 	{
-		vertices[i].position = D3DXVECTOR3(cosf(i), 0.0f, sinf(i));
+		vertices[i].position = D3DXVECTOR3(cosf(i)/2, 0.0f, sinf(i)/2);
 		vertices[i].texture = D3DXVECTOR2(0.0f, 0.0f);
 		vertices[i].normal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		indices[i] = i;

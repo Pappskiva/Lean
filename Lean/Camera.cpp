@@ -13,6 +13,11 @@ Camera::Camera()
 	m_rotationX = 0.0f;
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
+
+	// Setup where the camera is looking by default
+	m_LookAtX = 0.0f;
+	m_LookAtY = 0.0f;
+	m_LookAtZ = 1.0f;
 }
 
 
@@ -52,6 +57,17 @@ void Camera::GetRotation(D3DXVECTOR3& rot)
 	rot = D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
+void Camera::SetTargetToLookAt(float x, float y, float z)
+{
+	D3DXVECTOR3 betweenCameraAndTarget(x - m_positionX, y - m_positionY, z - m_positionZ);
+	D3DXVECTOR3 lookAtNormalizedVector;
+	D3DXVec3Normalize(&lookAtNormalizedVector, &betweenCameraAndTarget);
+
+	m_LookAtX = lookAtNormalizedVector.x;
+	m_LookAtY = lookAtNormalizedVector.y;
+	m_LookAtZ = lookAtNormalizedVector.z;
+}
+
 void Camera::Render()
 {
 	D3DXVECTOR3 up, position, lookAt;
@@ -68,10 +84,10 @@ void Camera::Render()
 	position.y = m_positionY;
 	position.z = m_positionZ;
 
-	// Setup where the camera is looking by default.
-	lookAt.x = 0.0f;
-	lookAt.y = 0.0f;
-	lookAt.z = 1.0f;
+	// Setup where the camera is looking.
+	lookAt.x = m_LookAtX;
+	lookAt.y = m_LookAtY;
+	lookAt.z = m_LookAtZ;
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotationX * 0.0174532925f;

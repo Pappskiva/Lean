@@ -11,9 +11,11 @@
 #include "Input.h"
 #include "Camera.h"
 #include "Ball.h"
+#include "Level.h"
 
 //Shaders
 #include "BallShaderClass.h"
+#include "LevelShaderClass.h"
 
 //FPS kollare för debug
 #include "FPSClass.h"
@@ -52,10 +54,13 @@ private:
 	Input* m_Input;
 	Camera* m_Camera;
 	Ball* m_Ball;
+	Level* m_Level;
+
 
 	FPSClass m_fps;
 
 	BallShaderClass* m_BallShader;
+	LevelShaderClass* m_LevelShader;
 
 };
 #endif
