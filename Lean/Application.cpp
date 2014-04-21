@@ -253,8 +253,9 @@ bool Application::Frame(float deltaTime)
 	}
 	if (distance <= m_Ball->GetRadius())
 	{
+		D3DXVECTOR3 rotationOfBall;
 		float testRollSpeed = 8.0f;
-		m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
+		m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);	
 	}
 
 	m_Level->Update(deltaTime);
