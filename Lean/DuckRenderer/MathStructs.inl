@@ -365,6 +365,13 @@ void Vec3<_Type>::PosFrom(const Matrix4<_Type> &m)
 	z = m._43;
 }
 
+template <typename _Type>
+Vec3<_Type> Vec3<_Type>::Reflect(const Vec3 &normal)
+{
+	Vec3 dir = *this;
+	return dir - normal * ((dir * normal * 2) / normal.LengthSquare());
+}
+
 /*==================
 Matrix3<_Type>
 ==================*/

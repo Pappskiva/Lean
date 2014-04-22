@@ -10,6 +10,7 @@
 
 #include "D3D.h"
 #include "DuckRenderer\DMath.h"
+#include "DuckRenderer\DCollision.h"
 
 #include "Texture.h"
 
@@ -50,6 +51,8 @@ public:
 	void UpdateWorldMatrix();
 	void GetWorldMatrix(m4&);
 
+	float SphereHeightmapIntersection(const v3 &center, const float radius, const v3 &velocity);
+
 private:
 	bool	InitializeBuffers(D3D*);
 	void	ShutdownBuffers();
@@ -64,6 +67,9 @@ private:
 	float m_scale;
 
 	float m_MaximumRotationValue;
+
+	uint triangleCount;
+	Triangle *collisionTriangles;
 
 	m4 worldMatrix;
 	v3 m_normal;

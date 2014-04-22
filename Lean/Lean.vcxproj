@@ -16,6 +16,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />
+    <ClCompile Include="DuckRenderer\DCollision.cpp" />
     <ClCompile Include="DuckRenderer\HString.cpp" />
     <ClCompile Include="DuckRenderer\MathFuncs.cpp" />
     <ClCompile Include="FPSClass.cpp" />
@@ -43,6 +44,7 @@
     <ClInclude Include="D3D Includes.h" />
     <ClInclude Include="D3D.h" />
     <ClInclude Include="DuckRenderer\Array.h" />
+    <ClInclude Include="DuckRenderer\DCollision.h" />
     <ClInclude Include="DuckRenderer\DMath.h" />
     <ClInclude Include="DuckRenderer\HString.h" />
     <ClInclude Include="DuckRenderer\MathFuncs.h" />

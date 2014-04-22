@@ -117,6 +117,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	
 	//Initialize the fpsclass object
 	m_fps.Initialize();
+
+	m_Ball->SetPosition(1, 5, 0);
 		
 
 	return true;
@@ -139,7 +141,6 @@ bool Application::Frame(float deltaTime)
 		return false;
 	}
 
-	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 	//Check if the user is pressing buttons to rotate the level in the x-axis
 	if (m_Input->IsUpPressed() || m_Input->IsWPressed())
@@ -172,8 +173,24 @@ bool Application::Frame(float deltaTime)
 
 	v3 testNormal;
 	m_Level->GetNormal(testNormal);
-
 	v3 ballPosition;
+	m_Ball->GetPosition(ballPosition);
+	/*v3 ballVelocity = m_Ball->GetVelocity() + v3(0, -9.81f, 0) * deltaTime;
+
+	float time = m_Level->SphereHeightmapIntersection(ballPosition, m_Ball->GetRadius(), ballVelocity);
+
+	if (time > 0 && time < deltaTime)
+	{
+		ballVelocity = ballVelocity.Reflect(testNormal);
+		ballVelocity.y = 0;// .1 * ballVelocity.y;
+
+		v3 pos = ballPosition + testNormal * time;
+		m_Ball->SetPosition(pos.x, pos.y, pos.z);
+	}
+
+	m_Ball->SetVelocity(ballVelocity);*/
+	
+
 	m_Ball->GetPosition(ballPosition);
 	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
 	float value2 = sqrtf(testNormal.x * testNormal.x + testNormal.y * testNormal.y + testNormal.z * testNormal.z);
@@ -220,6 +237,7 @@ void Application::RenderGraphics()
 	m_Ball->GetPosition(ballPosition);
 	viewMatrix.ViewAtLH(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f), 
 		ballPosition);
+
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 	m_Direct3D->GetOrthoMatrix(orthoMatrix);
 

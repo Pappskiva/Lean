@@ -40,8 +40,12 @@ public:
 	void	SetRadius(float);
 	float	GetRadius();
 
+	void		SetVelocity(const v3 &velocity);
+	const v3&	GetVelocity() const;
+
 	void	UpdateWorldMatrix();
 	void	GetWorldMatrix(m4&);
+
 
 private:
 	void	ShutdownBuffers();
@@ -50,11 +54,12 @@ private:
 
 private:
 
-	Mesh			*mesh;
+	Mesh			*m_mesh;
 
-	Texture*	m_Texture;
+	Texture			*m_Texture;
 
 	v3 m_position;
+	v3 m_velocity;
 	float m_rotationX, m_rotationY, m_rotationZ;
 	float m_radius;
 
@@ -63,11 +68,23 @@ private:
 
 inline void	Ball::SetMesh(const Mesh *mesh)
 {
-	this->mesh = (Mesh *)mesh;
+	this->m_mesh = (Mesh *)mesh;
 }
 
-inline Mesh *	Ball::GetMesh()
+inline Mesh* Ball::GetMesh()
 {
-	return mesh;
+	return m_mesh;
 }
+
+inline void Ball::SetVelocity(const v3 &velocity)
+{
+	this->m_velocity = velocity;
+}
+
+inline const v3& Ball::GetVelocity() const
+{
+	return m_velocity;
+}
+
+
 #endif

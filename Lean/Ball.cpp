@@ -18,6 +18,8 @@ Ball::Ball()
 
 	m_radius = 0.5f;
 
+	m_velocity = v3(0.0f);
+
 	worldMatrix = m4::IDENTITY;
 }
 
@@ -35,8 +37,8 @@ bool Ball::Initialize(D3D* direct3D, WCHAR* textureFileName)
 {
 	bool result = true;
 
-	mesh = direct3D->LoadMeshFromOBJ("Sphere.obj");
-	if (!mesh)
+	m_mesh = direct3D->LoadMeshFromOBJ("Sphere.obj");
+	if (!m_mesh)
 		return false;
 
 	//Ladda in texturen till föremålet.	
@@ -61,6 +63,8 @@ void Ball::Update(float deltaTime)
 {
 	//Uppdatera bollen
 
+	m_position += m_velocity * deltaTime;
+
 	//Testrotation
 	this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
 }
@@ -75,7 +79,7 @@ void Ball::Render(D3D *direct3D)
 	direct3D->ApplyConstantBuffers();
 	direct3D->ApplyTexture(m_Texture, 0);
 
-	direct3D->RenderMesh(mesh);
+	direct3D->RenderMesh(m_mesh);
 
 	return;
 }

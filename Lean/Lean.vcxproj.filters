@@ -99,6 +99,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DuckRenderer\DCollision.cpp">
+      <Filter>Source Files\DuckRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -181,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuckRenderer\DCollision.h">
+      <Filter>Header Files\DuckRenderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

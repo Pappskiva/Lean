@@ -112,6 +112,7 @@ struct Vec3
 	_Type					LengthSquare() const;
 	Vec3					Cross(const Vec3 &p) const;
 	void					PosFrom(const Matrix4<_Type> &m);
+	Vec3					Reflect(const Vec3 &normal);
 
 };
 

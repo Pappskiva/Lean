@@ -42,6 +42,7 @@ bool Level::Initialize(D3D* direct3D, WCHAR* textureFileName)
 	if (!result)
 		return false;
 
+
 	//Ladda in texturen till föremålet.
 	m_Texture = direct3D->LoadTextureFromFile(textureFileName);
 	if (!m_Texture)
@@ -175,12 +176,9 @@ void Level::GetNormal(v3& normal)
 	m4 transpose;
 	rotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 
-	//D3DXMatrixInverse(&inverseRotation, NULL, &rotationMatrix);
 	inverseRotation = rotationMatrix.Inverse();
-	
-	transpose = inverseRotation.Transpose();
 
-	normal = normal * transpose;
+	normal = normal * inverseRotation;
 }
 
 void Level::UpdateWorldMatrix()
@@ -201,6 +199,29 @@ void Level::GetWorldMatrix(m4& worldMatrix)
 {
 	//Få worldmatrisen
 	worldMatrix = this->worldMatrix;
+}
+
+float Level::SphereHeightmapIntersection(const v3 &center, const float radius, const v3 &velocity)
+{
+	v3 centerLocalSpace = center;
+	m3 inverseRotation(worldMatrix);
+	inverseRotation = inverseRotation.Transpose();
+
+	centerLocalSpace = centerLocalSpace * inverseRotation;
+
+	Sphere sphere;
+	sphere.pos = center;
+	sphere.radius = radius;
+
+	float time;
+	
+	for (uint i = 0; i < triangleCount; ++i)
+	if (TraceSphereTriangle(velocity, sphere, collisionTriangles[i], time))
+	{
+		return time;
+	}
+
+	return 0;
 }
 
 bool Level::InitializeBuffers(D3D* direct3D)
@@ -249,6 +270,16 @@ bool Level::InitializeBuffers(D3D* direct3D)
 	vertices[5].normal = v3(0, 1, 0);
 	vertices[5].u = 0.0f;
 	vertices[5].v = 1.0f;
+
+	triangleCount = 2;
+	collisionTriangles = new Triangle[triangleCount];
+	collisionTriangles[0].points[0] = vertices[0].position;
+	collisionTriangles[0].points[1] = vertices[1].position;
+	collisionTriangles[0].points[2] = vertices[2].position;
+
+	collisionTriangles[1].points[0] = vertices[0].position;
+	collisionTriangles[1].points[1] = vertices[1].position;
+	collisionTriangles[1].points[2] = vertices[2].position;
 
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
 
