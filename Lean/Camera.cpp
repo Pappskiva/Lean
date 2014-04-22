@@ -18,6 +18,7 @@ Camera::Camera()
 	m_LookAtX = 0.0f;
 	m_LookAtY = 0.0f;
 	m_LookAtZ = 1.0f;
+
 }
 
 
@@ -39,9 +40,9 @@ void Camera::SetPosition(float x, float y, float z)
 }
 
 
-void Camera::GetPosition(D3DXVECTOR3& pos)
+void Camera::GetPosition(v3& pos)
 {
-	pos = D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
+	pos = v3(m_positionX, m_positionY, m_positionZ);
 }
 
 void Camera::SetRotation(float x, float y, float z)
@@ -52,27 +53,26 @@ void Camera::SetRotation(float x, float y, float z)
 	return;
 }
 
-void Camera::GetRotation(D3DXVECTOR3& rot)
-{
-	rot = D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
-}
-
 void Camera::SetTargetToLookAt(float x, float y, float z)
 {
-	D3DXVECTOR3 betweenCameraAndTarget(x - m_positionX, y - m_positionY, z - m_positionZ);
-	D3DXVECTOR3 lookAtNormalizedVector;
-	D3DXVec3Normalize(&lookAtNormalizedVector, &betweenCameraAndTarget);
+	v3 betweenCameraAndTarget(x - m_positionX, y - m_positionY, z - m_positionZ);
+	betweenCameraAndTarget.Normalize();
 
-	m_LookAtX = lookAtNormalizedVector.x;
-	m_LookAtY = lookAtNormalizedVector.y;
-	m_LookAtZ = lookAtNormalizedVector.z;
+	m_LookAtX = betweenCameraAndTarget.x;
+	m_LookAtY = betweenCameraAndTarget.y;
+	m_LookAtZ = betweenCameraAndTarget.z;
+}
+
+void Camera::GetRotation(v3& rot)
+{
+	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
 void Camera::Render()
 {
-	D3DXVECTOR3 up, position, lookAt;
+	v3 up, position, lookAt;
 	float yaw, pitch, roll;
-	D3DXMATRIX rotationMatrix;
+	m4 rotationMatrix;
 
 	// Setup the vector that points upwards.
 	up.x = 0.0f;
@@ -84,10 +84,10 @@ void Camera::Render()
 	position.y = m_positionY;
 	position.z = m_positionZ;
 
-	// Setup where the camera is looking.
-	lookAt.x = m_LookAtX;
-	lookAt.y = m_LookAtY;
-	lookAt.z = m_LookAtZ;
+	// Setup where the camera is looking by default.
+	lookAt.x = 0.0f;
+	lookAt.y = 0.0f;
+	lookAt.z = 1.0f;
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotationX * 0.0174532925f;
@@ -95,22 +95,26 @@ void Camera::Render()
 	roll = m_rotationZ * 0.0174532925f;
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, yaw, pitch, roll);
+	rotationMatrix = m4::CreateYawPitchRoll(yaw, pitch, roll);
 
 	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
-	D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
+	
+	lookAt = rotationMatrix.Transform(lookAt);
+	up = rotationMatrix.Transform(up);
+	//D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
+	//D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
 
 	// Translate the rotated camera position to the location of the viewer.
 	lookAt = position + lookAt;
 
 	// Finally create the view matrix from the three updated vectors.
-	D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
+	m_viewMatrix.ViewAtLH(position, lookAt, up);
+	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 
 	return;
 }
 
-void Camera::GetViewMatrix(D3DXMATRIX& viewMatrix)
+void Camera::GetViewMatrix(m4& viewMatrix)
 {
 	viewMatrix = m_viewMatrix;
 	return;

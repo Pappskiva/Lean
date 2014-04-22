@@ -14,42 +14,61 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="Ball.cpp" />
-    <ClCompile Include="BallShaderClass.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />
+    <ClCompile Include="DuckRenderer\HString.cpp" />
+    <ClCompile Include="DuckRenderer\MathFuncs.cpp" />
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
-    <ClCompile Include="LevelShaderClass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="SystemClass.cpp" />
-    <ClCompile Include="TextureClass.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Windows\DDSTextureLoader.cpp" />
+    <ClCompile Include="Windows\pch.cpp" />
+    <ClCompile Include="Windows\WICTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Ball.h" />
-    <ClInclude Include="BallShaderClass.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="D3D Includes.h" />
     <ClInclude Include="D3D.h" />
+    <ClInclude Include="DuckRenderer\Array.h" />
+    <ClInclude Include="DuckRenderer\DMath.h" />
+    <ClInclude Include="DuckRenderer\HString.h" />
+    <ClInclude Include="DuckRenderer\MathFuncs.h" />
+    <ClInclude Include="DuckRenderer\MathStructs.h" />
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
-    <ClInclude Include="LevelShaderClass.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="PhysicsBridge.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
-    <ClInclude Include="TextureClass.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Windows\dds.h" />
+    <ClInclude Include="Windows\DDSTextureLoader.h" />
+    <ClInclude Include="Windows\pch.h" />
+    <ClInclude Include="Windows\PlatformHelpers.h" />
+    <ClInclude Include="Windows\WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ball.ps" />
     <None Include="ball.vs" />
+    <None Include="DuckRenderer\Array.inl" />
+    <None Include="DuckRenderer\MathStructs.inl" />
     <None Include="level.ps" />
     <None Include="level.vs" />
   </ItemGroup>
@@ -62,7 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -96,10 +115,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

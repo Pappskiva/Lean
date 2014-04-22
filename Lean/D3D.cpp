@@ -2,7 +2,10 @@
 // Filename: d3d.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "d3d.h"
+#include <assert.h>
 
+#define			WBOX(x) MessageBox(NULL, x, L"D3D Error!!", MB_OK | MB_ICONASTERISK);
+#define			SAFE_RELEASE(x)			{ if(x){x->Release(); x = nullptr;}}
 
 D3D::D3D()
 {
@@ -40,7 +43,6 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	unsigned int numModes, i, numerator, denominator;
 	DXGI_MODE_DESC* displayModeList;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	D3D_FEATURE_LEVEL featureLevel;
 	ID3D11Texture2D* backBufferPtr;
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -82,7 +84,7 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	{
 		return false;
 	}
-
+	
 	// Create a list to hold all the possible display modes for this monitor/video card combination.
 	displayModeList = new DXGI_MODE_DESC[numModes];
 	if (!displayModeList)
@@ -183,11 +185,19 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	swapChainDesc.Flags = 0;
 
 	// Set the feature level to DirectX 11.
-	featureLevel = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0
+	};
 
+	UINT gpuFlags = 0;
+#ifdef _DEBUG
+	gpuFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 	// Create the swap chain, Direct3D device, and Direct3D device context.
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, gpuFlags, featureLevels,
+		ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
 	if (FAILED(result))
 	{
 		return false;
@@ -320,17 +330,17 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	m_deviceContext->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
-	fieldOfView = (float)D3DX_PI / 4.0f;
+	fieldOfView = (float)PI * 0.25f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
-	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
+	m_projectionMatrix.Projection(fieldOfView, screenNear, screenDepth, screenAspect);
 
 	// Initialize the world matrix to the identity matrix.
-	D3DXMatrixIdentity(&m_worldMatrix);
+	m_worldMatrix = m4::IDENTITY;
 
 	// Create an orthographic projection matrix for 2D rendering.
-	D3DXMatrixOrthoLH(&m_orthoMatrix, (float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	m_orthoMatrix = m4::CreateOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	// Clear the second depth stencil state before setting the parameters.
 	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
@@ -389,6 +399,7 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		return false;
 	}
 
+	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	return true;
 }
 
@@ -401,71 +412,26 @@ void D3D::Shutdown()
 		m_swapChain->SetFullscreenState(false, NULL);
 	}
 
-	if (m_alphaEnableBlendingState)
-	{
-		m_alphaEnableBlendingState->Release();
-		m_alphaEnableBlendingState = 0;
-	}
+	for (uint i = 0; i < meshes.Length(); ++i)
+		meshes[i].Flush();
 
-	if (m_alphaDisableBlendingState)
-	{
-		m_alphaDisableBlendingState->Release();
-		m_alphaDisableBlendingState = 0;
-	}
+	for (uint i = 0; i < shaders.Length(); ++i)
+		shaders[i].Flush();
 
-	if (m_rasterState)
-	{
-		m_rasterState->Release();
-		m_rasterState = 0;
-	}
+	for (uint i = 0; i < textures.Length(); ++i)
+		textures[i].Shutdown();
 
-	if (m_depthStencilView)
-	{
-		m_depthStencilView->Release();
-		m_depthStencilView = 0;
-	}
-
-	if (m_depthDisabledStencilState)
-	{
-		m_depthDisabledStencilState->Release();
-		m_depthDisabledStencilState = 0;
-	}
-
-	if (m_depthStencilState)
-	{
-		m_depthStencilState->Release();
-		m_depthStencilState = 0;
-	}
-
-	if (m_depthStencilBuffer)
-	{
-		m_depthStencilBuffer->Release();
-		m_depthStencilBuffer = 0;
-	}
-
-	if (m_renderTargetView)
-	{
-		m_renderTargetView->Release();
-		m_renderTargetView = 0;
-	}
-
-	if (m_deviceContext)
-	{
-		m_deviceContext->Release();
-		m_deviceContext = 0;
-	}
-
-	if (m_device)
-	{
-		m_device->Release();
-		m_device = 0;
-	}
-
-	if (m_swapChain)
-	{
-		m_swapChain->Release();
-		m_swapChain = 0;
-	}
+	SAFE_RELEASE(m_alphaEnableBlendingState);
+	SAFE_RELEASE(m_alphaDisableBlendingState);
+	SAFE_RELEASE(m_rasterState);
+	SAFE_RELEASE(m_depthStencilView);
+	SAFE_RELEASE(m_depthDisabledStencilState);
+	SAFE_RELEASE(m_depthStencilState);
+	SAFE_RELEASE(m_depthStencilBuffer);
+	SAFE_RELEASE(m_renderTargetView);
+	SAFE_RELEASE(m_swapChain);
+	SAFE_RELEASE(m_deviceContext);
+	SAFE_RELEASE(m_device);	
 
 	return;
 }
@@ -522,21 +488,21 @@ ID3D11DeviceContext* D3D::GetDeviceContext()
 }
 
 
-void D3D::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
+void D3D::GetProjectionMatrix(m4& projectionMatrix)
 {
 	projectionMatrix = m_projectionMatrix;
 	return;
 }
 
 
-void D3D::GetWorldMatrix(D3DXMATRIX& worldMatrix)
+void D3D::GetWorldMatrix(m4& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
 	return;
 }
 
 
-void D3D::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
+void D3D::GetOrthoMatrix(m4& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
 	return;
@@ -590,4 +556,505 @@ void D3D::TurnOffAlphaBlending()
 	m_deviceContext->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
 
 	return;
+}
+
+Texture*		D3D::LoadTextureFromFile(const HString &filePath)
+{
+	Texture &texture = textures.Append();
+
+	HRESULT hr;
+
+	if (filePath.Find(".dds", filePath.Length() - 4) != -1)
+		hr = DirectX::CreateDDSTextureFromFile(m_device,
+		filePath.AsWChar(), 
+		nullptr,
+		&texture.m_texture);
+	else
+		hr = DirectX::CreateWICTextureFromFile(m_device,
+		m_deviceContext,
+		filePath.AsWChar(), 
+		nullptr, 
+		&texture.m_texture);
+
+	if (FAILED(hr))
+	{
+		WBOX(L"Invalid Texture Path!");
+		textures.RemoveLast();
+
+		return nullptr;
+	}
+
+
+	return &texture;
+}
+
+Mesh*			D3D::CreateMeshFromRam(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices, const uint nrIndices)
+{
+	Mesh &mesh = meshes.Append();
+	mesh.vertices = new uchar[vertexSize * nrVertices];
+	memcpy(mesh.vertices, vertexData, vertexSize * nrVertices);
+	mesh.nrVertices = nrVertices;
+	mesh.vertexSize = vertexSize;
+
+	if (indices)
+	{
+		mesh.indices = new uint[sizeof(uint)* nrIndices];
+		memcpy(mesh.indices, indices, sizeof(uint)* nrIndices);
+		mesh.nrIndices = nrIndices;
+	}
+
+	mesh.nrSubsets = 1;
+	mesh.subsets = new MeshSubset[mesh.nrSubsets];
+	mesh.subsets[0].startVertex = 0;
+	mesh.subsets[0].length = nrVertices;
+
+	if (!LoadMeshIntoDevice(&mesh))
+	{
+		meshes.RemoveLast();
+		return nullptr;
+	}
+
+	return &mesh;
+}
+
+Mesh*			D3D::LoadMeshFromOBJ(const std::string filePath)
+{
+	Mesh &mesh = meshes.Append();
+
+	if (!mesh.LoadMeshFromObjToRam(filePath))
+	{
+		meshes.RemoveLast();
+		return nullptr;
+	}
+
+	if (!LoadMeshIntoDevice(&mesh))
+		return nullptr;
+
+	return &mesh;
+}
+
+bool			D3D::LoadMeshIntoDevice(Mesh *mesh)
+{
+	if (mesh->gpuHasCopy)
+		return true;
+
+	HRESULT hr;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	D3D11_BUFFER_DESC bufferDesc;
+	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = mesh->vertexSize * mesh->nrVertices;
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.CPUAccessFlags = 0;
+	bufferDesc.MiscFlags = 0;
+	initData.pSysMem = mesh->vertices;
+
+	hr = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->vertexBuffer);
+	if (hr != S_OK)
+		return false;
+
+	if (mesh->indices)
+	{
+		bufferDesc.ByteWidth = sizeof(uint)* mesh->nrIndices;
+		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		initData.pSysMem = mesh->indices;
+
+		hr = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->indexBuffer);
+
+		if (hr != S_OK)
+		{
+			mesh->vertexBuffer->Release();
+			return false;
+		}
+	}
+
+	mesh->gpuHasCopy = true;
+
+	return true;
+}
+
+Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_ELEMENT_DESC elemDesc[], const uint nrElem)
+{
+	Shader *shader = &shaders.Append();
+	HRESULT hr;
+	ID3D10Blob *shaderBlob = nullptr, *errorBlob = nullptr;
+
+	hr = D3DCompileFromFile(shaderInfo.path.AsWChar(),
+		nullptr,
+		nullptr,
+		shaderInfo.entryPoint.AsChar(),
+		shaderInfo.version.AsChar(),
+		D3D10_SHADER_PACK_MATRIX_ROW_MAJOR,
+		0,
+		&shaderBlob,
+		&errorBlob);
+
+	if (hr != S_OK)
+	{
+		if (!errorBlob)
+			return nullptr;
+
+		char msg[20000];
+		strcpy_s(msg, sizeof(msg), (char*)errorBlob->GetBufferPointer());
+		OutputDebugStringA(msg);
+		MessageBoxA(GetDesktopWindow(), msg, "VertexShader Compilation Failed!", MB_OK | MB_ICONERROR);
+		errorBlob->Release();
+
+		return nullptr;
+	}
+
+	hr = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+
+	if (hr != S_OK)
+	{
+		SAFE_RELEASE(shaderBlob);
+
+		return nullptr;
+	}
+
+	if (elemDesc)
+	{
+		hr = m_device->CreateInputLayout(
+			elemDesc,
+			nrElem,
+			shaderBlob->GetBufferPointer(),
+			shaderBlob->GetBufferSize(),
+			&shader->inputLayout);
+
+		if (hr != S_OK)
+		{
+			WBOX(L"Cannot create input layout.");
+
+			SAFE_RELEASE(shaderBlob);
+			SAFE_RELEASE(shader->vertexShader);
+
+			return nullptr;
+		}
+	}
+
+	if (shaderBlob)
+		_ShaderReflection(shader, shaderBlob, SVF_VERTEXSHADER);
+
+	SAFE_RELEASE(shaderBlob);
+
+	return shader;
+}
+
+bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shader, const uint shaderType)
+{
+	HRESULT hr;
+	ID3D10Blob *shaderBlob = nullptr, *errorBlob = nullptr;
+
+	hr = D3DCompileFromFile(shaderInfo.path.AsWChar(),
+		nullptr,
+		nullptr,
+		shaderInfo.entryPoint.AsChar(),
+		shaderInfo.version.AsChar(),
+		D3D10_SHADER_PACK_MATRIX_ROW_MAJOR,
+		0,
+		&shaderBlob,
+		&errorBlob);
+
+	if (hr != S_OK)
+	{
+		if (!errorBlob)
+			return false;
+
+		char msg[20000];
+		strcpy_s(msg, sizeof(msg), (char*)errorBlob->GetBufferPointer());
+		OutputDebugStringA(msg);
+		MessageBoxA(GetDesktopWindow(), msg, "Shader Stage Compilation Failed!", MB_OK | MB_ICONERROR);
+		errorBlob->Release();
+
+		return false;
+	}
+
+	switch (shaderType)
+	{
+	case SVF_VERTEXSHADER:
+		hr = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+		break;
+	case SVF_PIXELSHADER:
+		hr = m_device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->pixelShader);
+	}
+
+	if (hr != S_OK)
+	{
+		SAFE_RELEASE(shaderBlob);
+
+		return false;
+	}
+
+
+	if (shaderBlob)
+		_ShaderReflection(shader, shaderBlob, shaderType);
+
+
+	SAFE_RELEASE(shaderBlob);
+
+
+	return true;
+}
+
+void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint shaderType)
+{
+	ID3D11ShaderReflection* reflection = nullptr;
+	HRESULT hr = D3DReflect(shaderBlob->GetBufferPointer(),
+		shaderBlob->GetBufferSize(),
+		IID_ID3D11ShaderReflection,
+		(void**)&reflection);
+
+	D3D11_SHADER_DESC shaderDesc;
+	reflection->GetDesc(&shaderDesc);
+
+	uint oldConstantLength = shader->constantBuffers.Length();
+	uint oldSamplerLength = shader->samplerStates.Length();
+	uint oldTextureLength = shader->textureSlots.Length();
+	for (uint resourceIndex = 0; resourceIndex < shaderDesc.BoundResources; ++resourceIndex)
+	{
+		D3D11_SHADER_INPUT_BIND_DESC inputBindDesc;
+		reflection->GetResourceBindingDesc(resourceIndex, &inputBindDesc);
+
+		switch (inputBindDesc.Type)
+		{
+#pragma region ConstantBuffers
+		case D3D_SIT_CBUFFER:
+		{
+			bool alreadyCreated = false;
+			for (uint c = 0; c < oldConstantLength; ++c)
+			if (shader->constantBuffers[c].slotNumber == inputBindDesc.BindPoint)
+			{
+				shader->constantBuffers[c].flag |= shaderType;
+				alreadyCreated = true;
+				break;
+			}
+
+			if (alreadyCreated)
+				break;
+
+			ID3D11ShaderReflectionConstantBuffer *refCBuffer = reflection->GetConstantBufferByName(inputBindDesc.Name);
+			D3D11_SHADER_BUFFER_DESC cBufferDesc;
+			refCBuffer->GetDesc(&cBufferDesc);
+
+			ConstantBuffer &tempCbuffer = shader->constantBuffers.Append();
+			tempCbuffer.flag = 0;
+			Array<ShaderVariable> tempMembers(8, false, false);
+
+			for (uint vIndex = 0; vIndex < cBufferDesc.Variables; ++vIndex)
+			{
+				ShaderVariable &tempMember = tempMembers.Append();
+				ID3D11ShaderReflectionVariable *variable = refCBuffer->GetVariableByIndex(vIndex);
+				D3D11_SHADER_VARIABLE_DESC variableDesc;
+				ID3D11ShaderReflectionType *variableType;
+				D3D11_SHADER_TYPE_DESC typeDesc;
+				variable->GetDesc(&variableDesc);
+				variableType = variable->GetType();
+				variableType->GetDesc(&typeDesc);
+
+				tempMember.bufferPlace = variableDesc.StartOffset;
+				tempMember.name = variableDesc.Name;
+				tempMember.size = variableDesc.Size;
+				tempMember.flag = 0;
+
+				switch (typeDesc.Type)
+				{
+				case D3D_SVT_FLOAT:
+				{
+										tempMember.flag |= SVF_FLOAT;
+				}break;
+				case D3D_SVT_INT:
+				{
+									tempMember.flag |= SVF_INT;
+				}break;
+				case D3D_SVT_UINT:
+				{
+										tempMember.flag |= SVF_UINT;
+				}break;
+				};
+
+									
+			}
+
+			D3D11_BUFFER_DESC bd;
+			ZeroMemory(&bd, sizeof(bd));
+
+			bd.Usage = D3D11_USAGE_DYNAMIC;
+			bd.ByteWidth = cBufferDesc.Size;
+			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+			HRESULT hr = m_device->CreateBuffer(&bd, nullptr, &tempCbuffer.gpuBuffer);
+
+			if (hr != S_OK)
+			{
+				WBOX(L"Couldn't Create Constant Buffer");
+				return;
+			}
+
+			tempCbuffer.slotNumber = inputBindDesc.BindPoint;
+			tempCbuffer.flag = shaderType;
+			tempCbuffer.bufferSize = cBufferDesc.Size;
+			tempCbuffer.nrMembers = tempMembers.Length();
+			tempCbuffer.data = new byte[cBufferDesc.Size];
+			tempCbuffer.members = new ShaderVariable[tempCbuffer.nrMembers];
+
+			for (uint j = 0; j < tempCbuffer.nrMembers; ++j)
+				tempCbuffer.members[j] = tempMembers[j];
+		}break;
+#pragma endregion ConstantBuffers
+		case D3D_SIT_SAMPLER:
+		{
+			bool alreadyCreated = false;
+			for (uint i = 0; i < oldSamplerLength; ++i)
+			if (shader->samplerStates[i].slot == inputBindDesc.BindPoint)
+			{
+				shader->samplerStates[i].flag |= shaderType;
+				alreadyCreated = true;
+				break;
+			}
+
+			if (alreadyCreated)
+				break;
+
+			SamplerState &sampler = shader->samplerStates.Append();
+			sampler.slot = inputBindDesc.BindPoint;
+			sampler.flag = shaderType;
+		}break;
+		case D3D_SIT_TEXTURE:
+		{
+			bool alreadyCreated = false;
+			for (uint i = 0; i < oldTextureLength; ++i)
+			if (shader->textureSlots[i].bufferPlace == inputBindDesc.BindPoint)
+			{
+				shader->textureSlots[i].flag |= shaderType;
+				alreadyCreated = true;
+				break;
+			}
+
+			if (alreadyCreated)
+				break;
+
+			for (uint i = 0; i < inputBindDesc.BindCount; ++i)
+			{
+				ShaderVariable &textureSlot = shader->textureSlots.Append();
+				textureSlot.bufferPlace = inputBindDesc.BindPoint + i;
+				textureSlot.flag = shaderType;
+				textureSlot.name = inputBindDesc.Name;
+				textureSlot.name.Append(i);
+			}
+
+		}break;
+		}
+
+	}
+
+	reflection->Release();
+}
+
+void			D3D::SetShader(const Shader *shader)
+{
+	assert(shader);
+	currentShader = (Shader *)shader;
+
+	m_deviceContext->VSSetShader(shader->vertexShader, nullptr, 0);
+	m_deviceContext->PSSetShader(shader->pixelShader, nullptr, 0);
+
+	if (shader->inputLayout)
+		m_deviceContext->IASetInputLayout(shader->inputLayout);
+
+	if (shader->rasterizer)
+		m_deviceContext->RSSetState(shader->rasterizer);
+
+	if (shader->depthStencilState)
+		m_deviceContext->OMSetDepthStencilState(shader->depthStencilState, 0);
+
+	for (uint i = 0; i < shader->samplerStates.Length(); ++i)
+	{
+		SamplerState &ss = shader->samplerStates[i];
+		if ((shader->samplerStates[i].flag & SVF_VERTEXSHADER) != 0)
+			m_deviceContext->VSSetSamplers(shader->samplerStates[i].slot, 1, &shader->samplerStates[i].samplerState);
+		if ((shader->samplerStates[i].flag & SVF_PIXELSHADER) != 0)
+			m_deviceContext->PSSetSamplers(shader->samplerStates[i].slot, 1, &shader->samplerStates[i].samplerState);
+	}
+
+	ID3D11Buffer *vsBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr },
+		*psBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+
+	ApplyConstantBuffers();
+}
+
+void			D3D::RenderMesh(const Mesh *mesh, const int subset) const
+{
+	UINT32 offset = 0;
+	m_deviceContext->IASetVertexBuffers(0,
+		1,
+		&mesh->vertexBuffer,
+		&mesh->vertexSize,
+		&offset);	
+
+	if (mesh->indexBuffer)
+	{
+		m_deviceContext->IASetIndexBuffer(mesh->indexBuffer,
+			DXGI_FORMAT_R32_UINT,
+			0);
+		
+		m_deviceContext->DrawIndexed(mesh->nrIndices, 0, 0);
+	}
+	else
+	{
+		if (subset == -1)
+			m_deviceContext->Draw(mesh->nrVertices, 0);
+		else
+		{
+			assert((uint) subset < mesh->nrSubsets);
+			m_deviceContext->Draw(mesh->subsets[subset].length, mesh->subsets[subset].startVertex);
+		}
+	}	
+}
+
+void			D3D::ApplyTexture(const Texture *texture, const uint slot)
+{
+	for (uint i = 0; currentShader->textureSlots.Length(); ++i)
+	{
+		ShaderVariable &texVar = currentShader->textureSlots[i];
+		
+		if (texVar.bufferPlace == slot)
+		{
+			if ((texVar.flag & SVF_VERTEXSHADER) != 0)
+				m_deviceContext->VSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&texture->m_texture);
+			else if ( (texVar.flag & SVF_PIXELSHADER) != 0)
+				m_deviceContext->PSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&texture->m_texture);
+			break;
+		}
+	}
+}
+
+void			D3D::ApplyConstantBuffers()
+{
+	ID3D11Buffer *vsBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr },
+		*psBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+
+	for (uint i = 0; i < currentShader->constantBuffers.Length(); ++i)
+	{
+		ConstantBuffer &cBuffer = currentShader->constantBuffers[i];
+
+
+		D3D11_MAPPED_SUBRESOURCE subRes;
+		if (m_deviceContext->Map(cBuffer.gpuBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &subRes) == S_OK)
+		{
+			memcpy(subRes.pData, cBuffer.data, cBuffer.bufferSize);
+			m_deviceContext->Unmap(cBuffer.gpuBuffer, 0);
+		}
+		else
+			WBOX(L"Couldn't Map ConstantBuffer!");
+
+		if ((cBuffer.flag & SVF_VERTEXSHADER) != 0)
+			vsBuffers[cBuffer.slotNumber] = cBuffer.gpuBuffer;
+		if ((cBuffer.flag & SVF_PIXELSHADER) != 0)
+			psBuffers[cBuffer.slotNumber] = cBuffer.gpuBuffer;
+	}
+
+	m_deviceContext->VSSetConstantBuffers(0, 8, vsBuffers);
+	m_deviceContext->PSSetConstantBuffers(0, 8, psBuffers);
 }

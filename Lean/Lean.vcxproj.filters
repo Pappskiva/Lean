@@ -13,14 +13,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\ShaderClasses">
-      <UniqueIdentifier>{92af8add-8099-44e5-9310-c6bcfe88fc46}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{4894e00f-2c47-43fa-a6a1-241f6a3cbeff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ShaderClasses">
-      <UniqueIdentifier>{e644ca24-8bfe-4bf8-a5fb-aa4148bd2fc0}</UniqueIdentifier>
+    <Filter Include="Header Files\DuckRenderer">
+      <UniqueIdentifier>{9410a13e-9188-40ec-ac22-9267c6a16e85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DuckRenderer">
+      <UniqueIdentifier>{56252b01-8b9b-4c01-834c-f7fabd9142c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{d2389cce-519e-40a4-98e7-41622fefb8cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{5760f86d-7285-42a6-960d-4d255c75e380}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,16 +57,10 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BallShaderClass.cpp">
-      <Filter>Source Files\ShaderClasses</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FPSClass.cpp">
@@ -69,10 +69,34 @@
     <ClCompile Include="LevelManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelShaderClass.cpp">
-      <Filter>Source Files\ShaderClasses</Filter>
+    <ClCompile Include="DuckRenderer\MathFuncs.cpp">
+      <Filter>Source Files\DuckRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DuckRenderer\HString.cpp">
+      <Filter>Source Files\DuckRenderer</Filter>
     </ClCompile>
     <ClCompile Include="Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\DDSTextureLoader.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\pch.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\WICTextureLoader.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,16 +125,10 @@
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BallShaderClass.h">
-      <Filter>Header Files\ShaderClasses</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ApplicationTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FPSClass.h">
@@ -119,10 +137,49 @@
     <ClInclude Include="LevelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelShaderClass.h">
-      <Filter>Header Files\ShaderClasses</Filter>
+    <ClInclude Include="DuckRenderer\MathFuncs.h">
+      <Filter>Header Files\DuckRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="DuckRenderer\MathStructs.h">
+      <Filter>Header Files\DuckRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="DuckRenderer\DMath.h">
+      <Filter>Header Files\DuckRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D Includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuckRenderer\Array.h">
+      <Filter>Header Files\DuckRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuckRenderer\HString.h">
+      <Filter>Header Files\DuckRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\dds.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\DDSTextureLoader.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\pch.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\PlatformHelpers.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\WICTextureLoader.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,6 +189,12 @@
     </None>
     <None Include="ball.vs">
       <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="DuckRenderer\MathStructs.inl">
+      <Filter>Header Files\DuckRenderer</Filter>
+    </None>
+    <None Include="DuckRenderer\Array.inl">
+      <Filter>Header Files\DuckRenderer</Filter>
     </None>
     <None Include="level.ps">
       <Filter>Source Files\Shaders</Filter>

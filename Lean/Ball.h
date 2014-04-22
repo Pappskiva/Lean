@@ -5,72 +5,69 @@
 #ifndef BALL_H
 #define BALL_H
 
-#include <d3d11.h>
-#include "..\\Include\\d3dx10math.h"
+#include "D3D.h"
+#include "DuckRenderer\DMath.h"
+#include "Mesh.h"
 #include <fstream>
 
-#include "TextureClass.h"
+#include "Texture.h"
 
 class Ball
 {
 protected:
-
-	struct VertexType
-	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
-	};
-
 public:
 	Ball();
 	Ball(const Ball&);
 	~Ball();
 
-	bool Initialize(ID3D11Device*, WCHAR*);
+	bool Initialize(D3D*, WCHAR*);
 	void Shutdown();
 	void Update(float);
-	void Render(ID3D11DeviceContext*);
-	int	 GetIndexCount();
+	void Render(D3D *direct3D);
 
 	ID3D11ShaderResourceView* GetTexture();
 
-	void SetPosition(float, float, float);
-	void GetPosition(D3DXVECTOR3&);
+	void	SetMesh(const Mesh *mesh);
+	Mesh *	GetMesh();
 
-	void SetRotation(float, float, float);
-	void GetRotation(D3DXVECTOR3&);
+	void	SetPosition(float, float, float);
+	void	GetPosition(v3&);
 
-	void SetScale(float);
-	float GetScale();
+	void	SetRotation(float, float, float);
+	void	GetRotation(v3&);
 
-	void SetRadius(float);
-	float GetRadius();
 
-	void UpdateWorldMatrix();
-	void GetWorldMatrix(D3DXMATRIX&);
+	void	SetRadius(float);
+	float	GetRadius();
+
+	void	UpdateWorldMatrix();
+	void	GetWorldMatrix(m4&);
 
 private:
-	bool	InitializeBuffers(ID3D11Device*);
-	void	LoadSphere(VertexType*, unsigned long*);
 	void	ShutdownBuffers();
 	void	RenderBuffers(ID3D11DeviceContext*);
 
-	bool	LoadTexture(ID3D11Device*, WCHAR*);
-	void	ReleaseTexture();
 
 private:
-	ID3D11Buffer	*m_vertexBuffer, *m_indexBuffer;
-	int				m_vertexCount, m_indexCount;
 
-	TextureClass*	m_Texture;
+	Mesh			*mesh;
 
-	float m_positionX, m_positionY, m_positionZ;
+	Texture*	m_Texture;
+
+	v3 m_position;
 	float m_rotationX, m_rotationY, m_rotationZ;
-	float m_scale;
 	float m_radius;
 
-	D3DXMATRIX worldMatrix;
-
+	m4 worldMatrix;
 };
+
+inline void	Ball::SetMesh(const Mesh *mesh)
+{
+	this->mesh = (Mesh *)mesh;
+}
+
+inline Mesh *	Ball::GetMesh()
+{
+	return mesh;
+}
 #endif

@@ -13,9 +13,6 @@
 #include "Ball.h"
 #include "Level.h"
 
-//Shaders
-#include "BallShaderClass.h"
-#include "LevelShaderClass.h"
 
 //FPS kollare för debug
 #include "FPSClass.h"
@@ -50,17 +47,15 @@ private:
 	int screenWidth;
 	int screenHeight;
 
-	D3D* m_Direct3D;
-	Input* m_Input;
-	Camera* m_Camera;
-	Ball* m_Ball;
-	Level* m_Level;
-
+	D3D *m_Direct3D;
+	Input *m_Input;
+	Camera *m_Camera;
+	Ball *m_Ball;
+	Level *m_Level;
 
 	FPSClass m_fps;
 
-	BallShaderClass* m_BallShader;
-	LevelShaderClass* m_LevelShader;
+	Shader *m_BallShader;
 
 };
 #endif

@@ -6,40 +6,35 @@
 #define LEVEL_H
 
 #include <d3d11.h>
-#include "..\\Include\\d3dx10math.h"
 #include <fstream>
 
-#include "TextureClass.h"
+#include "D3D.h"
+#include "DuckRenderer\DMath.h"
+
+#include "Texture.h"
 
 class Level
 {
 protected:
-
-	struct VertexType
-	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
-	};
 
 public:
 	Level();
 	Level(const Level&);
 	~Level();
 
-	bool Initialize(ID3D11Device*, WCHAR*);
+	bool Initialize(D3D*, WCHAR*);
 	void Shutdown();
 	void Update(float);
-	void Render(ID3D11DeviceContext*);
+	void Render(D3D*);
 	int	 GetIndexCount();
 
 	ID3D11ShaderResourceView* GetTexture();
 
 	void SetPosition(float, float, float);
-	void GetPosition(D3DXVECTOR3&);
+	void GetPosition(v3&);
 
 	void SetRotation(float, float, float);
-	void GetRotation(D3DXVECTOR3&);
+	void GetRotation(v3&);
 
 	void SetRotationX(float);
 	float GetRotationX();
@@ -50,24 +45,19 @@ public:
 	void SetScale(float);
 	float GetScale();
 
-	void GetNormal(D3DXVECTOR3&);
+	void GetNormal(v3&);
 
 	void UpdateWorldMatrix();
-	void GetWorldMatrix(D3DXMATRIX&);
+	void GetWorldMatrix(m4&);
 
 private:
-	bool	InitializeBuffers(ID3D11Device*);
+	bool	InitializeBuffers(D3D*);
 	void	ShutdownBuffers();
-	void	RenderBuffers(ID3D11DeviceContext*);
-
-	bool	LoadTexture(ID3D11Device*, WCHAR*);
-	void	ReleaseTexture();
 
 private:
-	ID3D11Buffer	*m_vertexBuffer, *m_indexBuffer;
-	int				m_vertexCount, m_indexCount;
+	Mesh *m_mesh;
 
-	TextureClass*	m_Texture;
+	Texture*	m_Texture;
 
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
@@ -75,8 +65,8 @@ private:
 
 	float m_MaximumRotationValue;
 
-	D3DXMATRIX worldMatrix;
-	D3DXVECTOR3 m_normal;
+	m4 worldMatrix;
+	v3 m_normal;
 
 };
 #endif
