@@ -1,0 +1,3 @@
+Heightmaps\0.bmp
+150
+250
