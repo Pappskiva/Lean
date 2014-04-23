@@ -55,3 +55,8 @@ Debug/Lean.ilk
 /*.booproj
 
 *.obj
+*.obj
+*.suo
+*.sdf
+*.ilk
+*.exe
