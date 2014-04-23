@@ -1,5 +1,7 @@
 *.opensdf
 *.tlog
+Lean/Debug/
+Debug/
 Lean/Debug/pch.obj
 Lean/Debug/WICTextureLoader.obj
 Lean/Debug/Texture.obj
