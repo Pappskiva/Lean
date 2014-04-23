@@ -4,6 +4,8 @@ Lean/Debug/
 Debug/
 *.suo
 *.sdf
+Lean.sdf
+Lean.v11.suo
 Lean/Debug/pch.obj
 Lean/Debug/WICTextureLoader.obj
 Lean/Debug/Texture.obj
