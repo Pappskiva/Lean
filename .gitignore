@@ -1,7 +1,7 @@
 *.opensdf
 *.tlog
-Lean/Debug/*
-Debug/*
+Lean/Debug/
+Debug/
 *.suo
 *.sdf
 Lean.sdf
@@ -36,3 +36,5 @@ Lean/Debug/Lean.log
 Lean/Debug/FPSClass.obj
 Lean/Debug/ApplicationTimer.obj
 Lean/Debug/D3D.obj
+Debug/Lean.exe
+Debug/Lean.ilk
