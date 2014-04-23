@@ -1,7 +1,7 @@
 *.opensdf
 *.tlog
-Lean/Debug/
-Debug/
+Lean/Debug/*
+Debug/*
 *.suo
 *.sdf
 Lean.sdf
