@@ -60,3 +60,9 @@ Debug/Lean.ilk
 *.sdf
 *.ilk
 *.exe
+*.exe
+*.ilk
+*.sdf
+*.suo
+*.obj
+*.log
