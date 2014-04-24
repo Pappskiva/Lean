@@ -2,7 +2,7 @@
 #define _LEVELLOADERCLASS_H_
 
 #include <d3d11.h>
-#include "..\\Include\\d3dx10math.h"
+#include "DuckRenderer\DMath.h"
 #include <stdio.h>
 #include <fstream>
 #include <sstream>
@@ -14,9 +14,9 @@ class LevelLoaderClass
 public:
 	struct VertexType
 	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
+		v3 position;
+		v3 texture;
+		v3 normal;
 	};
 
 public:
@@ -25,7 +25,7 @@ public:
 	~LevelLoaderClass();
 
 	//LoadLevel tar in int för leveln, öppnar upp textfilen för information och lagrar sedan all data om leveln i de andra parametrarna. GoalPos får enbart x och z värde. 
-	bool LoadLevel(int level, VertexType *&heightMap, int &height, int &width, D3DXVECTOR3 &goalPos);
+	bool LoadLevel(int level, VertexType *&heightMap, int &height, int &width, v3 &goalPos);
 	void Shutdown();
 
 private: 
