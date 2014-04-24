@@ -76,6 +76,12 @@
     <None Include="level.ps" />
     <None Include="level.vs" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="Bullet\BulletCollision_Debug.lib" />
+    <Library Include="Bullet\BulletDynamics_Debug.lib" />
+    <Library Include="Bullet\BulletSoftBody_Debug.lib" />
+    <Library Include="Bullet\LinearMath_Debug.lib" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F638B05-F9B3-4238-A88C-F4A6FC99C859}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -121,7 +127,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Grupp9Comp1\Desktop\Litet spel\Lean\Lean\Bullet\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

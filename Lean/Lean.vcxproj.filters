@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Windows">
       <UniqueIdentifier>{5760f86d-7285-42a6-960d-4d255c75e380}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bullet">
+      <UniqueIdentifier>{c190c187-3c31-498c-9718-e292cd51f668}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -214,5 +217,19 @@
     <None Include="level.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Bullet\BulletCollision_Debug.lib">
+      <Filter>Bullet</Filter>
+    </Library>
+    <Library Include="Bullet\BulletDynamics_Debug.lib">
+      <Filter>Bullet</Filter>
+    </Library>
+    <Library Include="Bullet\BulletSoftBody_Debug.lib">
+      <Filter>Bullet</Filter>
+    </Library>
+    <Library Include="Bullet\LinearMath_Debug.lib">
+      <Filter>Bullet</Filter>
+    </Library>
   </ItemGroup>
 </Project>
