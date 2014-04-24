@@ -15,7 +15,7 @@ public:
 	struct VertexType
 	{
 		v3 position;
-		v3 texture;
+		v2 texture;
 		v3 normal;
 	};
 
