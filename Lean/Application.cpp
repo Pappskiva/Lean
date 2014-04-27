@@ -12,6 +12,7 @@ Application::Application()
 	m_Camera = nullptr;
 	m_Ball = nullptr;
 	m_Level = nullptr;
+	m_Obstacle = nullptr;
 
 	m_BallShader = nullptr;
 }
@@ -80,6 +81,17 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	//Create the level object
 	m_Level = new Level;
+	if (!m_Level)
+	{
+		return false;
+	}
+
+	//Create the obstacle object
+	m_Obstacle = new Obstacle;
+	if (!m_Obstacle)
+	{
+		return false;
+	}
 
 	//Initialize the level object
 	result = m_Level->Initialize(m_Direct3D, L"testLevelTexture.png");
@@ -94,7 +106,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
-	
+
+	result = m_Obstacle->Initialize(m_Direct3D, L"testLevelTexture.png");
+	if (!result)
+	{
+		return false;
+	}
 
 	//Create the ballshaderclass object
 	//Initialize  the ballshaderclass object
@@ -211,8 +228,11 @@ bool Application::Frame(float deltaTime)
 	m_Level->Update(deltaTime);
 	m_Ball->Update(deltaTime);
 
-	m_Camera->SetTargetToLookAt(ballPosition.x, ballPosition.y, ballPosition.z);
 	m_Camera->SetPosition(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f);
+	m_Camera->SetTargetToLookAt(ballPosition.x, ballPosition.y, ballPosition.z);
+	
+	//For billboarding, the test obstacle needs the position of the camera
+	m_Obstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f);
 
 	// Render the graphics.
 	RenderGraphics();
@@ -228,15 +248,10 @@ void Application::RenderGraphics()
 	//Clear the scene
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	//m_Camera->Render();
+	m_Camera->Render();
 
 	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
-	//m_Camera->GetViewMatrix(viewMatrix);
-
-	v3 ballPosition;
-	m_Ball->GetPosition(ballPosition);
-	viewMatrix.ViewAtLH(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f), 
-		ballPosition);
+	m_Camera->GetViewMatrix(viewMatrix);
 
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 	m_Direct3D->GetOrthoMatrix(orthoMatrix);
@@ -248,6 +263,8 @@ void Application::RenderGraphics()
 	m_Ball->Render(m_Direct3D);
 
 	m_Level->Render(m_Direct3D);
+
+	m_Obstacle->Render(m_Direct3D);
 
 
 	m_Direct3D->EndScene();
@@ -284,6 +301,13 @@ void Application::Shutdown()
 	{
 		m_Ball->Shutdown();
 		m_Ball = 0;
+	}
+
+	//Release the obstacle object
+	if (m_Obstacle)
+	{
+		m_Obstacle->Shutdown();
+		m_Obstacle = 0;
 	}
 
 	//Release the ballshader object

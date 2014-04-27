@@ -27,6 +27,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="LevelManager.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Sound.h" />
