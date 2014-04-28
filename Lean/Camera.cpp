@@ -85,9 +85,9 @@ void Camera::Render()
 	position.z = m_positionZ;
 
 	// Setup where the camera is looking by default.
-	lookAt.x = 0.0f;
-	lookAt.y = 0.0f;
-	lookAt.z = 1.0f;
+	lookAt.x = m_LookAtX;
+	lookAt.y = m_LookAtY;
+	lookAt.z = m_LookAtZ;
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotationX * 0.0174532925f;

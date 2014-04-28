@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "Ball.h"
 #include "Level.h"
-#include "Obstacle.h"
+#include "WaterObstacle.h"
 //Hej och goddag
 
 //FPS kollare för debug
@@ -78,7 +78,7 @@ private:
 	Camera *m_Camera;
 	Ball *m_Ball;
 	Level *m_Level;
-	Obstacle *m_Obstacle; //För testningsyften
+	Obstacle *m_WaterObstacle; //För testningsyften
 
 	FPSClass m_fps;
 

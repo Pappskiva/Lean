@@ -21,8 +21,10 @@
     <ClCompile Include="DuckRenderer\MathFuncs.cpp" />
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LeafObstacle.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelLoaderClass.cpp" />
+    <ClCompile Include="MagnetObstacle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -33,6 +35,8 @@
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TrampolineObstacle.cpp" />
+    <ClCompile Include="WaterObstacle.cpp" />
     <ClCompile Include="Windows\DDSTextureLoader.cpp" />
     <ClCompile Include="Windows\pch.cpp" />
     <ClCompile Include="Windows\WICTextureLoader.cpp" />
@@ -52,8 +56,10 @@
     <ClInclude Include="DuckRenderer\MathStructs.h" />
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="LeafObstacle.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelLoaderClass.h" />
+    <ClInclude Include="MagnetObstacle.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Obstacle.h" />
@@ -62,6 +68,8 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TrampolineObstacle.h" />
+    <ClInclude Include="WaterObstacle.h" />
     <ClInclude Include="Windows\dds.h" />
     <ClInclude Include="Windows\DDSTextureLoader.h" />
     <ClInclude Include="Windows\pch.h" />

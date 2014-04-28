@@ -8,8 +8,6 @@ Obstacle::Obstacle()
 {
 	m_Texture = 0;
 
-	m_Type = WATER;
-
 	m_position.x = 0.0f;
 	m_position.y = 0.0f;
 	m_position.z = 0.0f;
@@ -58,7 +56,7 @@ bool Obstacle::Initialize(D3D* direct3D, WCHAR* textureFileName)
 void Obstacle::Shutdown()
 {
 	// Release vertex och index arrayen
-	ShutdownBuffers();
+	//ShutdownBuffers();
 
 	return;
 }
@@ -144,11 +142,11 @@ void Obstacle::GetWorldMatrix(m4& worldMatrix)
 	worldMatrix = this->worldMatrix;
 }
 
-void Obstacle::ShutdownBuffers()
-{
-	// Release indexbuffern
-	return;
-}
+//void Obstacle::ShutdownBuffers()
+//{
+//	// Release indexbuffern
+//	return;
+//}
 
 bool Obstacle::InitalizeBuffers(D3D* direct3D)
 {

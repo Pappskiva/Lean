@@ -12,7 +12,7 @@ Application::Application()
 	m_Camera = nullptr;
 	m_Ball = nullptr;
 	m_Level = nullptr;
-	m_Obstacle = nullptr;
+	m_WaterObstacle = nullptr;
 
 	defaultShader = nullptr;
 }
@@ -87,8 +87,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Create the obstacle object
-	m_Obstacle = new Obstacle;
-	if (!m_Obstacle)
+	m_WaterObstacle = new WaterObstacle;
+	if (!m_WaterObstacle)
 	{
 		return false;
 	}
@@ -107,14 +107,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	result = m_Obstacle->Initialize(m_Direct3D, L"testLevelTexture.png");
+	result = m_WaterObstacle->Initialize(m_Direct3D, L"testLevelTexture.png");
 	if (!result)
 	{
 		return false;
 	}
 
 	//Loads the PointLight mesh into vram
-	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("LightSphere.obj");
+	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("Sphere.obj");
 
 	if (!lightSphereMesh)
 	{
@@ -163,7 +163,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Ball->SetPosition(1, 5, 0);
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(defaultShader);
-	m_Obstacle->SetShader(defaultShader);
+	m_WaterObstacle->SetShader(defaultShader);
 
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
@@ -264,8 +264,8 @@ bool Application::Frame(float deltaTime)
 	m_Camera->SetPosition(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f);
 	m_Camera->SetTargetToLookAt(ballPosition.x, ballPosition.y, ballPosition.z);
 	
-	//For billboarding, the test obstacle needs the position of the camera
-	m_Obstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f);
+	
+	m_WaterObstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f);
 
 	// Render the graphics.
 	RenderGraphics();
@@ -290,7 +290,7 @@ void Application::RenderGraphics()
 
 			m_Level->Render(m_Direct3D);
 
-			m_Obstacle->Render(m_Direct3D);
+			m_WaterObstacle->Render(m_Direct3D);
 
 			m_Direct3D->BeginLightStage();
 
@@ -337,10 +337,10 @@ void Application::Shutdown()
 	}
 
 	//Release the obstacle object
-	if (m_Obstacle)
+	if (m_WaterObstacle)
 	{
-		m_Obstacle->Shutdown();
-		m_Obstacle = 0;
+		m_WaterObstacle->Shutdown();
+		m_WaterObstacle = 0;
 	}
 
 	// Release the Direct3D object.

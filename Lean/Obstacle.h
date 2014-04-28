@@ -29,7 +29,7 @@ class Obstacle
 public:
 	Obstacle();
 	Obstacle(const Obstacle&);
-	virtual ~Obstacle();
+	virtual ~Obstacle() = 0;
 
 	virtual bool Initialize(D3D*, WCHAR*);
 	virtual void Shutdown();
@@ -55,9 +55,9 @@ public:
 	void	SetShader(const Shader *shader);
 
 protected:
-	bool 	InitalizeBuffers(D3D*);
-	void	ShutdownBuffers();
-	void	RenderBuffers(ID3D11DeviceContext*);
+	virtual bool 	InitalizeBuffers(D3D*);
+	//void	ShutdownBuffers();
+	
 
 
 protected:
