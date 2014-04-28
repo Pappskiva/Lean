@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Level.h"
+#include "LevelLoaderClass.h"
 
 Level::Level()
 {
@@ -192,7 +193,7 @@ void Level::UpdateWorldMatrix()
 	scaleMatrix = m4::CreateScale(v3(m_scale, m_scale, m_scale));
 	localSpace = m4::CreateTranslation(v3(m_positionX, m_positionY, m_positionZ));
 
-	worldMatrix = scaleMatrix * rotationMatrix * localSpace;
+	worldMatrix = rotationMatrix * localSpace;
 }
 
 void Level::GetWorldMatrix(m4& worldMatrix)
@@ -294,4 +295,90 @@ void Level::ShutdownBuffers()
 {
 
 	return;
+}
+
+void Level::LoadLevel(const uint levelIndex, D3D* direct3D)
+{
+	LevelLoaderClass loader;
+	int tempHeight, tempWidth;
+	v3 pos;
+
+	const float LEVEL_POINT_DISTANCE = 1.0f / 75.0f;
+	const float LEVEL_MAX_HEIGHT = 1.0f / 255.0f;
+	
+	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, pos);
+	uint height = (uint)tempHeight, width = (uint)tempWidth;
+	
+	struct Vertex
+	{
+		v3 pos;
+		v3 normal;
+		v2 uv;
+	}*vertices = new Vertex[height * width];
+
+	for (uint z = 0; z < height; z++)
+		for (uint x = 0; x < width; x++)
+		{
+			vertices[x + z * width].pos.x = (x - width * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].pos.y = heightmap[x + z * width] * LEVEL_MAX_HEIGHT;
+			vertices[x + z * width].pos.z = (z - height * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].uv.v[0] = (float)x / width;
+			vertices[x + z * width].uv.v[1] = (float)z / height;
+		}
+
+	//Calculates the normal for each triangle and adds it to the vertices 
+	//that builds it up.
+	for (uint x = 0; x < width - 1; ++x)	
+		for (uint z = 0; z < height - 1; ++z)
+		{
+			v3 vec1 = vertices[(z + 1) * width + (x + 1)].pos
+				-
+				vertices[z * width + x].pos;
+
+			v3 vec2 = vertices[z * width + (x + 1)].pos
+				-
+				vertices[z * width + x].pos;
+
+			v3 normal = vec1.Cross(vec2);
+			vertices[z * width + x].normal += normal;
+			vertices[(x + 1) + z * width].normal += normal;
+			vertices[(x + 1) + (z + 1) * width].normal += normal;
+
+			vec1 = vertices[(z + 1) * width + x].pos
+				-
+				vertices[z * width + x].pos;
+
+			vec2 = vertices[(z + 1) * width + (x + 1)].pos
+				-
+				vertices[z * width + x].pos;
+
+			normal = vec1.Cross(vec2);
+			vertices[(x + 1) + (z + 1) * width].normal += normal;
+			vertices[x + z * width].normal += normal;
+			vertices[x + (z + 1) * width].normal += normal;
+		}
+
+	uint *indices = new uint[(height - 1) * (width - 1) * 6];
+
+	for (uint z = 0; z < height - 1; z++)
+		for (uint x = 0; x < width - 1; x++)
+		{
+			//Calculating the normalized normal
+			vertices[z * width + x].normal.Normalize();
+
+			//Calculating the indices
+			indices[(x + z * (width - 1)) * 6] = (x + 1) + (z + 1) * width;
+			indices[(x + z * (width - 1)) * 6 + 1] = (x + 1) + z * width;
+			indices[(x + z * (width - 1)) * 6 + 2] = x + z * width;
+
+			indices[(x + z * (width - 1)) * 6 + 3] = (x + 1) + (z + 1) * width;
+			indices[(x + z * (width - 1)) * 6 + 4] = x + z * width;
+			indices[(x + z * (width - 1)) * 6 + 5] = x + (z + 1) * width;
+		}
+
+	m_mesh->Flush();
+	m_mesh->Initialize(vertices, sizeof(Vertex), width * height, indices, (height - 1) * (width - 1) * 6);
+	direct3D->LoadMeshIntoDevice(m_mesh);
+
+	delete[] vertices;	
 }

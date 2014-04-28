@@ -42,7 +42,6 @@ public:
 
 	void				Initialize(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices, const uint nrIndices);
 
-	bool				LoadMeshFromObjToRam(std::string filePath);
 	void				SaveAsDMesh(std::string filePath);
 	uint				GetMeshID();
 	//void				GetTriangles(Triangle *&triangleArray, uint &numTriangles) const;//wrongo, Måste fixa en vertexlayout. //test
@@ -54,6 +53,9 @@ public:
 	uint				GetVertexSize();
 
 	friend class D3D;
+
+private: 
+	bool				LoadMeshFromObjToRam(std::string filePath);
 };
 
 inline uint Mesh::GetMeshID()

@@ -31,6 +31,8 @@ public:
 
 	ID3D11ShaderResourceView* GetTexture();
 
+	void LoadLevel(const uint levelIndex, D3D* direct3D);
+
 	void SetPosition(float, float, float);
 	void GetPosition(v3&);
 
@@ -70,6 +72,8 @@ private:
 
 	float m_MaximumRotationValue;
 
+	//maybe for collision detection!
+	float *heightmap;
 	uint triangleCount;
 	Triangle *collisionTriangles;
 

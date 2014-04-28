@@ -711,7 +711,7 @@ void			D3D::BeginDeferredRenderingScene(float clearColor[])
 	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[0], clearColor);
 	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[1], clearColor);
 
-	static float lightClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	static float lightClearColor[4] = { 0.5f, 0.5f, 0.5f, 0.0f };
 	m_deviceContext->ClearRenderTargetView(lightRenderTargetView, lightClearColor);
 
 	m_deviceContext->OMSetRenderTargets(2, gBufferRenderTargetView, m_depthStencilView);

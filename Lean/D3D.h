@@ -58,6 +58,7 @@ public:
 	void				ApplyConstantBuffers();
 
 	Shader*				GetCurrentShader();
+	//void				ReloadMesh(const Mesh *mesh);
 
 
 private:

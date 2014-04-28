@@ -17,7 +17,7 @@ LevelLoaderClass::~LevelLoaderClass()
 }
 
 
-bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height, int &width, v3 &goalPos)
+bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos)
 {
 	bool result;
 	string heightMapFileName;
@@ -28,7 +28,7 @@ bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height,
 	string levelFileName = ss.str();
 	ifstream in;
 	in.open(levelFileName);
-	if(!in.is_open())
+	if (!in.is_open())
 	{
 		return false;
 	}
@@ -39,12 +39,12 @@ bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height,
 	goalPos.y = -1;
 	heightMapFileName = levelFilePath + heightMapFileName;
 	result = LoadHeightMap((char*)heightMapFileName.c_str(), heightMap);
-	if(!result)
+	if (!result)
 	{
 		return false;
-	}	
+	}
 
-	NormalizeHeightMap(heightMap);
+	//NormalizeHeightMap(heightMap);
 
 	height = m_terrainHeight;
 	width = m_terrainWidth;
@@ -53,7 +53,7 @@ bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height,
 }
 
 
-bool LevelLoaderClass::LoadHeightMap(char* filename, VertexType *&heightMap)
+bool LevelLoaderClass::LoadHeightMap(char* filename, float *&heightMap)
 {
 	FILE* filePtr;
 	int error;
@@ -65,19 +65,19 @@ bool LevelLoaderClass::LoadHeightMap(char* filename, VertexType *&heightMap)
 	unsigned char height;
 
 	error = fopen_s(&filePtr, filename, "rb");
-	if(error != 0)
+	if (error != 0)
 	{
 		return false;
 	}
 
 	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	if(count != 1)
+	if (count != 1)
 	{
 		return false;
 	}
 
 	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
-	if(count != 1)
+	if (count != 1)
 	{
 		return false;
 	}
@@ -92,54 +92,51 @@ bool LevelLoaderClass::LoadHeightMap(char* filename, VertexType *&heightMap)
 	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
 
 	count = fread(bitmapImage, 1, imageSize, filePtr);
-	if(count != imageSize)
+	if (count != imageSize)
 	{
 		return false;
 	}
 
 	error = fclose(filePtr);
-	if(error != 0)
+	if (error != 0)
 	{
 		return false;
 	}
 
-	heightMap = (VertexType*) calloc(m_terrainWidth * m_terrainHeight, sizeof(VertexType));
-	
-	k=0;
+	heightMap = new float[m_terrainHeight * m_terrainWidth];
 
-	for(j=0; j<m_terrainHeight; j++)
+	k = 0;
+
+	for (j = 0; j<m_terrainHeight; j++)
 	{
-		for(i=0; i<m_terrainWidth; i++)
+		for (i = 0; i<m_terrainWidth; i++)
 		{
 			height = bitmapImage[k];
-			
+
 			index = (m_terrainHeight * j) + i;
 
-			heightMap[index].position.x = (float)i;
-			heightMap[index].position.y = (float)height;
-			heightMap[index].position.z = (float)j;
+			heightMap[index] = (float)height;
 
-			k+=3;
+			k += 3;
 		}
 	}
 
-	delete [] bitmapImage;
+	delete[] bitmapImage;
 	bitmapImage = 0;
 
 	return true;
 }
 
 
-void LevelLoaderClass::NormalizeHeightMap(VertexType* heightMap)
+void LevelLoaderClass::NormalizeHeightMap(float* heightMap)
 {
 	int i, j;
 
-
-	for(j=0; j<m_terrainHeight; j++)
+	for (j = 0; j<m_terrainHeight; j++)
 	{
-		for(i=0; i<m_terrainWidth; i++)
+		for (i = 0; i<m_terrainWidth; i++)
 		{
-			heightMap[(m_terrainHeight * j) + i].position.y /= 10.0f;
+			heightMap[(m_terrainHeight * j) + i] /= 10.0f;
 		}
 	}
 

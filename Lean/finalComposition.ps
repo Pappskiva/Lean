@@ -14,7 +14,7 @@ float4 PS(PixelInput input) : SV_Target
 	float3 diffuseColor = colormap.Sample(fullscreenQuadSampler, input.uv).rgb;
 	float4 lightData = lightmap.Sample(fullscreenQuadSampler, input.uv);
    
-    float3 diffuseLight = lightData.rgb;	
+    float3 diffuseLight = lightData.rgb;
 	float specularLight = lightData.a;
 
 	return float4(diffuseColor * diffuseLight + specularLight, 1.0f);

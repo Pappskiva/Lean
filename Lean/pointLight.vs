@@ -23,9 +23,7 @@ PixelInput PointLightVertexShader(in float3 inPos : POSITION)
 {
 	PixelInput output = (PixelInput) 0;
 
-
 	output.pos = mul(float4((inPos * lightRadius) + lightPos, 1.0f), viewProj);
-	//output.pos = mul(float4((inPos * lightRadius) + lightPos, 1.0f), viewProj);
 	output.screenCoord = output.pos;
 
 	return output;

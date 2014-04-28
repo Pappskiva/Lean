@@ -54,33 +54,33 @@ struct LightPack
 class Application
 {
 public:
-	Application();
-	Application(const Application&);
-	~Application();
+					Application();
+					Application(const Application&);
+					~Application();
 
-	bool Initialize(HINSTANCE, HWND, int, int);
-	void Shutdown();
-	bool Frame(float);
+	bool			Initialize(HINSTANCE, HWND, int, int);
+	void			Shutdown();
+	bool			Frame(float);
 
 private:
-	void RenderGraphics();
+	void			RenderGraphics();
 	void			_UpdateShaderVariables();
 	void			_RenderLights();
 	void			AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
 
 	
 private:
-	int screenWidth;
-	int screenHeight;
+	int				screenWidth;
+	int				screenHeight;
 
-	D3D *m_Direct3D;
-	Input *m_Input;
-	Camera *m_Camera;
-	Ball *m_Ball;
-	Level *m_Level;
-	Obstacle *m_WaterObstacle; //För testningsyften
+	D3D				*m_Direct3D;
+	Input			*m_Input;
+	Camera			*m_Camera;
+	Ball			*m_Ball;
+	Level			*m_Level;
+	Obstacle		*m_WaterObstacle; //För testningsyften
 
-	FPSClass m_fps;
+	FPSClass		m_fps;
 
 	Shader			*defaultShader;
 

@@ -36,10 +36,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	// Create the Direct3D object.
 	m_Direct3D = new D3D();
-	if (!m_Direct3D)
-	{
-		return false;
-	}
 
 	//Initialize the Direct3D object.
 	result = m_Direct3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
@@ -52,10 +48,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	//Create the input object
 	m_Input = new Input();
-	if (!m_Input)
-	{
-		return false;
-	}
 
 	// Initialize the input object.
 	result = m_Input->Initialize(hinstance, hwnd, screenWidth, screenHeight);
@@ -67,31 +59,15 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	//Create the camera object.
 	m_Camera = new Camera;
-	if (!m_Camera)
-	{
-		return false;
-	}
 
 	//Create the ball object
 	m_Ball = new Ball;
-	if (!m_Ball)
-	{
-		return false;
-	}
 
 	//Create the level object
 	m_Level = new Level;
-	if (!m_Level)
-	{
-		return false;
-	}
 
 	//Create the obstacle object
 	m_WaterObstacle = new WaterObstacle;
-	if (!m_WaterObstacle)
-	{
-		return false;
-	}
 
 	//Initialize the level object
 	result = m_Level->Initialize(m_Direct3D, L"testLevelTexture.png");
@@ -114,7 +90,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Loads the PointLight mesh into vram
-	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("Sphere.obj");
+	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("LightSphere.obj");
 
 	if (!lightSphereMesh)
 	{
@@ -163,11 +139,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Ball->SetPosition(1, 5, 0);
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(defaultShader);
+	m_Level->LoadLevel(0, m_Direct3D);
 	m_WaterObstacle->SetShader(defaultShader);
 
-	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
+	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
-	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
+	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
 	AddPointLight(v3(1.0f, 0.5f, 1.0f), 2.0f, v3(1, 1, 0), 1.0f);
 		
 
@@ -223,23 +200,7 @@ bool Application::Frame(float deltaTime)
 
 	v3 testNormal;
 	m_Level->GetNormal(testNormal);
-	v3 ballPosition;
-	m_Ball->GetPosition(ballPosition);
-	/*v3 ballVelocity = m_Ball->GetVelocity() + v3(0, -9.81f, 0) * deltaTime;
-
-	float time = m_Level->SphereHeightmapIntersection(ballPosition, m_Ball->GetRadius(), ballVelocity);
-
-	if (time > 0 && time < deltaTime)
-	{
-		ballVelocity = ballVelocity.Reflect(testNormal);
-		ballVelocity.y = 0;// .1 * ballVelocity.y;
-
-		v3 pos = ballPosition + testNormal * time;
-		m_Ball->SetPosition(pos.x, pos.y, pos.z);
-	}
-
-	m_Ball->SetVelocity(ballVelocity);*/
-	
+	v3 ballPosition;	
 
 	m_Ball->GetPosition(ballPosition);
 	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
