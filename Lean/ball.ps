@@ -12,20 +12,29 @@ struct PixelInputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-	//float3 normal : NORMAL;
+	float3 normal : NORMAL;
 };
 
+
+struct PixelOutput
+{
+	float4 diffuse : SV_TARGET0;
+	float4 normal : SV_TARGET1;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
-float4 BallPixelShader(PixelInputType input) : SV_TARGET
+PixelOutput BallPixelShader(PixelInputType input)
 {
-    float4 textureColor;
+    PixelOutput outColors;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, input.tex);
+    outColors.diffuse.rgb = shaderTexture.Sample(SampleType, input.tex).rgb;
+	outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);
+	
+	outColors.diffuse.a = 0.5f;//specualarIntensity;
+	outColors.normal.a = 0.5f;//specualarPower;
 
-	//return float4(1,0,0,1);
-    return textureColor;
+    return outColors;
 }

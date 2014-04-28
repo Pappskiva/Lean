@@ -52,6 +52,7 @@ public:
 
 	Type	GetType();
 
+	void	SetShader(const Shader *shader);
 
 protected:
 	bool 	InitalizeBuffers(D3D*);
@@ -62,6 +63,7 @@ protected:
 protected:
 
 	Mesh			*m_mesh;
+	Shader			*m_shader;
 	Texture			*m_Texture;
 
 	Type m_Type;
@@ -81,6 +83,11 @@ inline void	Obstacle::SetMesh(const Mesh *mesh)
 inline Mesh* Obstacle::GetMesh()
 {
 	return m_mesh;
+}
+
+inline void Obstacle::SetShader(const Shader *shader)
+{
+	this->m_shader = (Shader *)shader;
 }
 
 #endif

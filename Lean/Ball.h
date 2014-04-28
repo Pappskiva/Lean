@@ -46,6 +46,7 @@ public:
 	void	UpdateWorldMatrix();
 	void	GetWorldMatrix(m4&);
 
+	void	SetShader(const Shader *shader);
 
 private:
 	void	ShutdownBuffers();
@@ -55,7 +56,7 @@ private:
 private:
 
 	Mesh			*m_mesh;
-
+	Shader			*m_shader;
 	Texture			*m_Texture;
 
 	v3 m_position;
@@ -86,5 +87,9 @@ inline const v3& Ball::GetVelocity() const
 	return m_velocity;
 }
 
+inline void Ball::SetShader(const Shader *shader)
+{
+	this->m_shader = (Shader *)shader;
+}
 
 #endif

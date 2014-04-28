@@ -53,14 +53,16 @@ public:
 
 	float SphereHeightmapIntersection(const v3 &center, const float radius, const v3 &velocity);
 
+	void SetShader(const Shader *shader);
+
 private:
 	bool	InitializeBuffers(D3D*);
 	void	ShutdownBuffers();
 
 private:
 	Mesh *m_mesh;
-
-	Texture*	m_Texture;
+	Shader *m_shader;
+	Texture *m_Texture;
 
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
@@ -75,4 +77,10 @@ private:
 	v3 m_normal;
 
 };
+
+inline void Level::SetShader(const Shader *shader)
+{
+	this->m_shader = (Shader *)shader;
+}
+
 #endif

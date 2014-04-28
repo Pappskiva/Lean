@@ -191,12 +191,12 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		D3D_FEATURE_LEVEL_10_0
 	};
 
-	UINT gpuFlags = 0;
+	UINT m_deviceFlags = 0;
 #ifdef _DEBUG
-	gpuFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	m_deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	// Create the swap chain, Direct3D device, and Direct3D device context.
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, gpuFlags, featureLevels,
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, m_deviceFlags, featureLevels,
 		ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
 	if (FAILED(result))
 	{
@@ -229,11 +229,11 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	depthBufferDesc.Height = screenHeight;
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
-	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	depthBufferDesc.SampleDesc.Count = 1;
 	depthBufferDesc.SampleDesc.Quality = 0;
 	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	depthBufferDesc.CPUAccessFlags = 0;
 	depthBufferDesc.MiscFlags = 0;
 
@@ -282,7 +282,7 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
 	// Set up the depth stencil view description.
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
@@ -292,6 +292,17 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	{
 		return false;
 	}
+
+	// Create the depth stencil resource view.
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+	result = m_device->CreateShaderResourceView(m_depthStencilBuffer, &shaderResourceViewDesc, &m_depthStencilShaderResourceView);
+
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
 	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
@@ -400,6 +411,143 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	}
 
 	m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	/////////////////////////////////////////Deferred Renderering
+
+	ID3D11Texture2D *rtDiffuse, *rtNormal, *rtLight;
+	D3D11_TEXTURE2D_DESC texture2DDesc;
+	ZeroMemory(&texture2DDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	texture2DDesc.Width = screenWidth;
+	texture2DDesc.Height = screenHeight;
+	texture2DDesc.MipLevels = 1;
+	texture2DDesc.ArraySize = 1;
+	texture2DDesc.SampleDesc.Count = 1;
+	texture2DDesc.SampleDesc.Quality = 0;
+	texture2DDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texture2DDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	texture2DDesc.Usage = D3D11_USAGE_DEFAULT;
+	texture2DDesc.CPUAccessFlags = 0;
+
+	result = m_device->CreateTexture2D(&texture2DDesc, nullptr, &rtDiffuse);
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateTexture2D(&texture2DDesc, nullptr, &rtNormal);
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateTexture2D(&texture2DDesc, nullptr, &rtLight);
+
+	if (result != S_OK)
+		return false;
+
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetDesc;
+	ZeroMemory(&renderTargetDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
+	renderTargetDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	renderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+	result = m_device->CreateRenderTargetView(rtDiffuse, &renderTargetDesc, &gBufferRenderTargetView[0]);
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateRenderTargetView(rtNormal, &renderTargetDesc, &gBufferRenderTargetView[1]);
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateRenderTargetView(rtLight, &renderTargetDesc, &lightRenderTargetView);
+
+	if (result != S_OK)
+		return false;
+
+	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM  DXGI_FORMAT_R32_FLOAT;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+	result = m_device->CreateShaderResourceView(rtDiffuse, &shaderResourceViewDesc, &gBufferShaderResourceView[0]);
+	rtDiffuse->Release();
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateShaderResourceView(rtNormal, &shaderResourceViewDesc, &gBufferShaderResourceView[1]);
+	rtNormal->Release();
+
+	if (result != S_OK)
+		return false;
+
+	result = m_device->CreateShaderResourceView(rtLight, &shaderResourceViewDesc, &lightShaderResourceView);
+	rtLight->Release();
+
+	struct QuadVertex
+	{
+		float x, y, z;
+		float u, v;
+	}tempVB[] =
+	{
+		{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+		{ 1.0f, -1.0f, 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+	};
+
+	uint indices[6];
+	indices[0] = 1;
+	indices[1] = 3;
+	indices[2] = 2;
+	indices[3] = 1;
+	indices[4] = 2;
+	indices[5] = 0;
+
+	fullscreenQuadMesh = CreateMeshFromRam(tempVB, sizeof(QuadVertex), 4, indices, 6);
+
+
+	ShaderInfo vsInfo, psInfo;
+	vsInfo.entryPoint = "VS";
+	vsInfo.path = L"fullScreenQuad.vs";
+	vsInfo.version = "vs_4_0";
+
+	psInfo.entryPoint = "PS";
+	psInfo.path = L"finalComposition.ps";
+	psInfo.version = "ps_4_0";
+
+	D3D11_INPUT_ELEMENT_DESC elemDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	finalCompositionShader = (Shader *)LoadVertexShader(vsInfo, elemDesc, 2);
+
+	if (!finalCompositionShader)
+	{
+		WBOX(L"Couldn't Load Shader!");
+		return false;
+	}
+
+	if (!LoadShaderStageIntoShader(psInfo, finalCompositionShader, SVF_PIXELSHADER))
+		return false;
+
+
+	D3D11_BLEND_DESC blendDesc;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.AlphaToCoverageEnable = FALSE;
+
+	m_device->CreateBlendState(&blendDesc, &lightBlending);
+
 	return true;
 }
 
@@ -558,25 +706,74 @@ void D3D::TurnOffAlphaBlending()
 	return;
 }
 
+void			D3D::BeginDeferredRenderingScene(float clearColor[])
+{
+	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[0], clearColor);
+	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[1], clearColor);
+
+	static float lightClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	m_deviceContext->ClearRenderTargetView(lightRenderTargetView, lightClearColor);
+
+	m_deviceContext->OMSetRenderTargets(2, gBufferRenderTargetView, m_depthStencilView);
+}
+
+void			D3D::EndDeferredRenderingScene()
+{
+	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	SetShader(finalCompositionShader);
+
+	static ID3D11ShaderResourceView *tempPointers[2] {gBufferShaderResourceView[0], lightShaderResourceView};
+	m_deviceContext->PSSetShaderResources(0, 2, tempPointers);
+
+	RenderMesh(fullscreenQuadMesh);
+
+	m_deviceContext->OMSetDepthStencilState(nullptr, 0);
+
+	static ID3D11ShaderResourceView *const pSRV[8] = { nullptr, nullptr, nullptr, nullptr
+		, nullptr, nullptr, nullptr, nullptr };
+
+	m_deviceContext->PSSetShaderResources(0, 8, pSRV);
+}
+
+void			D3D::BeginLightStage()
+{
+	m_deviceContext->OMSetRenderTargets(1, &lightRenderTargetView, nullptr);
+	m_deviceContext->OMSetBlendState(lightBlending, nullptr, 0xffffffff);
+	m_deviceContext->PSSetShaderResources(0, 1, &gBufferShaderResourceView[1]);
+	m_deviceContext->PSSetShaderResources(1, 1, &m_depthStencilShaderResourceView);
+
+	TurnZBufferOff();
+}
+
+void			D3D::EndLightStage()
+{
+	TurnOffAlphaBlending();
+
+	static ID3D11ShaderResourceView *const pSRV[8] = { nullptr, nullptr, nullptr, nullptr
+		, nullptr, nullptr, nullptr, nullptr };
+
+	m_deviceContext->PSSetShaderResources(0, 8, pSRV);
+}
+
 Texture*		D3D::LoadTextureFromFile(const HString &filePath)
 {
 	Texture &texture = textures.Append();
 
-	HRESULT hr;
+	HRESULT result;
 
 	if (filePath.Find(".dds", filePath.Length() - 4) != -1)
-		hr = DirectX::CreateDDSTextureFromFile(m_device,
+		result = DirectX::CreateDDSTextureFromFile(m_device,
 		filePath.AsWChar(), 
 		nullptr,
 		&texture.m_texture);
 	else
-		hr = DirectX::CreateWICTextureFromFile(m_device,
+		result = DirectX::CreateWICTextureFromFile(m_device,
 		m_deviceContext,
 		filePath.AsWChar(), 
 		nullptr, 
 		&texture.m_texture);
 
-	if (FAILED(hr))
+	if (FAILED(result))
 	{
 		WBOX(L"Invalid Texture Path!");
 		textures.RemoveLast();
@@ -638,7 +835,7 @@ bool			D3D::LoadMeshIntoDevice(Mesh *mesh)
 	if (mesh->gpuHasCopy)
 		return true;
 
-	HRESULT hr;
+	HRESULT result;
 
 	D3D11_SUBRESOURCE_DATA initData;
 	D3D11_BUFFER_DESC bufferDesc;
@@ -650,8 +847,8 @@ bool			D3D::LoadMeshIntoDevice(Mesh *mesh)
 	bufferDesc.MiscFlags = 0;
 	initData.pSysMem = mesh->vertices;
 
-	hr = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->vertexBuffer);
-	if (hr != S_OK)
+	result = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->vertexBuffer);
+	if (result != S_OK)
 		return false;
 
 	if (mesh->indices)
@@ -660,9 +857,9 @@ bool			D3D::LoadMeshIntoDevice(Mesh *mesh)
 		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		initData.pSysMem = mesh->indices;
 
-		hr = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->indexBuffer);
+		result = m_device->CreateBuffer(&bufferDesc, &initData, &mesh->indexBuffer);
 
-		if (hr != S_OK)
+		if (result != S_OK)
 		{
 			mesh->vertexBuffer->Release();
 			return false;
@@ -677,10 +874,10 @@ bool			D3D::LoadMeshIntoDevice(Mesh *mesh)
 Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_ELEMENT_DESC elemDesc[], const uint nrElem)
 {
 	Shader *shader = &shaders.Append();
-	HRESULT hr;
+	HRESULT result;
 	ID3D10Blob *shaderBlob = nullptr, *errorBlob = nullptr;
 
-	hr = D3DCompileFromFile(shaderInfo.path.AsWChar(),
+	result = D3DCompileFromFile(shaderInfo.path.AsWChar(),
 		nullptr,
 		nullptr,
 		shaderInfo.entryPoint.AsChar(),
@@ -690,7 +887,7 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 		&shaderBlob,
 		&errorBlob);
 
-	if (hr != S_OK)
+	if (result != S_OK)
 	{
 		if (!errorBlob)
 			return nullptr;
@@ -704,9 +901,9 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 		return nullptr;
 	}
 
-	hr = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+	result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
 
-	if (hr != S_OK)
+	if (result != S_OK)
 	{
 		SAFE_RELEASE(shaderBlob);
 
@@ -715,14 +912,14 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 
 	if (elemDesc)
 	{
-		hr = m_device->CreateInputLayout(
+		result = m_device->CreateInputLayout(
 			elemDesc,
 			nrElem,
 			shaderBlob->GetBufferPointer(),
 			shaderBlob->GetBufferSize(),
 			&shader->inputLayout);
 
-		if (hr != S_OK)
+		if (result != S_OK)
 		{
 			WBOX(L"Cannot create input layout.");
 
@@ -743,10 +940,10 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 
 bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shader, const uint shaderType)
 {
-	HRESULT hr;
+	HRESULT result;
 	ID3D10Blob *shaderBlob = nullptr, *errorBlob = nullptr;
 
-	hr = D3DCompileFromFile(shaderInfo.path.AsWChar(),
+	result = D3DCompileFromFile(shaderInfo.path.AsWChar(),
 		nullptr,
 		nullptr,
 		shaderInfo.entryPoint.AsChar(),
@@ -756,7 +953,7 @@ bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shad
 		&shaderBlob,
 		&errorBlob);
 
-	if (hr != S_OK)
+	if (result != S_OK)
 	{
 		if (!errorBlob)
 			return false;
@@ -773,13 +970,13 @@ bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shad
 	switch (shaderType)
 	{
 	case SVF_VERTEXSHADER:
-		hr = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+		result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
 		break;
 	case SVF_PIXELSHADER:
-		hr = m_device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->pixelShader);
+		result = m_device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->pixelShader);
 	}
 
-	if (hr != S_OK)
+	if (result != S_OK)
 	{
 		SAFE_RELEASE(shaderBlob);
 
@@ -800,7 +997,7 @@ bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shad
 void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint shaderType)
 {
 	ID3D11ShaderReflection* reflection = nullptr;
-	HRESULT hr = D3DReflect(shaderBlob->GetBufferPointer(),
+	HRESULT result = D3DReflect(shaderBlob->GetBufferPointer(),
 		shaderBlob->GetBufferSize(),
 		IID_ID3D11ShaderReflection,
 		(void**)&reflection);
@@ -871,9 +1068,7 @@ void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint
 				{
 										tempMember.flag |= SVF_UINT;
 				}break;
-				};
-
-									
+				};									
 			}
 
 			D3D11_BUFFER_DESC bd;
@@ -884,9 +1079,9 @@ void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint
 			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-			HRESULT hr = m_device->CreateBuffer(&bd, nullptr, &tempCbuffer.gpuBuffer);
+			HRESULT result = m_device->CreateBuffer(&bd, nullptr, &tempCbuffer.gpuBuffer);
 
-			if (hr != S_OK)
+			if (result != S_OK)
 			{
 				WBOX(L"Couldn't Create Constant Buffer");
 				return;
@@ -955,6 +1150,10 @@ void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint
 void			D3D::SetShader(const Shader *shader)
 {
 	assert(shader);
+
+	if (currentShader == shader)
+		return;
+
 	currentShader = (Shader *)shader;
 
 	m_deviceContext->VSSetShader(shader->vertexShader, nullptr, 0);
@@ -977,9 +1176,6 @@ void			D3D::SetShader(const Shader *shader)
 		if ((shader->samplerStates[i].flag & SVF_PIXELSHADER) != 0)
 			m_deviceContext->PSSetSamplers(shader->samplerStates[i].slot, 1, &shader->samplerStates[i].samplerState);
 	}
-
-	ID3D11Buffer *vsBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr },
-		*psBuffers[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 	ApplyConstantBuffers();
 }

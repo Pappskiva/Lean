@@ -38,6 +38,12 @@ public:
 	void TurnOnAlphaBlending();
 	void TurnOffAlphaBlending();
 
+	void				BeginDeferredRenderingScene(float clearColor[]);
+	void				EndDeferredRenderingScene();
+
+	void				BeginLightStage();
+	void				EndLightStage();
+
 	Texture*			LoadTextureFromFile(const HString &filePath);
 	Mesh*				CreateMeshFromRam(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices = nullptr, const uint nrIndices = 0);
 	Mesh*				LoadMeshFromOBJ(const std::string filePath);
@@ -53,14 +59,8 @@ public:
 
 	Shader*				GetCurrentShader();
 
-private:
-	Array<Mesh> meshes;
-	Array<Shader> shaders;
-	Array<Texture> textures;
-	Shader *currentShader;
-	
-	bool m_vsync_enabled;
 
+private:
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;
@@ -68,7 +68,17 @@ private:
 	ID3D11Texture2D* m_depthStencilBuffer;
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
+	ID3D11ShaderResourceView* m_depthStencilShaderResourceView;
 	ID3D11RasterizerState* m_rasterState;
+	
+	Array<Mesh> meshes;
+	Array<Shader> shaders;
+	Array<Texture> textures;
+	
+	Mesh *fullscreenQuadMesh;
+	Shader *currentShader;
+
+	bool m_vsync_enabled;
 
 	m4 m_projectionMatrix;
 	m4 m_worldMatrix;
@@ -78,6 +88,14 @@ private:
 
 	ID3D11BlendState* m_alphaEnableBlendingState;
 	ID3D11BlendState* m_alphaDisableBlendingState;
+
+	//deferred
+	ID3D11RenderTargetView		*gBufferRenderTargetView[2], *lightRenderTargetView;
+	ID3D11ShaderResourceView	*gBufferShaderResourceView[2], *lightShaderResourceView;
+	ID3D11BlendState			*lightBlending;
+
+	
+	Shader *finalCompositionShader;
 
 	void _ShaderReflection(Shader *shader, ID3D10Blob* shaderBlob, const uint shaderType);
 };

@@ -14,7 +14,7 @@ Application::Application()
 	m_Level = nullptr;
 	m_Obstacle = nullptr;
 
-	m_BallShader = nullptr;
+	defaultShader = nullptr;
 }
 
 
@@ -113,6 +113,31 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	//Loads the PointLight mesh into vram
+	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("LightSphere.obj");
+
+	if (!lightSphereMesh)
+	{
+		WBOX(L"Couldn't Load LightSphere.obj");
+		return false;
+	}
+
+	//Loads the light shader from file
+	D3D11_INPUT_ELEMENT_DESC lightShaderElem[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	pointLightShader = m_Direct3D->LoadVertexShader(ShaderInfo("pointLight.vs", "PointLightVertexShader", "vs_4_0"),
+		lightShaderElem,
+		1);
+	if (!pointLightShader)
+		return false;
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("pointLight.ps", "PointLightPixelShader", "ps_4_0"),
+		pointLightShader,
+		SVF_PIXELSHADER))
+		return false;
+
 	//Create the ballshaderclass object
 	//Initialize  the ballshaderclass object
 	D3D11_INPUT_ELEMENT_DESC ballShaderElem[] =
@@ -122,13 +147,13 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	m_BallShader = m_Direct3D->LoadVertexShader(ShaderInfo("ball.vs", "BallVertexShader", "vs_4_0"),
+	defaultShader = m_Direct3D->LoadVertexShader(ShaderInfo("ball.vs", "BallVertexShader", "vs_4_0"),
 		ballShaderElem,
 		3);
-	if (!m_BallShader)
+	if (!defaultShader)
 		return false;
 	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("ball.ps", "BallPixelShader", "ps_4_0"),
-		m_BallShader,
+		defaultShader,
 		SVF_PIXELSHADER))
 		return false;
 	
@@ -136,6 +161,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_fps.Initialize();
 
 	m_Ball->SetPosition(1, 5, 0);
+	m_Ball->SetShader(defaultShader);
+	m_Level->SetShader(defaultShader);
+	m_Obstacle->SetShader(defaultShader);
+
+	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
+	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
+	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
+	AddPointLight(v3(1.0f, 0.5f, 1.0f), 2.0f, v3(1, 1, 0), 1.0f);
 		
 
 	return true;
@@ -242,30 +275,30 @@ bool Application::Frame(float deltaTime)
 
 void Application::RenderGraphics()
 {
-	m4 worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
-	//bool result;
-
+	static float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	//Clear the scene
+
+	_UpdateShaderVariables();
+
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_Camera->Render();
-
-	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
-	m_Camera->GetViewMatrix(viewMatrix);
-
-	m_Direct3D->GetProjectionMatrix(projectionMatrix);
-	m_Direct3D->GetOrthoMatrix(orthoMatrix);
-
-	m_BallShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
-	m_BallShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
-	m_Direct3D->SetShader(m_BallShader);
 	//Render the ball buffers.
-	m_Ball->Render(m_Direct3D);
 
-	m_Level->Render(m_Direct3D);
+		m_Direct3D->BeginDeferredRenderingScene(clearColor);
+		
+			m_Ball->Render(m_Direct3D);
 
-	m_Obstacle->Render(m_Direct3D);
+			m_Level->Render(m_Direct3D);
 
+			m_Obstacle->Render(m_Direct3D);
+
+			m_Direct3D->BeginLightStage();
+
+				_RenderLights();
+
+			m_Direct3D->EndLightStage();
+
+		m_Direct3D->EndDeferredRenderingScene();
 
 	m_Direct3D->EndScene();
 
@@ -310,13 +343,6 @@ void Application::Shutdown()
 		m_Obstacle = 0;
 	}
 
-	//Release the ballshader object
-	if (m_BallShader)
-	{
-		m_BallShader->Flush();
-		m_BallShader = 0;
-	}
-
 	// Release the Direct3D object.
 	if (m_Direct3D)
 	{
@@ -324,4 +350,63 @@ void Application::Shutdown()
 		delete m_Direct3D;
 		m_Direct3D = 0;
 	}
+}
+
+void Application::_UpdateShaderVariables()
+{
+	m4 worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+
+	/*v3 ballPosition;
+	m_Ball->GetPosition(ballPosition);
+	viewMatrix.ViewAtLH(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f),
+		ballPosition);*/
+
+	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
+	m_Camera->Render();
+
+	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_Direct3D->GetProjectionMatrix(projectionMatrix);
+
+	defaultShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
+	defaultShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
+
+
+	m4 viewProj = viewMatrix * projectionMatrix;
+	m4 viewProjInverted = viewProj.Inverse();
+
+	//pointLightShader->UpdateConstantBuffer(0, &test, sizeof(stuff));
+	pointLightShader->SetVariable("viewProj", &viewProj, sizeof(m4));
+	pointLightShader->SetVariable("viewProjInverted", &viewProjInverted, sizeof(m4));
+}
+
+void Application::_RenderLights()
+{
+	for (uint i = 0; i < lights.Length(); ++i)
+	{
+		//assert(lights[i].shader);
+		m_Direct3D->SetShader(lights[i].shader);
+
+		switch (lights[i].lightType)
+		{
+		case LT_Point:
+			lights[i].shader->UpdateConstantBuffer(1, &lights[i], sizeof(LightPack));
+			m_Direct3D->ApplyConstantBuffers();
+			break;
+		}
+
+		m_Direct3D->RenderMesh(lights[i].mesh);
+	}
+}
+
+void Application::AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity)
+{
+	LightPack &light = lights.Append();
+	light.pos = center;
+	light.range = radius;
+	light.color = color;
+	light.intensity = intensity;
+	light.mesh = lightSphereMesh;
+	light.shader = pointLightShader;
+	light.lightType = LT_Point;
 }

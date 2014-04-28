@@ -50,8 +50,7 @@ PixelInputType BallVertexShader(VertexInputType input)
     
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;
-
-	//output.normal = input.normal;
+	output.normal = mul(input.normal, (float3x3) worldMatrix);
 
     return output;
 }

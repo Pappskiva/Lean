@@ -76,8 +76,8 @@ void Obstacle::Render(D3D *direct3D)
 	//direct3D->SetTexture(blabla)
 	UpdateWorldMatrix();
 
-	Shader *shader = direct3D->GetCurrentShader();
-	shader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
+	direct3D->SetShader(m_shader);
+	m_shader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
 	direct3D->ApplyConstantBuffers();
 	direct3D->ApplyTexture(m_Texture, 0);
 

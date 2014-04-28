@@ -69,9 +69,6 @@
     <ClCompile Include="FPSClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DuckRenderer\MathFuncs.cpp">
       <Filter>Source Files\DuckRenderer</Filter>
     </ClCompile>
@@ -146,9 +143,6 @@
     <ClInclude Include="FPSClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DuckRenderer\MathFuncs.h">
       <Filter>Header Files\DuckRenderer</Filter>
     </ClInclude>
@@ -221,6 +215,18 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="level.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="finalComposition.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="pointLight.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="fullScreenQuad.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="pointLight.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

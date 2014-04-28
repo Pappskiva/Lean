@@ -23,7 +23,6 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelLoaderClass.cpp" />
-    <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -55,7 +54,6 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelLoaderClass.h" />
-    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Obstacle.h" />
@@ -75,8 +73,12 @@
     <None Include="ball.vs" />
     <None Include="DuckRenderer\Array.inl" />
     <None Include="DuckRenderer\MathStructs.inl" />
+    <None Include="finalComposition.ps" />
+    <None Include="fullScreenQuad.vs" />
     <None Include="level.ps" />
     <None Include="level.vs" />
+    <None Include="pointLight.ps" />
+    <None Include="pointLight.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Bullet\BulletCollision_Debug.lib" />
