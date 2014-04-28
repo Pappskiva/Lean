@@ -17,7 +17,7 @@ LevelLoaderClass::~LevelLoaderClass()
 }
 
 
-bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height, int &width, v3 &goalPos)
+bool LevelLoaderClass::LoadLevel(int level, VertexType *&heightMap, int &height, int &width, D3DXVECTOR3 &goalPos)
 {
 	bool result;
 	string heightMapFileName;

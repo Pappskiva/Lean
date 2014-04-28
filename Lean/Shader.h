@@ -9,7 +9,7 @@
 #include <fstream>
 #include <string>
 
-enum ShaderVariableFlags
+enum ShaderVariableFlags : uint
 {
 	SVF_VERTEXSHADER = 0x1,
 	SVF_HULLSHADER = 0x2,
@@ -21,6 +21,10 @@ enum ShaderVariableFlags
 	SVF_FLOAT = 0x100,
 	SVF_UINT = 0x200,
 	SVF_INT = 0x800,
+
+	SVF_GBUFFER = 0x1000,
+	SVF_RENDERTARGET = 0x2000,
+	SVF_DEPTHSTENCIL = 0x4000,
 
 };
 
@@ -106,6 +110,8 @@ public:
 
 	void						AddTextureSampler(const Shader &shader, int inSlot, const uint resultSlot);
 	void						AddTextureSampler(const ID3D11SamplerState *sampler, const uint slot);
+	void						AddTextureSlotFlag(const uint index, const ShaderVariableFlags flag);
+
 
 	void						SetRasterizer(const Shader &shader);
 	void						SetDepthStencilState(const Shader &shader);
