@@ -65,6 +65,7 @@ public:
 private:
 	void			RenderGraphics();
 	void			_UpdateShaderVariables();
+	void			_RenderSkybox();
 	void			_RenderLights();
 	void			AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
 
@@ -79,10 +80,13 @@ private:
 	Ball			*m_Ball;
 	Level			*m_Level;
 	Obstacle		*m_WaterObstacle; //För testningsyften
+	Mesh			*m_skybox;
 
 	FPSClass		m_fps;
 
-	Shader			*defaultShader, *levelShader;
+	Shader			*defaultShader, *levelShader, *skyboxShader;
+
+	Texture			*m_SkyboxTexture;
 
 	//kanske borde vara i någon sceneManager	
 	Array<LightPack>	lights;
