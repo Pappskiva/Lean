@@ -7,7 +7,8 @@
 
 Level::Level()
 {
-	m_Texture = nullptr;
+	m_Texture1 = nullptr;
+	m_Texture2 = nullptr;
 
 	m_positionX = 0.0f;
 	m_positionY = 0.0f;
@@ -34,7 +35,7 @@ Level::~Level()
 
 }
 
-bool Level::Initialize(D3D* direct3D, WCHAR* textureFileName)
+bool Level::Initialize(D3D* direct3D, WCHAR* textureFileName1, WCHAR* textureFileName2)
 {
 	bool result;
 
@@ -44,9 +45,13 @@ bool Level::Initialize(D3D* direct3D, WCHAR* textureFileName)
 		return false;
 
 
-	//Ladda in texturen till föremålet.
-	m_Texture = direct3D->LoadTextureFromFile(textureFileName);
-	if (!m_Texture)
+	//Ladda in texturerna till föremålet.
+	m_Texture1 = direct3D->LoadTextureFromFile(textureFileName1);
+	if (!m_Texture1)
+		return false;
+
+	m_Texture2 = direct3D->LoadTextureFromFile(textureFileName2);
+	if (!m_Texture2)
 		return false;
 
 	return true;
@@ -94,7 +99,8 @@ void Level::Render(D3D* direct3D)
 	direct3D->SetShader(m_shader);
 	m_shader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
 	direct3D->ApplyConstantBuffers();
-	direct3D->ApplyTexture(m_Texture, 0);
+	direct3D->ApplyTexture(m_Texture1, 0);
+	direct3D->ApplyTexture(m_Texture2, 1);
 
 	direct3D->RenderMesh(m_mesh);
 
@@ -102,9 +108,17 @@ void Level::Render(D3D* direct3D)
 }
 
 
-ID3D11ShaderResourceView* Level::GetTexture()
+ID3D11ShaderResourceView* Level::GetTexture(int textureNumber)
 {
-	return m_Texture->GetTexture();
+	if (textureNumber == 0)
+	{
+		return m_Texture1->GetTexture();
+	}
+	else if (textureNumber == 1)
+	{
+		return m_Texture2->GetTexture();
+	}
+	
 }
 
 void Level::SetPosition(float positionX, float positionY, float positionZ)

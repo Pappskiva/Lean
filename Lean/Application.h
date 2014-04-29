@@ -82,7 +82,7 @@ private:
 
 	FPSClass		m_fps;
 
-	Shader			*defaultShader;
+	Shader			*defaultShader, *levelShader;
 
 	//kanske borde vara i någon sceneManager	
 	Array<LightPack>	lights;

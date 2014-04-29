@@ -29,6 +29,7 @@ struct PixelInputType
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float height : HEIGHT;
 };
 
 
@@ -42,6 +43,7 @@ PixelInputType LevelVertexShader(VertexInputType input)
 
 	// Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
+	output.height = input.position.y;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
@@ -50,8 +52,7 @@ PixelInputType LevelVertexShader(VertexInputType input)
     
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;
-
-	output.normal = input.normal;
+	output.normal = mul(input.normal, (float3x3) worldMatrix);
 
     return output;
 }

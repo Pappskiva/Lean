@@ -23,13 +23,13 @@ public:
 	Level(const Level&);
 	~Level();
 
-	bool Initialize(D3D*, WCHAR*);
+	bool Initialize(D3D*, WCHAR*, WCHAR*);
 	void Shutdown();
 	void Update(float);
 	void Render(D3D*);
 	int	 GetIndexCount();
 
-	ID3D11ShaderResourceView* GetTexture();
+	ID3D11ShaderResourceView* GetTexture(int);
 
 	void LoadLevel(const uint levelIndex, D3D* direct3D);
 
@@ -64,7 +64,7 @@ private:
 private:
 	Mesh *m_mesh;
 	Shader *m_shader;
-	Texture *m_Texture;
+	Texture *m_Texture1, *m_Texture2;
 
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;

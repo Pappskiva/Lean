@@ -2,8 +2,16 @@
 // Filename: level.ps
 ////////////////////////////////////////////////////////////////////////////////
 
-Texture2D shaderTexture;
+Texture2D shaderTexture1 : register (t0);
+Texture2D shaderTexture2 : register (t1);
 SamplerState SampleType;
+
+SamplerState linearSampler //Tillagd för att jag inte kunde lista ut hur man lade till en samplerstate rätt i Shader klassen
+{
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = wrap;
+	AddressV = wrap;
+};
 
 //////////////
 // TYPEDEFS //
@@ -13,18 +21,45 @@ struct PixelInputType
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float height : HEIGHT;
 };
 
+
+struct PixelOutput
+{
+	float4 diffuse : SV_TARGET0;
+	float4 normal : SV_TARGET1;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
-float4 LevelPixelShader(PixelInputType input) : SV_TARGET
+PixelOutput LevelPixelShader(PixelInputType input)
 {
-    float4 textureColor;
+    PixelOutput outColors;
 
-    // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, input.tex);
+    // Sample the pixel color from the texture using the sampler at this texture coordinate location,
+	// based on the height the original vertex was localy at, the texture used is changed as well
+    if(input.height >= 0.6f)
+	{
+		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex*4).rgb;
+	}
+	else if(input.height >= 0.25f)
+	{
+		float3 color1 = shaderTexture1.Sample(linearSampler, input.tex*4).rgb;
+		float3 color2 = shaderTexture2.Sample(linearSampler, input.tex*1).rgb;
+		float blendAmount = (input.height - 0.05f) * (1.0f/ 0.6f - 0.25f);
+        outColors.diffuse.rgb = lerp(color2, color1, blendAmount);
+	}
+	else
+	{
+		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex*2).rgb;
+	}
 
-    return textureColor;
+	outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);
+	
+	outColors.diffuse.a = 0.5f;//specualarIntensity;
+	outColors.normal.a = 0.5f;//specualarPower;
+
+    return outColors;
 }
