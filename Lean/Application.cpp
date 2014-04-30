@@ -304,7 +304,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Ball->SetPosition(1, 5, 0);
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
-	m_Level->LoadLevel(0, m_Direct3D);
+	m_Level->LoadLevel(1, m_Direct3D);
 	m_WaterObstacle->SetShader(obstacleShader);
 
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);

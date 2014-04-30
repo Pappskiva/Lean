@@ -36,24 +36,31 @@ struct PixelOutput
 ////////////////////////////////////////////////////////////////////////////////
 PixelOutput LevelPixelShader(PixelInputType input)
 {
+	float lowestBlendHeight = 0.25f; //The lowest height, everything below this only uses the dark grimy texture
+	float highestBlendHeight = 0.6f; //The heighest height, everything above this only uses the nature texture
+	int natureTextureWrapAmount = 4;
+	int grimyTextureWrapAmount = 1;
+
     PixelOutput outColors;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location,
 	// based on the height the original vertex was localy at, the texture used is changed as well
-    if(input.height >= 0.6f)
+    if(input.height >= highestBlendHeight)
 	{
-		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex*4).rgb;
+		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex* natureTextureWrapAmount).rgb;
 	}
-	else if(input.height >= 0.25f)
+	else if(input.height >= lowestBlendHeight)
 	{
-		float3 color1 = shaderTexture1.Sample(linearSampler, input.tex*4).rgb;
-		float3 color2 = shaderTexture2.Sample(linearSampler, input.tex*1).rgb;
-		float blendAmount = (input.height - 0.05f) * (1.0f/ 0.6f - 0.25f);
+
+		float blendAmount = (input.height -  lowestBlendHeight) * (1.0f / (highestBlendHeight - lowestBlendHeight));
+		float3 color1 = shaderTexture1.Sample(linearSampler, input.tex * natureTextureWrapAmount).rgb;
+		float3 color2 = shaderTexture2.Sample(linearSampler, input.tex * grimyTextureWrapAmount).rgb;
+		
         outColors.diffuse.rgb = lerp(color2, color1, blendAmount);
 	}
 	else
 	{
-		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex*2).rgb;
+		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex * grimyTextureWrapAmount).rgb;
 	}
 
 	outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);

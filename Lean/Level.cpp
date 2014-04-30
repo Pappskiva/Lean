@@ -204,10 +204,10 @@ void Level::UpdateWorldMatrix()
 	m4 localSpace;
 
 	rotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
-	scaleMatrix = m4::CreateScale(v3(m_scale, m_scale, m_scale));
+	scaleMatrix = m4::CreateScale(v3(m_scale, 1.0f, m_scale));
 	localSpace = m4::CreateTranslation(v3(m_positionX, m_positionY, m_positionZ));
 
-	worldMatrix = rotationMatrix * localSpace;
+	worldMatrix = scaleMatrix * rotationMatrix * localSpace;
 }
 
 void Level::GetWorldMatrix(m4& worldMatrix)
