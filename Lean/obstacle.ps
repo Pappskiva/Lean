@@ -1,0 +1,37 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: obstacle.ps
+////////////////////////////////////////////////////////////////////////////////
+
+Texture2D shaderTexture : register (t0);
+SamplerState SampleType;
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+};
+
+
+struct PixelOutput
+{
+	float4 diffuse : SV_TARGET0;
+	float4 normal : SV_TARGET1;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+PixelOutput ObstaclePixelShader(PixelInputType input)
+{
+    PixelOutput outColors;
+
+    // Sample the pixel color from the texture using the sampler at this texture coordinate location.
+    outColors.diffuse.rgba = shaderTexture.Sample(SampleType, input.tex).rgba;
+	//outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);
+
+    return outColors;
+}

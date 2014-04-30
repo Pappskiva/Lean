@@ -16,6 +16,8 @@ Application::Application()
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
+	skyboxShader = nullptr;
+	obstacleShader = nullptr;
 }
 
 
@@ -84,7 +86,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	result = m_WaterObstacle->Initialize(m_Direct3D, L"testLevelTexture.png");
+	result = m_WaterObstacle->Initialize(m_Direct3D);
 	if (!result)
 	{
 		return false;
@@ -248,6 +250,27 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		SVF_PIXELSHADER))
 		return false;
 
+
+	//Create the obstacleshaderclass object
+	//Initialize  the obstacleshaderclass object
+	D3D11_INPUT_ELEMENT_DESC obstacleShaderElem[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	obstacleShader = m_Direct3D->LoadVertexShader(ShaderInfo("obstacle.vs", "ObstacleVertexShader", "vs_4_0"),
+		obstacleShaderElem,
+		3);
+	if (!obstacleShader)
+		return false;
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("obstacle.ps", "ObstaclePixelShader", "ps_4_0"),
+		obstacleShader,
+		SVF_PIXELSHADER))
+		return false;
+
+
 	ID3D11SamplerState* m_sampleState;
 	D3D11_SAMPLER_DESC samplerDesc;
 
@@ -282,7 +305,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
 	m_Level->LoadLevel(0, m_Direct3D);
-	m_WaterObstacle->SetShader(defaultShader);
+	m_WaterObstacle->SetShader(obstacleShader);
 
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
@@ -393,7 +416,9 @@ void Application::RenderGraphics()
 
 			m_Level->Render(m_Direct3D);
 
+			m_Direct3D->TurnOnAlphaBlending();
 			m_WaterObstacle->Render(m_Direct3D);
+			m_Direct3D->TurnOnAlphaBlending();
 
 			m_Direct3D->BeginLightStage();
 
@@ -486,6 +511,8 @@ void Application::_UpdateShaderVariables()
 	levelShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 	skyboxShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
 	skyboxShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
+	obstacleShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
+	obstacleShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 
 	// Translatera skyboxen till kamerans position
 	v3 cameraPos;

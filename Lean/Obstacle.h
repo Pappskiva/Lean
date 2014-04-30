@@ -31,7 +31,7 @@ public:
 	Obstacle(const Obstacle&);
 	virtual ~Obstacle() = 0;
 
-	virtual bool Initialize(D3D*, WCHAR*);
+	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
 	virtual void Update(float, float, float);
 	virtual void Render(D3D *direct3D);
@@ -57,7 +57,7 @@ public:
 protected:
 	virtual bool 	InitalizeBuffers(D3D*);
 	//void	ShutdownBuffers();
-	
+
 
 
 protected:

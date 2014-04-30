@@ -11,12 +11,12 @@ public:
 	WaterObstacle();
 	~WaterObstacle();
 
-	virtual bool Initialize(D3D*, WCHAR*);
+	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
 	virtual void Update(float, float, float);
 
 protected:
-	virtual bool 	InitalizeBuffers(D3D*);
+	//virtual bool 	InitalizeBuffers(D3D*);
 
 
 };

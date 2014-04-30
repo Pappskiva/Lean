@@ -253,6 +253,12 @@
     <None Include="pointLight.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="obstacle.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="obstacle.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Bullet\BulletCollision_Debug.lib">

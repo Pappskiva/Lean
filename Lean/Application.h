@@ -84,7 +84,7 @@ private:
 
 	FPSClass		m_fps;
 
-	Shader			*defaultShader, *levelShader, *skyboxShader;
+	Shader			*defaultShader, *levelShader, *skyboxShader, *obstacleShader;
 
 	Texture			*m_SkyboxTexture;
 

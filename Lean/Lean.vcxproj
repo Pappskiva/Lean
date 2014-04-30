@@ -85,6 +85,8 @@
     <None Include="fullScreenQuad.vs" />
     <None Include="level.ps" />
     <None Include="level.vs" />
+    <None Include="obstacle.ps" />
+    <None Include="obstacle.vs" />
     <None Include="pointLight.ps" />
     <None Include="pointLight.vs" />
   </ItemGroup>
