@@ -13,6 +13,7 @@ Application::Application()
 	m_Ball = nullptr;
 	m_Level = nullptr;
 	m_WaterObstacle = nullptr;
+	m_Goal = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -72,6 +73,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	//Create the obstacle object
 	m_WaterObstacle = new WaterObstacle;
 
+	//Create the goal object
+	m_Goal = new Goal;
+
 	//Initialize the level object
 	result = m_Level->Initialize(m_Direct3D, L"testSpringGround.png", L"testDeepGround.png");
 	if (!result)
@@ -80,13 +84,21 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Initialize the ball object
-	result = m_Ball->Initialize(m_Direct3D, L"testTexture.png");
+	result = m_Ball->Initialize(m_Direct3D, L"ball.png");
 	if (!result)
 	{
 		return false;
 	}
 
+	//Initialize the obstacle object
 	result = m_WaterObstacle->Initialize(m_Direct3D);
+	if (!result)
+	{
+		return false;
+	}
+
+	//Initialize the goal object
+	result = m_Goal->Initialize(m_Direct3D, L"testTexture.png");
 	if (!result)
 	{
 		return false;
@@ -306,6 +318,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Level->SetShader(levelShader);
 	m_Level->LoadLevel(1, m_Direct3D);
 	m_WaterObstacle->SetShader(obstacleShader);
+	m_Goal->SetShader(defaultShader);
 
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
@@ -393,6 +406,8 @@ bool Application::Frame(float deltaTime)
 	
 	m_WaterObstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f);
 
+	m_Goal->Update(deltaTime);
+
 	// Render the graphics.
 	RenderGraphics();
 
@@ -415,6 +430,8 @@ void Application::RenderGraphics()
 			m_Ball->Render(m_Direct3D);
 
 			m_Level->Render(m_Direct3D);
+
+			m_Goal->Render(m_Direct3D);
 
 			m_Direct3D->TurnOnAlphaBlending();
 			m_WaterObstacle->Render(m_Direct3D);
@@ -478,6 +495,13 @@ void Application::Shutdown()
 	{
 		m_WaterObstacle->Shutdown();
 		m_WaterObstacle = 0;
+	}
+
+	//Release the goal object
+	if (m_Goal)
+	{
+		m_Goal->Shutdown();
+		m_Goal = 0;
 	}
 
 	// Release the Direct3D object.

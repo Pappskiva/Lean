@@ -20,6 +20,7 @@
     <ClCompile Include="DuckRenderer\HString.cpp" />
     <ClCompile Include="DuckRenderer\MathFuncs.cpp" />
     <ClCompile Include="FPSClass.cpp" />
+    <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="LeafObstacle.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="DuckRenderer\MathFuncs.h" />
     <ClInclude Include="DuckRenderer\MathStructs.h" />
     <ClInclude Include="FPSClass.h" />
+    <ClInclude Include="Goal.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="LeafObstacle.h" />
     <ClInclude Include="Level.h" />

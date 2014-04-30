@@ -18,7 +18,7 @@ Level::Level()
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
 
-	m_scale = 5.0f;
+	m_scale = 25.0f;
 
 	m_MaximumRotationValue = 20.0f; //Degrees
 
