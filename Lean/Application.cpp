@@ -98,7 +98,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Initialize the goal object
-	result = m_Goal->Initialize(m_Direct3D, L"testTexture.png");
+	result = m_Goal->Initialize(m_Direct3D, L"blackGoal.png");
 	if (!result)
 	{
 		return false;
@@ -403,10 +403,12 @@ bool Application::Frame(float deltaTime)
 	m_Camera->SetPosition(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f);
 	m_Camera->SetTargetToLookAt(ballPosition.x, ballPosition.y, ballPosition.z);
 	
-	
-	m_WaterObstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f);
+	float planeRotX = m_Level->GetRotationX();
+	float planeRotZ = m_Level->GetRotationZ();
 
-	m_Goal->Update(deltaTime);
+	m_WaterObstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ);
+
+	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
 	// Render the graphics.
 	RenderGraphics();

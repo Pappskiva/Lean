@@ -33,7 +33,7 @@ public:
 
 	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
-	virtual void Update(float, float, float);
+	virtual void Update(float, float, float, float, float);
 	virtual void Render(D3D *direct3D);
 
 	ID3D11ShaderResourceView* GetTexture();

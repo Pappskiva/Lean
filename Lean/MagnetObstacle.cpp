@@ -38,10 +38,10 @@ void MagnetObstacle::Shutdown()
 {
 
 }
-void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ)
-{
-	m_rotationY = -atan2(m_position.x - cameraPosX, m_position.z - cameraPosZ) * 57.2957795131f; //I grader, då vi gör det till radianer igen i updateworldmatrix funktionen
-}
+//void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ)
+//{
+//	m_rotationY = -atan2(m_position.x - cameraPosX, m_position.z - cameraPosZ) * 57.2957795131f; //I grader, då vi gör det till radianer igen i updateworldmatrix funktionen
+//}
 
 /*
 bool MagnetObstacle::InitalizeBuffers(D3D* direct3D)

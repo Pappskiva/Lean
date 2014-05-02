@@ -21,7 +21,7 @@ public:
 
 	bool Initialize(D3D*, WCHAR*);
 	void Shutdown();
-	void Update(float);
+	void Update(float, float, float);
 	void Render(D3D *direct3D);
 
 	ID3D11ShaderResourceView* GetTexture();

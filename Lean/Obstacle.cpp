@@ -8,8 +8,8 @@ Obstacle::Obstacle()
 {
 	m_Texture = 0;
 
-	m_position.x = 0.0f;
-	m_position.y = 0.0f;
+	m_position.x = 3.0f;
+	m_position.y = 1.0f;
 	m_position.z = 0.0f;
 
 	m_rotationX = 0.0f;
@@ -62,10 +62,12 @@ void Obstacle::Shutdown()
 	return;
 }
 
-void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ)
+void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ)
 {
 	//Uppdatera hindret
 
+	m_rotationX = planeRotationX;
+	m_rotationZ = planeRotationZ;
 	//Updatera hindrets rotation, billboarding
 	m_rotationY = -atan2(m_position.x - cameraPosX, m_position.z - cameraPosZ) * 57.2957795131f; //I grader, då vi gör det till radianer igen i updateworldmatrix funktionen
 }
@@ -127,14 +129,16 @@ Type Obstacle::GetType()
 void Obstacle::UpdateWorldMatrix()
 {
 	//Ändra worldmatrisen baserat på postion, rotation och skala.
-	m4 rotationMatrix;
-	rotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
+	m4 billBoardRotationMatrix;
+	billBoardRotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, 0.0f, 0.0f);
+	m4 worldRotationMatrix;
+	worldRotationMatrix = m4::CreateYawPitchRoll(0.0f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	m4 scaleMatrix;
 	scaleMatrix = m4::CreateScale(v3(1.0f, 1.0f, 1.0f));
 	m4 localSpace;
 	localSpace = m4::CreateTranslation(m_position);
 
-	worldMatrix = scaleMatrix * rotationMatrix * localSpace;
+	worldMatrix = scaleMatrix * billBoardRotationMatrix * localSpace * worldRotationMatrix;
 }
 
 void Obstacle::GetWorldMatrix(m4& worldMatrix)

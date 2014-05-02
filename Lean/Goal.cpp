@@ -8,9 +8,9 @@ Goal::Goal()
 {
 	m_Texture = 0;
 
-	m_position.x = 0.0f;
-	m_position.y = 2.0f;
-	m_position.z = 0.0f;
+	m_position.x = 3.0f;
+	m_position.y = 1.0f;
+	m_position.z = 2.0f;
 
 	m_rotationX = 0.0f;
 	m_rotationY = 0.0f;
@@ -58,9 +58,11 @@ void Goal::Shutdown()
 	return;
 }
 
-void Goal::Update(float deltaTime)
+void Goal::Update(float deltaTime, float planeRotationX, float planeRotationZ)
 {
 	//Uppdatera målet
+	m_rotationX = planeRotationX;
+	m_rotationZ = planeRotationZ;
 }
 
 void Goal::Render(D3D *direct3D)
@@ -127,7 +129,7 @@ void Goal::UpdateWorldMatrix()
 	m4 localSpace;
 	localSpace = m4::CreateTranslation(m_position);
 
-	worldMatrix = scaleMatrix * rotationMatrix * localSpace;
+	worldMatrix = scaleMatrix * localSpace * rotationMatrix;
 }
 
 void Goal::GetWorldMatrix(m4& worldMatrix)
