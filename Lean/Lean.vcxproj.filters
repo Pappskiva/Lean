@@ -280,4 +280,36 @@
       <Filter>Bullet</Filter>
     </Library>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="ball.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="blackGoal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="leaf.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="magnet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testDeepGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testLevelTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testSpringGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="trampoline.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="water.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

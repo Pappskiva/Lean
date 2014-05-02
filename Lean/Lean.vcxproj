@@ -98,6 +98,18 @@
     <Library Include="Bullet\BulletSoftBody_Debug.lib" />
     <Library Include="Bullet\LinearMath_Debug.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="ball.png" />
+    <Image Include="blackGoal.png" />
+    <Image Include="leaf.png" />
+    <Image Include="magnet.png" />
+    <Image Include="testDeepGround.png" />
+    <Image Include="testLevelTexture.png" />
+    <Image Include="testSpringGround.png" />
+    <Image Include="testTexture.png" />
+    <Image Include="trampoline.png" />
+    <Image Include="water.png" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F638B05-F9B3-4238-A88C-F4A6FC99C859}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
