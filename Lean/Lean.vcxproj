@@ -103,10 +103,13 @@
     <Image Include="blackGoal.png" />
     <Image Include="leaf.png" />
     <Image Include="magnet.png" />
+    <Image Include="testAutumnGround.png" />
     <Image Include="testDeepGround.png" />
     <Image Include="testLevelTexture.png" />
     <Image Include="testSpringGround.png" />
+    <Image Include="testSummerGround.png" />
     <Image Include="testTexture.png" />
+    <Image Include="testWinterGround.png" />
     <Image Include="trampoline.png" />
     <Image Include="water.png" />
   </ItemGroup>

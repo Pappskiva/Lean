@@ -311,5 +311,14 @@
     <Image Include="water.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="testAutumnGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testSummerGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testWinterGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
