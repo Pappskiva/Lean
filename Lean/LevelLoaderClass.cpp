@@ -17,7 +17,7 @@ LevelLoaderClass::~LevelLoaderClass()
 }
 
 
-bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos)
+bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles)
 {
 	bool result;
 	string heightMapFileName;
@@ -33,10 +33,35 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		return false;
 	}
 	getline(in, heightMapFileName);
-	in >> goalPos.x;
-	in >> goalPos.z;
+	int nrOfObst;
+	int obstPos = 0;
+	in >> nrOfObst;
+	obstacles = new ObstacleType[nrOfObst];
+	string str;
+	while (!in.eof())
+	{
+		in >> str;
+		if (str == "g")
+		{
+			in >> goalPos.x;
+			in >> goalPos.z;
+			goalPos.y = -1;
+		}
+		else if (str == "s")
+		{
+			in >> startPos.x;
+			in >> startPos.z;
+		}
+		else
+		{
+			obstacles[obstPos].type = str;
+			in >> obstacles[obstPos].pos.x;
+			in >> obstacles[obstPos].pos.z;
+			obstacles[obstPos].pos.y = -1;
+			obstPos++;
+		}
+	}
 	in.close();
-	goalPos.y = -1;
 	heightMapFileName = levelFilePath + heightMapFileName;
 	result = LoadHeightMap((char*)heightMapFileName.c_str(), heightMap);
 	if (!result)

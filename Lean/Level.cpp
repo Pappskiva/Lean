@@ -320,7 +320,11 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D)
 	const float LEVEL_POINT_DISTANCE = 1.0f / 75.0f;
 	const float LEVEL_MAX_HEIGHT = 1.0f / 255.0f;
 	
-	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, pos);
+	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
+	v3 startPos;
+	LevelLoaderClass::ObstacleType *obstacles;
+
+	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, pos, startPos, obstacles);
 	uint height = (uint)tempHeight, width = (uint)tempWidth;
 	
 	struct Vertex

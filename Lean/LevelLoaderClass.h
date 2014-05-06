@@ -12,12 +12,18 @@ using namespace std;
 class LevelLoaderClass
 {
 public:
+	struct ObstacleType
+	{
+		v3 pos;
+		string type;
+	};
+
 	LevelLoaderClass();
 	LevelLoaderClass(const LevelLoaderClass&);
 	~LevelLoaderClass();
 
-	//LoadLevel tar in int för leveln, öppnar upp textfilen för information och lagrar sedan all data om leveln i de andra parametrarna. GoalPos får enbart x och z värde. 
-	bool LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos);
+	//LoadLevel tar in int för leveln, öppnar upp textfilen för information och lagrar sedan all data om leveln i de andra parametrarna. Positionerna får enbart x och z värde. 
+	bool LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles);
 	void Shutdown();
 
 private:
