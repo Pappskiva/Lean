@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: TrampolineObstacle.cpp
+////////////////////////////////////////////////////////////////////////////////
+
 #include "TrampolineObstacle.h"
 
 TrampolineObstacle::TrampolineObstacle() : Obstacle()
@@ -14,6 +18,7 @@ bool TrampolineObstacle::Initialize(D3D* direct3D)
 {
 	bool result = true;
 
+	/*Detta utkommenterade kodstycker är för framtiden, ifall vi önskar ladda in en mesh för objektet*/
 	/*m_mesh = direct3D->LoadMeshFromOBJ(".obj");
 	if (!m_mesh)
 	return false;*/
@@ -23,6 +28,8 @@ bool TrampolineObstacle::Initialize(D3D* direct3D)
 	{
 		return false;
 	}
+
+	/*En trampolintextur läses och laddas in till hindret*/
 
 	WCHAR* textureFileName = L"data//trampoline.png";
 	//Ladda in texturen till föremålet.	

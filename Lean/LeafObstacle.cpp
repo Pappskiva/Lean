@@ -1,3 +1,6 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: LeafObstacle.cpp
+////////////////////////////////////////////////////////////////////////////////
 #include "LeafObstacle.h"
 
 LeafObstacle::LeafObstacle() : Obstacle()
@@ -14,10 +17,12 @@ bool LeafObstacle::Initialize(D3D* direct3D)
 {
 	bool result = true;
 
+	/*Detta utkommenterade kodstycker är för framtiden, ifall vi önskar ladda in en mesh för objektet*/
 	/*m_mesh = direct3D->LoadMeshFromOBJ(".obj");
 	if (!m_mesh)
 	return false;*/
 
+	/*En lövtextur läses och laddas in till hindret*/
 	result = InitalizeBuffers(direct3D);
 	if (!result)
 	{

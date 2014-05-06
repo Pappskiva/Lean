@@ -6,6 +6,8 @@
 
 Goal::Goal()
 {
+	/*Alla privata variabler sätts till 0 eller standard/testvärden*/
+
 	m_Texture = 0;
 
 	m_position.x = 3.0f;
@@ -35,12 +37,12 @@ bool Goal::Initialize(D3D* direct3D, WCHAR* textureFileName)
 {
 	bool result = true;
 
-	//Load in a sphere, something round.
+	/*Ladda in en sfär*/
 	m_mesh = direct3D->LoadMeshFromOBJ("data//Sphere.obj");
 	if (!m_mesh)
 	return false;
 
-	//Ladda in texturen till föremålet.	
+	/*Ladda in texturen till föremålet.*/
 	m_Texture = direct3D->LoadTextureFromFile(textureFileName);
 	if (!m_Texture)
 	{
@@ -60,14 +62,14 @@ void Goal::Shutdown()
 
 void Goal::Update(float deltaTime, float planeRotationX, float planeRotationZ)
 {
-	//Uppdatera målet
+	/*Uppdatera målet. Vi får även rotationen på banan så att målet ligger rätt utmed det.*/
 	m_rotationX = planeRotationX;
 	m_rotationZ = planeRotationZ;
 }
 
 void Goal::Render(D3D *direct3D)
 {
-	//direct3D->SetTexture(blabla)
+	/*Worldmatrisen uppdateras baserat på position och rotation*/
 	UpdateWorldMatrix();
 
 	direct3D->SetShader(m_shader);
@@ -88,7 +90,7 @@ ID3D11ShaderResourceView* Goal::GetTexture()
 
 void Goal::SetPosition(float positionX, float positionY, float positionZ)
 {
-	//Sätt positionen
+	/*Sätt positionen*/
 	m_position.x = positionX;
 	m_position.y = positionY;
 	m_position.z = positionZ;
@@ -96,13 +98,13 @@ void Goal::SetPosition(float positionX, float positionY, float positionZ)
 
 void Goal::GetPosition(v3& pos)
 {
-	//Få positionen
+	/*Få positionen*/
 	pos = m_position;
 }
 
 void Goal::SetRotation(float rotationX, float rotationY, float rotationZ)
 {
-	//Sätt rotationen
+	/*Sätt rotationen*/
 	m_rotationX = rotationX;
 	m_rotationY = rotationY;
 	m_rotationZ = rotationZ;
@@ -110,7 +112,7 @@ void Goal::SetRotation(float rotationX, float rotationY, float rotationZ)
 
 void Goal::GetRotation(v3& rot)
 {
-	//Få rotationen
+	/*Få rotationen*/
 	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
@@ -121,7 +123,7 @@ int Goal::GetNextLevelNumber()
 
 void Goal::UpdateWorldMatrix()
 {
-	//Ändra worldmatrisen baserat på postion, rotation och skala.
+	/*Ändra worldmatrisen baserat på postion, rotation och skala.*/
 	m4 rotationMatrix;
 	rotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	m4 scaleMatrix;
@@ -134,6 +136,6 @@ void Goal::UpdateWorldMatrix()
 
 void Goal::GetWorldMatrix(m4& worldMatrix)
 {
-	//Få worldmatrisen
+	/*Få worldmatrisen*/
 	worldMatrix = this->worldMatrix;
 }

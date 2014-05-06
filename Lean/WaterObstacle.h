@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: WaterObstacle.h
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+WaterObstacle är en subklass till Obstacle.
+*/
+
 #pragma once
 #ifndef WATEROBSTACLE_H
 #define WATEROBSTACLE_H
@@ -11,6 +19,7 @@ public:
 	WaterObstacle();
 	~WaterObstacle();
 
+	/*Initialisering och nedstängning*/
 	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
 	//virtual void Update(float, float, float);

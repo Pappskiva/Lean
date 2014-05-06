@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: WaterObstacle.cpp
+////////////////////////////////////////////////////////////////////////////////
+
 #include "WaterObstacle.h"
 
 WaterObstacle::WaterObstacle() : Obstacle()
@@ -14,6 +18,7 @@ bool WaterObstacle::Initialize(D3D* direct3D)
 {
 	bool result = true;
 
+	/*Detta utkommenterade kodstycker är för framtiden, ifall vi önskar ladda in en mesh för objektet*/
 	/*m_mesh = direct3D->LoadMeshFromOBJ(".obj");
 	if (!m_mesh)
 	return false;*/
@@ -24,6 +29,7 @@ bool WaterObstacle::Initialize(D3D* direct3D)
 		return false;
 	}
 
+	/*En vattentextur läses och laddas in till hindret*/
 	WCHAR* textureFileName = L"data//water.png";
 	//Ladda in texturen till föremålet.	
 	m_Texture = direct3D->LoadTextureFromFile(textureFileName);

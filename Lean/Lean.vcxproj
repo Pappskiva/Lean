@@ -32,6 +32,7 @@
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SystemClass.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="Texture.h" />

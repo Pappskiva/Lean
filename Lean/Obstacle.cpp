@@ -6,6 +6,7 @@
 
 Obstacle::Obstacle()
 {
+	/*Sätt alla variabler till 0 eller standard/testvärden*/
 	m_Texture = 0;
 
 	m_position.x = 3.0f;
@@ -31,18 +32,17 @@ Obstacle::~Obstacle()
 
 bool Obstacle::Initialize(D3D* direct3D)
 {
+	/*Eftersom klassen är virtual så bör detta aldrig faktiskt hända*/
 	bool result = true;
 
-	/*m_mesh = direct3D->LoadMeshFromOBJ(".obj");
-	if (!m_mesh)
-	return false;*/
-
+	/*Meshen skapas*/
 	result = InitalizeBuffers(direct3D);
 	if (!result)
 	{
 		return false;
 	}
 
+	/*Hämta och ladda in texturen till föremålet*/
 	WCHAR* textureFileName = L"data//testTexture.png";
 	//Ladda in texturen till föremålet.	
 	m_Texture = direct3D->LoadTextureFromFile(textureFileName);
@@ -64,11 +64,10 @@ void Obstacle::Shutdown()
 
 void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ)
 {
-	//Uppdatera hindret
-
+	/*Uppdatera hindret så det ligger utmed banan rätt*/
 	m_rotationX = planeRotationX;
 	m_rotationZ = planeRotationZ;
-	//Updatera hindrets rotation, billboarding
+	/*billboarding rotation*/
 	m_rotationY = -atan2(m_position.x - cameraPosX, m_position.z - cameraPosZ) * 57.2957795131f; //I grader, då vi gör det till radianer igen i updateworldmatrix funktionen
 }
 
@@ -95,7 +94,7 @@ ID3D11ShaderResourceView* Obstacle::GetTexture()
 
 void Obstacle::SetPosition(float positionX, float positionY, float positionZ)
 {
-	//Sätt positionen
+	/*Sätt positionen*/
 	m_position.x = positionX;
 	m_position.y = positionY;
 	m_position.z = positionZ;
@@ -103,13 +102,13 @@ void Obstacle::SetPosition(float positionX, float positionY, float positionZ)
 
 void Obstacle::GetPosition(v3& pos)
 {
-	//Få positionen
+	/*Få positionen*/
 	pos = m_position;
 }
 
 void Obstacle::SetRotation(float rotationX, float rotationY, float rotationZ)
 {
-	//Sätt rotationen
+	/*Sätt rotationen*/
 	m_rotationX = rotationX;
 	m_rotationY = rotationY;
 	m_rotationZ = rotationZ;
@@ -117,7 +116,7 @@ void Obstacle::SetRotation(float rotationX, float rotationY, float rotationZ)
 
 void Obstacle::GetRotation(v3& rot)
 {
-	//Få rotationen
+	/*Få rotationen*/
 	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
@@ -128,7 +127,9 @@ Type Obstacle::GetType()
 
 void Obstacle::UpdateWorldMatrix()
 {
-	//Ändra worldmatrisen baserat på postion, rotation och skala.
+	/*Ändra worldmatrisen baserat på postion, rotation och skala.*/
+
+	/*Eftersom det finns två typer av rotation, billboarding och utmed planet så behövs två matriser skapas*/
 	m4 billBoardRotationMatrix;
 	billBoardRotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, 0.0f, 0.0f);
 	m4 worldRotationMatrix;
@@ -138,6 +139,7 @@ void Obstacle::UpdateWorldMatrix()
 	m4 localSpace;
 	localSpace = m4::CreateTranslation(m_position);
 
+	/*Matriserna multipliceras ihop*/
 	worldMatrix = scaleMatrix * billBoardRotationMatrix * localSpace * worldRotationMatrix;
 }
 

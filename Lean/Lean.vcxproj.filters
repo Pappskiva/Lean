@@ -123,6 +123,9 @@
     <ClCompile Include="Goal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -225,6 +228,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Goal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
