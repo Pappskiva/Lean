@@ -30,6 +30,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="ObstacleHandler.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="ObstacleHandler.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
