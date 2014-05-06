@@ -98,7 +98,7 @@ bool Skybox::Initialize(D3D* d3d, const HString &textureFilePath)
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	mShader = d3d->LoadVertexShader(ShaderInfo("skybox.vs", "SkyboxVertexShader", "vs_4_0"),
+	mShader = d3d->LoadVertexShader(ShaderInfo("shader/skybox.vs", "SkyboxVertexShader", "vs_4_0"),
 		skyboxShaderElem,
 		2);
 
@@ -106,12 +106,14 @@ bool Skybox::Initialize(D3D* d3d, const HString &textureFilePath)
 	{
 		return false;
 	}
-	if (!d3d->LoadShaderStageIntoShader(ShaderInfo("skybox.ps", "SkyboxPixelShader", "ps_4_0"),
+	if (!d3d->LoadShaderStageIntoShader(ShaderInfo("shader/skybox.ps", "SkyboxPixelShader", "ps_4_0"),
 		mShader,
 		SVF_PIXELSHADER))
 	{
 		return false;
 	}
+
+	return true;
 }
 
 void Skybox::Shutdown()
