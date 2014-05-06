@@ -1,0 +1,26 @@
+För att skapa en ny level skapar du först en heightmap. 
+Denna är enbart vit och svart, ingen grå. Det vita är upphöjt och är därmed banan.
+Spara denna som bmp 24bit. Paint gör något mysko när man gör detta så använd hellre t.ex. Gimp.
+Spara heightmapen i data\\Levels\\Heightmaps.
+
+Skapa en textfil med samma namn(i siffror) som banan.
+Övert i textfilen skriver du länken till heightmapen t.ex. Heightmaps\4.bmp. Använd endast ett backslash!
+För att sätta ut startpositionen skriver du:
+s
+x-posistionen
+z-positionen
+För målpositionen skriver du:
+g
+x-positionen
+z-positionen
+För hinder skriver du:
+l/i/t/m (l=lövhögen, i=isplätten, t=trampolinen, m=magneten)
+x-positionen
+z-positionen
+
+s, g och hinder behöver inte vara i någon speciell ordning.
+Utan målposition och startposition lär programmet krascha.
+
+Spara textfilen i data\\Levels.
+
+För att spela banan ändrar man LoadLevel-anropet till att läsa din bana (första parametern till bannamnen t.ex. 4).
