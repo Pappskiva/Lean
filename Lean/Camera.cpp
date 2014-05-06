@@ -6,6 +6,7 @@
 
 Camera::Camera()
 {
+	/*Sätt alla variabler till 0 eller standard/testvärden*/
 	m_positionX = 0.0f;
 	m_positionY = 0.0f;
 	m_positionZ = 0.0f;
@@ -14,7 +15,6 @@ Camera::Camera()
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
 
-	// Setup where the camera is looking by default
 	m_LookAtX = 0.0f;
 	m_LookAtY = 0.0f;
 	m_LookAtZ = 1.0f;
@@ -33,6 +33,7 @@ Camera::~Camera()
 
 void Camera::SetPosition(float x, float y, float z)
 {
+	/*Sätt positionen*/
 	m_positionX = x;
 	m_positionY = y;
 	m_positionZ = z;
@@ -42,19 +43,28 @@ void Camera::SetPosition(float x, float y, float z)
 
 void Camera::GetPosition(v3& pos)
 {
+	/*Få positionen*/
 	pos = v3(m_positionX, m_positionY, m_positionZ);
 }
 
 void Camera::SetRotation(float x, float y, float z)
 {
+	/*Sätt rotationen*/
 	m_rotationX = x;
 	m_rotationY = y;
 	m_rotationZ = z;
 	return;
 }
 
+void Camera::GetRotation(v3& rot)
+{
+	/*Få rotationen*/
+	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
+}
+
 void Camera::SetTargetToLookAt(float x, float y, float z)
 {
+	/*Sätt vilken riktning som kameran ska titta åt. Positionen på det man vill titta mot läggs in, och en normaliserad vector mellan kamerans och objektets position fås fram*/
 	v3 betweenCameraAndTarget(x - m_positionX, y - m_positionY, z - m_positionZ);
 	betweenCameraAndTarget.Normalize();
 
@@ -63,54 +73,45 @@ void Camera::SetTargetToLookAt(float x, float y, float z)
 	m_LookAtZ = betweenCameraAndTarget.z;
 }
 
-void Camera::GetRotation(v3& rot)
-{
-	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
-}
-
 void Camera::Render()
 {
 	v3 up, position, lookAt;
 	float yaw, pitch, roll;
 	m4 rotationMatrix;
 
-	// Setup the vector that points upwards.
+	/*Skapa en vektor som pekar uppåt*/
 	up.x = 0.0f;
 	up.y = 1.0f;
 	up.z = 0.0f;
 
-	// Setup the position of the camera in the world.
+	/*Ta kamerans position*/
 	position.x = m_positionX;
 	position.y = m_positionY;
 	position.z = m_positionZ;
 
-	// Setup where the camera is looking by default.
+	/*Ta riktningen den tittar mot*/
 	lookAt.x = m_LookAtX;
 	lookAt.y = m_LookAtY;
 	lookAt.z = m_LookAtZ;
 
-	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
+	/*Bestäm pitch, yaw och roll i radianer*/
 	pitch = m_rotationX * 0.0174532925f;
 	yaw = m_rotationY * 0.0174532925f;
 	roll = m_rotationZ * 0.0174532925f;
 
-	// Create the rotation matrix from the yaw, pitch, and roll values.
+	/*Skapa rotationsmatrisen baserat på rotation*/
 	rotationMatrix = m4::CreateYawPitchRoll(yaw, pitch, roll);
 
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	
+	/*Ändra lookAt och up vektorerna baserat på rotationsmatrisen så de är rätt*/ 
 	lookAt = rotationMatrix.Transform(lookAt);
 	up = rotationMatrix.Transform(up);
-	//D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
-	//D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
 
-	// Translate the rotated camera position to the location of the viewer.
+	/*Ändra så att lookAt blir rätt baserat på kamerans position*/
 	lookAt = position + lookAt;
 
-	// Finally create the view matrix from the three updated vectors.
+	/*Skapa view matrisen från de tre vektorerna*/
 	m_viewMatrix.ViewAtLH(position, lookAt, up);
-	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
-
+	
 	return;
 }
 
