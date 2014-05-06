@@ -17,6 +17,8 @@ LevelLoaderClass::~LevelLoaderClass()
 }
 
 
+//Plockar ihop rätt filnamn, öppnar textfilen för banan, läser in heightmap, läser in viktiga positioner och sparar som goalPos/startPos/obstacles.
+//Anropar sedan LoadHeightmap för att läsa heightmapen den fick från textfilen och till sist NormalizeHeightMap för att ge mindre höjdskillnader.
 bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles)
 {
 	bool result;
@@ -69,7 +71,7 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		return false;
 	}
 
-	//NormalizeHeightMap(heightMap);
+	NormalizeHeightMap(heightMap); //Måste ändras när resten av klasserna ändras.
 
 	height = m_terrainHeight;
 	width = m_terrainWidth;
@@ -161,7 +163,7 @@ void LevelLoaderClass::NormalizeHeightMap(float* heightMap)
 	{
 		for (i = 0; i<m_terrainWidth; i++)
 		{
-			heightMap[(m_terrainHeight * j) + i] /= 10.0f;
+			heightMap[(m_terrainHeight * j) + i] /= 1.0f; //Gör för tillfället inget eftersom resten av klasserna inte funkar med denna ännu.
 		}
 	}
 

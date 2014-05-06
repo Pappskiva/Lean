@@ -1,3 +1,8 @@
+//----------------------------------------------------
+//LevelLoaderClass öppnar en textfil och laddar därifrån in information såsom heightmap och viktiga positioner om banor.
+//För att använda: Se till att ha skapat banor, se data//Levels//How to Level.txt, skapa ett objekt av klassen, anropa LevelLoader med ett giltigt bannamn.
+//----------------------------------------------------
+
 #ifndef _LEVELLOADERCLASS_H_
 #define _LEVELLOADERCLASS_H_
 
