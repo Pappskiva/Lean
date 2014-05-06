@@ -14,7 +14,7 @@
 #include "Level.h"
 #include "WaterObstacle.h"
 #include "Goal.h"
-//Hej och goddag
+#include "Skybox.h"
 
 //FPS kollare för debug
 #include "FPSClass.h"
@@ -66,7 +66,6 @@ public:
 private:
 	void			RenderGraphics();
 	void			_UpdateShaderVariables();
-	void			_RenderSkybox();
 	void			_RenderLights();
 	void			AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
 
@@ -80,15 +79,14 @@ private:
 	Camera			*m_Camera;
 	Ball			*m_Ball;
 	Level			*m_Level;
+	Skybox			*m_Skybox;
 	Obstacle		*m_WaterObstacle; //För testningsyften
 	Goal			*m_Goal; //För testningsyften
-	Mesh			*m_skybox;
 
 	FPSClass		m_fps;
 
-	Shader			*defaultShader, *levelShader, *skyboxShader, *obstacleShader;
+	Shader			*defaultShader, *levelShader, *obstacleShader;
 
-	Texture			*m_SkyboxTexture;
 
 	//kanske borde vara i någon sceneManager	
 	Array<LightPack>	lights;

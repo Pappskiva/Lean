@@ -17,7 +17,6 @@ Application::Application()
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
-	skyboxShader = nullptr;
 	obstacleShader = nullptr;
 }
 
@@ -104,97 +103,16 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	// Initiera Skybox meshen
-	m_skybox = new Mesh();
-
-	// Skapa vertex och index data för skybox
-	struct Vertex
-	{
-		float position[3];
-		float uv[2];
-	};
-
-	Vertex vertices[] =
-	{
-		{ -1.0f, -1.0f, 1.0f, 0.0f, 0.0f },    // sida 1
-		{ 1.0f, -1.0f, 1.0f, 0.0f, 1.0f },
-		{ -1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-
-		{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // sida 2
-		{ -1.0f, 1.0f, -1.0f, 0.0f, 1.0f },
-		{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f },
-
-		{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f },    // sida 3
-		{ -1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-
-		{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // sida 4
-		{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f },
-		{ -1.0f, -1.0f, 1.0f, 1.0f, 0.0f },
-		{ 1.0f, -1.0f, 1.0f, 1.0f, 1.0f },
-
-		{ 1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // sida 5
-		{ 1.0f, 1.0f, -1.0f, 0.0f, 1.0f },
-		{ 1.0f, -1.0f, 1.0f, 1.0f, 0.0f },
-		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-
-		{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // sida 6
-		{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f },
-		{ -1.0f, 1.0f, -1.0f, 1.0f, 0.0f },
-		{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-	};
-
-	uint indices[] =
-	{
-		0, 2, 1,    // sida 1
-		2, 3, 1,
-		4, 6, 5,    // sida 2
-		6, 7, 5,
-		8, 10, 9,    // sida 3
-		10, 11, 9,
-		12, 14, 13,    // sida 4
-		14, 15, 13,
-		16, 18, 17,    // sida 5
-		18, 19, 17,
-		20, 22, 21,    // sida 6
-		22, 23, 21,
-	};
-
-	// Skapa meshen för skybox
-	m_skybox = m_Direct3D->CreateMeshFromRam(vertices, sizeof(Vertex), 24, indices, 36);
-	if (!m_skybox)
+	// Skapa Skybox objektet
+	m_Skybox = new Skybox;
+	if (!m_Skybox)
 	{
 		return false;
 	}
 
-	// Ladda in texturen för skyboxen
-	m_SkyboxTexture = m_Direct3D->LoadTextureFromFile("data//BackgroundCube.dds");
-	if (!m_SkyboxTexture)
-	{
-		return false;
-	}
-
-	// Skapa och initiera skyboxShaderClass objekt
-	D3D11_INPUT_ELEMENT_DESC skyboxShaderElem[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	skyboxShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//skybox.vs", "SkyboxVertexShader", "vs_4_0"),
-		skyboxShaderElem,
-		2);
-
-	if (!skyboxShader)
-	{
-		return false;
-	}
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//skybox.ps", "SkyboxPixelShader", "ps_4_0"),
-		skyboxShader,
-		SVF_PIXELSHADER))
+	// Initialisera Skybox objektet
+	result = m_Skybox->Initialize(m_Direct3D, "BackgroundCube.dds");
+	if (!result)
 	{
 		return false;
 	}
@@ -447,7 +365,7 @@ void Application::RenderGraphics()
 
 		m_Direct3D->EndDeferredRenderingScene();
 
-		_RenderSkybox();
+		m_Skybox->Render(m_Direct3D);
 
 	m_Direct3D->EndScene();
 
@@ -486,10 +404,10 @@ void Application::Shutdown()
 	}
 
 	//Release the skybox object
-	if (m_skybox)
+	if (m_Skybox)
 	{
-		m_skybox->Flush();
-		m_skybox = 0;
+		m_Skybox->Shutdown();
+		m_Skybox = 0;
 	}
 
 	//Release the obstacle object
@@ -535,18 +453,13 @@ void Application::_UpdateShaderVariables()
 	defaultShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 	levelShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
 	levelShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
-	skyboxShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
-	skyboxShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 	obstacleShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
 	obstacleShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 
-	// Translatera skyboxen till kamerans position
-	v3 cameraPos;
-	m_Camera->GetPosition(cameraPos);
-	//static float r = 0;
-	//r += 0.001f;
-	m4 skyboxWorldMatrix = m4::CreateScale(v3(100, 100, 100)) * /*m4::CreateYawPitchRoll(r * 0.5f, r * 0.75, r) **/ m4::CreateTranslation(cameraPos);
-	skyboxShader->SetVariable("worldMatrix", &skyboxWorldMatrix, sizeof(m4));
+	// Updatera Skyboxens shader variabler
+	v3 camPos;
+	m_Camera->GetPosition(camPos);
+	m_Skybox->UpdateShaderVariables(camPos, viewMatrix, projectionMatrix);
 
 	m4 viewProj = viewMatrix * projectionMatrix;
 	m4 viewProjInverted = viewProj.Inverse();
@@ -554,19 +467,6 @@ void Application::_UpdateShaderVariables()
 	//pointLightShader->UpdateConstantBuffer(0, &test, sizeof(stuff));
 	pointLightShader->SetVariable("viewProj", &viewProj, sizeof(m4));
 	pointLightShader->SetVariable("viewProjInverted", &viewProjInverted, sizeof(m4));
-}
-
-void Application::_RenderSkybox()
-{
-	// Rendera skybox
-	
-	//Shader* skyBoxShader = m_Direct3D->GetCurrentShader();
-	m_Direct3D->SetShader(skyboxShader);
-	
-	m_Direct3D->ApplyConstantBuffers();
-	m_Direct3D->ApplyTexture(m_SkyboxTexture, 0);
-
-	m_Direct3D->RenderMesh(m_skybox);
 }
 
 void Application::_RenderLights()
