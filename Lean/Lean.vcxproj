@@ -99,7 +99,7 @@
     <Library Include="Bullet\LinearMath_Debug.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="ball.png" />
+    <Image Include="data\ball.png" />
     <Image Include="blackGoal.png" />
     <Image Include="leaf.png" />
     <Image Include="magnet.png" />

@@ -36,7 +36,7 @@ bool Goal::Initialize(D3D* direct3D, WCHAR* textureFileName)
 	bool result = true;
 
 	//Load in a sphere, something round.
-	m_mesh = direct3D->LoadMeshFromOBJ("Sphere.obj");
+	m_mesh = direct3D->LoadMeshFromOBJ("data//Sphere.obj");
 	if (!m_mesh)
 	return false;
 

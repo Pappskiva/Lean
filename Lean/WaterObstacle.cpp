@@ -24,7 +24,7 @@ bool WaterObstacle::Initialize(D3D* direct3D)
 		return false;
 	}
 
-	WCHAR* textureFileName = L"water.png";
+	WCHAR* textureFileName = L"data//water.png";
 	//Ladda in texturen till föremålet.	
 	m_Texture = direct3D->LoadTextureFromFile(textureFileName);
 	if (!m_Texture)

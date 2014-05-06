@@ -509,11 +509,11 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 	ShaderInfo vsInfo, psInfo;
 	vsInfo.entryPoint = "VS";
-	vsInfo.path = L"fullScreenQuad.vs";
+	vsInfo.path = L"shader//fullScreenQuad.vs";
 	vsInfo.version = "vs_4_0";
 
 	psInfo.entryPoint = "PS";
-	psInfo.path = L"finalComposition.ps";
+	psInfo.path = L"shader//finalComposition.ps";
 	psInfo.version = "ps_4_0";
 
 	D3D11_INPUT_ELEMENT_DESC elemDesc[] =

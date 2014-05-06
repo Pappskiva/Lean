@@ -77,14 +77,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Goal = new Goal;
 
 	//Initialize the level object
-	result = m_Level->Initialize(m_Direct3D, L"testSpringGround.png", L"testDeepGround.png");
+	result = m_Level->Initialize(m_Direct3D, L"data//testSpringGround.png", L"data//testDeepGround.png");
 	if (!result)
 	{
 		return false;
 	}
 
 	//Initialize the ball object
-	result = m_Ball->Initialize(m_Direct3D, L"ball.png");
+	result = m_Ball->Initialize(m_Direct3D, L"data//ball.png");
 	if (!result)
 	{
 		return false;
@@ -98,7 +98,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Initialize the goal object
-	result = m_Goal->Initialize(m_Direct3D, L"blackGoal.png");
+	result = m_Goal->Initialize(m_Direct3D, L"data//blackGoal.png");
 	if (!result)
 	{
 		return false;
@@ -171,7 +171,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Ladda in texturen för skyboxen
-	m_SkyboxTexture = m_Direct3D->LoadTextureFromFile("BackgroundCube.dds");
+	m_SkyboxTexture = m_Direct3D->LoadTextureFromFile("data//BackgroundCube.dds");
 	if (!m_SkyboxTexture)
 	{
 		return false;
@@ -184,7 +184,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	skyboxShader = m_Direct3D->LoadVertexShader(ShaderInfo("skybox.vs", "SkyboxVertexShader", "vs_4_0"),
+	skyboxShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//skybox.vs", "SkyboxVertexShader", "vs_4_0"),
 		skyboxShaderElem,
 		2);
 
@@ -192,7 +192,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("skybox.ps", "SkyboxPixelShader", "ps_4_0"),
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//skybox.ps", "SkyboxPixelShader", "ps_4_0"),
 		skyboxShader,
 		SVF_PIXELSHADER))
 	{
@@ -200,7 +200,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Loads the PointLight mesh into vram
-	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("LightSphere.obj");
+	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("data//LightSphere.obj");
 
 	if (!lightSphereMesh)
 	{
@@ -214,12 +214,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	pointLightShader = m_Direct3D->LoadVertexShader(ShaderInfo("pointLight.vs", "PointLightVertexShader", "vs_4_0"),
+	pointLightShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//pointLight.vs", "PointLightVertexShader", "vs_4_0"),
 		lightShaderElem,
 		1);
 	if (!pointLightShader)
 		return false;
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("pointLight.ps", "PointLightPixelShader", "ps_4_0"),
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//pointLight.ps", "PointLightPixelShader", "ps_4_0"),
 		pointLightShader,
 		SVF_PIXELSHADER))
 		return false;
@@ -233,12 +233,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	defaultShader = m_Direct3D->LoadVertexShader(ShaderInfo("ball.vs", "BallVertexShader", "vs_4_0"),
+	defaultShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//ball.vs", "BallVertexShader", "vs_4_0"),
 		ballShaderElem,
 		3);
 	if (!defaultShader)
 		return false;
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("ball.ps", "BallPixelShader", "ps_4_0"),
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//ball.ps", "BallPixelShader", "ps_4_0"),
 		defaultShader,
 		SVF_PIXELSHADER))
 		return false;
@@ -252,12 +252,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	levelShader = m_Direct3D->LoadVertexShader(ShaderInfo("level.vs", "LevelVertexShader", "vs_4_0"),
+	levelShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//level.vs", "LevelVertexShader", "vs_4_0"),
 		levelShaderElem,
 		3);
 	if (!levelShader)
 		return false;
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("level.ps", "LevelPixelShader", "ps_4_0"),
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//level.ps", "LevelPixelShader", "ps_4_0"),
 		levelShader,
 		SVF_PIXELSHADER))
 		return false;
@@ -272,12 +272,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	obstacleShader = m_Direct3D->LoadVertexShader(ShaderInfo("obstacle.vs", "ObstacleVertexShader", "vs_4_0"),
+	obstacleShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//obstacle.vs", "ObstacleVertexShader", "vs_4_0"),
 		obstacleShaderElem,
 		3);
 	if (!obstacleShader)
 		return false;
-	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("obstacle.ps", "ObstaclePixelShader", "ps_4_0"),
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//obstacle.ps", "ObstaclePixelShader", "ps_4_0"),
 		obstacleShader,
 		SVF_PIXELSHADER))
 		return false;

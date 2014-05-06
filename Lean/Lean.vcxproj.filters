@@ -281,9 +281,6 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="ball.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="blackGoal.png">
       <Filter>Resource Files</Filter>
     </Image>
@@ -318,6 +315,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="testWinterGround.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\ball.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
