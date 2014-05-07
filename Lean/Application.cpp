@@ -242,7 +242,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	m_Goal->SetNextLevelNumber(2); //För stunden leder målet till sig själv.
+	m_Goal->SetNextLevelNumber(1);
 
 	m_Goal->SetShader(defaultShader);
 
@@ -299,7 +299,7 @@ bool Application::Frame(float deltaTime)
 
 	if (m_Input->IsSpacePressed())
 	{
-
+		
 	}
 
 	v3 testNormal;
@@ -336,6 +336,21 @@ bool Application::Frame(float deltaTime)
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
+	//Titta om målet och bollen är nära nog för att kollidera
+	v3 goalPosition;
+	m_Ball->GetPosition(ballPosition);
+	m_Goal->GetPosition(goalPosition);
+	v3 relPos = ballPosition - goalPosition;
+	distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
+	float minDist = m_Ball->GetRadius() + 2.0f;
+	if (distance < minDist * minDist)
+	{
+		//ChangeLevel(m_Goal->GetNextLevelNumber());
+	}
+	
+
+
+
 	// Render the graphics.
 	RenderGraphics();
 
@@ -363,10 +378,7 @@ void Application::RenderGraphics()
 
 			m_Direct3D->TurnOnAlphaBlending();
 			m_ObstacleHandler->Render(m_Direct3D);
-			m_Direct3D->TurnOnAlphaBlending();
-
-			m_Direct3D->TurnOnAlphaBlending();
-			m_Direct3D->TurnOnAlphaBlending();
+			m_Direct3D->TurnOffAlphaBlending();
 
 			m_Direct3D->BeginLightStage();
 
@@ -519,9 +531,19 @@ void Application::ChangeLevel(int levelNumber)
 	int nrOfObst;
 	m_Level->LoadLevel(levelNumber, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
 
+	//Ta bort alla tidigare hinder
+	m_ObstacleHandler->RemoveAllObstacles();
+	//Lägg in de nya hindren
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
+	}
+	//Reinitsiera de nya hindren
+	m_ObstacleHandler->Initialize(m_Direct3D);
+	m_ObstacleHandler->SetShader(obstacleShader);
 	delete[] obstacles;
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	m_Goal->SetNextLevelNumber(1); //Den leder till sig själv, men detta värdet bör ökas med ett.
+	m_Goal->SetNextLevelNumber(1);
 }

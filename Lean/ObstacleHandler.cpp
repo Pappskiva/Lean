@@ -74,6 +74,7 @@ void ObstacleHandler::RemoveAllObstacles()
 	for (int i = 0; i < nrOfObst; i++)
 	{
 		delete obstacles[i];
+		obstacles[i] = 0;
 	}
 
 	nrOfObst = 0;
