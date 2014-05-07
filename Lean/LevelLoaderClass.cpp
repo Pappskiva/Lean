@@ -64,6 +64,7 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		}
 	}
 	in.close();
+
 	heightMapFileName = levelFilePath + heightMapFileName;
 	result = LoadHeightMap((char*)heightMapFileName.c_str(), heightMap);
 	if (!result)

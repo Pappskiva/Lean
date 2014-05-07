@@ -19,6 +19,8 @@ Level::Level()
 
 	m_scale = 1.0f;
 
+	heightmap = nullptr;
+
 	m_MaximumRotationValue = 20.0f; //Degrees
 
 	worldMatrix = m4::IDENTITY;
@@ -312,6 +314,12 @@ void Level::ShutdownBuffers()
 
 void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::ObstacleType *&obstacles, v3 &startPos, v3 &goalPos, int &nrOfObst)
 {
+	if (heightmap)
+	{
+		delete [] heightmap;
+		heightmap = 0;
+	}
+
 	LevelLoaderClass loader;
 	int tempHeight, tempWidth;
 
