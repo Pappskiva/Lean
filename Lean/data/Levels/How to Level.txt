@@ -1,5 +1,6 @@
 För att skapa en ny level skapar du först en heightmap. 
 Denna är enbart vit och svart, ingen grå. Det vita är upphöjt och är därmed banan.
+Banan kommer senare vara hälften så stor som bilden så en bild som är 64*64 (måste vara en 2-exponent) blir 32*32 i spelet.
 Spara denna som bmp 24bit. Paint gör något mysko när man gör detta så använd hellre t.ex. Gimp.
 Spara heightmapen i data\\Levels\\Heightmaps.
 
@@ -18,6 +19,7 @@ l/i/t/m (l=lövhögen, i=isplätten, t=trampolinen, m=magneten)
 x-positionen
 z-positionen
 
+Positionerna är lättast att läsa ut från att kolla pixlarna på bilden och dela med 2. Dessa positioner räknas från översta vänstra hörnet. Programmet gör sedan om dessa koordinater till passande för spelet.
 s, g och hinder behöver inte vara i någon speciell ordning.
 Utan målposition och startposition lär programmet krascha.
 
