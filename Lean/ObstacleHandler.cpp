@@ -9,11 +9,7 @@ ObstacleHandler::ObstacleHandler()
 
 ObstacleHandler::~ObstacleHandler()
 {
-	for (int i = 0; i < nrOfObst; i++)
-	{
-		delete obstacles[i];
-	}
-	delete[] obstacles;
+	
 }
 
 void ObstacleHandler::AddObstacle(string type, v3 pos)
@@ -68,12 +64,33 @@ void ObstacleHandler::Update(float deltaTime, float cameraPosX, float cameraPosZ
 	}
 }
 
+void ObstacleHandler::RemoveAllObstacles()
+{
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		obstacles[i]->Shutdown();
+	}
+
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		delete obstacles[i];
+	}
+
+	nrOfObst = 0;
+}
+
 void ObstacleHandler::Shutdown()
 {
 	for (int i = 0; i < nrOfObst; i++)
 	{
 		obstacles[i]->Shutdown();
 	}
+
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		delete obstacles[i];
+	}
+	delete[] obstacles;
 }
 
 bool ObstacleHandler::Initialize(D3D* device)
