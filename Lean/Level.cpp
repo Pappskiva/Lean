@@ -395,6 +395,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	direct3D->LoadMeshIntoDevice(m_mesh);
 
 	delete[] vertices;	
+	delete[] indices;
 
 	SetTextureBasedOnNumber(levelIndex, direct3D);
 }
