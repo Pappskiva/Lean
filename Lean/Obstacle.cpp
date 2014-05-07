@@ -9,7 +9,7 @@ Obstacle::Obstacle()
 	/*Sätt alla variabler till 0 eller standard/testvärden*/
 	m_Texture = 0;
 
-	m_position.x = 3.0f;
+	m_position.x = 0.0f;
 	m_position.y = 1.0f;
 	m_position.z = 0.0f;
 

@@ -11,7 +11,7 @@
 #include "D3D.h"
 #include "DuckRenderer\DMath.h"
 #include "DuckRenderer\DCollision.h"
-
+#include "LevelLoaderClass.h"
 #include "Texture.h"
 
 class Level
@@ -31,7 +31,7 @@ public:
 
 	ID3D11ShaderResourceView* GetTexture(int);
 
-	void LoadLevel(const uint levelIndex, D3D* direct3D);
+	void LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::ObstacleType *&obstacles, v3 &startPos, v3 &goalPos, int &nrOfObst);
 
 	void SetPosition(float, float, float);
 	void GetPosition(v3&);

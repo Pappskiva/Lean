@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "Ball.h"
 #include "Level.h"
-#include "WaterObstacle.h"
+#include "ObstacleHandler.h"
 #include "Goal.h"
 #include "Skybox.h"
 
@@ -80,7 +80,7 @@ private:
 	Ball			*m_Ball;
 	Level			*m_Level;
 	Skybox			*m_Skybox;
-	Obstacle		*m_WaterObstacle; //För testningsyften
+	ObstacleHandler	*m_ObstacleHandler;
 	Goal			*m_Goal; //För testningsyften
 
 	FPSClass		m_fps;

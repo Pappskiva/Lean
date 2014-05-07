@@ -19,7 +19,7 @@ LevelLoaderClass::~LevelLoaderClass()
 
 //Plockar ihop rätt filnamn, öppnar textfilen för banan, läser in heightmap, läser in viktiga positioner och sparar som goalPos/startPos/obstacles.
 //Anropar sedan LoadHeightmap för att läsa heightmapen den fick från textfilen och till sist NormalizeHeightMap för att ge mindre höjdskillnader.
-bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles)
+bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles, int &nrOfObst)
 {
 	bool result;
 	string heightMapFileName;
@@ -35,7 +35,6 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		return false;
 	}
 	getline(in, heightMapFileName);
-	int nrOfObst;
 	int obstPos = 0;
 	in >> nrOfObst;
 	obstacles = new ObstacleType[nrOfObst];
@@ -47,19 +46,20 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		{
 			in >> goalPos.x;
 			in >> goalPos.z;
-			goalPos.y = -1;
+			goalPos.y = 2.55;
 		}
 		else if (str == "s")
 		{
 			in >> startPos.x;
 			in >> startPos.z;
+			startPos.y = 2.55;
 		}
 		else
 		{
 			obstacles[obstPos].type = str;
 			in >> obstacles[obstPos].pos.x;
 			in >> obstacles[obstPos].pos.z;
-			obstacles[obstPos].pos.y = -1;
+			obstacles[obstPos].pos.y = 2.55;
 			obstPos++;
 		}
 	}
@@ -75,6 +75,22 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 
 	height = m_terrainHeight;
 	width = m_terrainWidth;
+
+	//Eftersom positionerna är räknade från översta vänstra hörnet och projektets origo är i mitten av banan placeras positionerna om.
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		obstacles[i].pos.x -= 16;
+		obstacles[i].pos.z = 32 - obstacles[i].pos.z;
+		obstacles[i].pos.z -= 16;
+		obstacles[i].pos.x -= 0.5f; //Eftersom pixlarna på kartan är så stora måste vi lägga om dem lite för att hamna där vi vill.
+		obstacles[i].pos.z -= 0.5f;
+	}
+	startPos.x -= 16;
+	startPos.z = 32 - startPos.z;
+	startPos.z -= 16;
+	goalPos.x -= 16;
+	goalPos.z = 32 - goalPos.z;
+	goalPos.z -= 16;
 
 	return true;
 }
@@ -163,7 +179,7 @@ void LevelLoaderClass::NormalizeHeightMap(float* heightMap)
 	{
 		for (i = 0; i<m_terrainWidth; i++)
 		{
-			heightMap[(m_terrainHeight * j) + i] /= 1.0f; //Gör för tillfället inget eftersom resten av klasserna inte funkar med denna ännu.
+			heightMap[(m_terrainHeight * j) + i] /= 100.0f;
 		}
 	}
 
