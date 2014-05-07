@@ -69,6 +69,8 @@ private:
 	void			_RenderLights();
 	void			AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
 
+	void			ChangeLevel(int);
+
 	
 private:
 	int				screenWidth;

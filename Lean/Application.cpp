@@ -499,3 +499,8 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 	light.shader = pointLightShader;
 	light.lightType = LT_Point;
 }
+
+void Application::ChangeLevel(int levelNumber)
+{
+	m_Level->LoadLevel(levelNumber, m_Direct3D);
+}
