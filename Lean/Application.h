@@ -12,7 +12,6 @@
 #include "Camera.h"
 #include "Ball.h"
 #include "Level.h"
-#include "LevelLoaderClass.h"
 #include "ObstacleHandler.h"
 #include "Goal.h"
 #include "Skybox.h"
