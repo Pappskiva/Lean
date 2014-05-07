@@ -223,7 +223,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
-
+	
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;
@@ -510,5 +510,5 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
-	m_Level->LoadLevel(levelNumber, m_Direct3D);
+	//m_Level->LoadLevel(levelNumber, m_Direct3D);
 }
