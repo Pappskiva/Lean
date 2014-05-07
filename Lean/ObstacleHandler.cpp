@@ -88,3 +88,11 @@ bool ObstacleHandler::Initialize(D3D* device)
 	}
 	return result;
 }
+
+void ObstacleHandler::SetShader(const Shader *shader)
+{
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		obstacles[i]->SetShader(shader);
+	}
+}

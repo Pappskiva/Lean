@@ -22,6 +22,7 @@ public:
 	void Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ);
 	void Shutdown();
 	bool Initialize(D3D*);
+	void SetShader(const Shader *shader);
 
 private:
 	Obstacle** obstacles;

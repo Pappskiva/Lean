@@ -28,7 +28,7 @@ public:
 	~LevelLoaderClass();
 
 	//LoadLevel tar in int för leveln, öppnar upp textfilen för information och lagrar sedan all data om leveln i de andra parametrarna. Positionerna får enbart x och z värde. 
-	bool LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles);
+	bool LoadLevel(int level, float *&heightMap, int &height, int &width, v3 &goalPos, v3 &startPos, ObstacleType *&obstacles, int &nrOfObst);
 	void Shutdown();
 
 private:

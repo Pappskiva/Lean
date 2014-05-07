@@ -12,7 +12,7 @@ Application::Application()
 	m_Camera = nullptr;
 	m_Ball = nullptr;
 	m_Level = nullptr;
-	m_WaterObstacle = nullptr;
+	m_ObstacleHandler = nullptr;
 	m_Goal = nullptr;
 
 	defaultShader = nullptr;
@@ -69,9 +69,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	//Create the level object
 	m_Level = new Level;
 
-	//Create the obstacle object
-	m_WaterObstacle = new WaterObstacle;
-
 	//Create the goal object
 	m_Goal = new Goal;
 
@@ -84,13 +81,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	//Initialize the ball object
 	result = m_Ball->Initialize(m_Direct3D, L"data//ball.png");
-	if (!result)
-	{
-		return false;
-	}
-
-	//Initialize the obstacle object
-	result = m_WaterObstacle->Initialize(m_Direct3D);
 	if (!result)
 	{
 		return false;
@@ -231,11 +221,26 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	//Initialize the fpsclass object
 	m_fps.Initialize();
 
-	m_Ball->SetPosition(1, 5, 0);
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
-	m_Level->LoadLevel(1, m_Direct3D);
-	m_WaterObstacle->SetShader(obstacleShader);
+
+	LevelLoaderClass::ObstacleType *obstacles;
+	v3 startPos;
+	v3 goalPos;
+	int nrOfObst;
+	m_Level->LoadLevel(1, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
+	m_ObstacleHandler = new ObstacleHandler();
+	for (int i = 0; i < nrOfObst; i++)
+	{
+		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
+	}
+
+	m_ObstacleHandler->Initialize(m_Direct3D);
+	m_ObstacleHandler->SetShader(obstacleShader);
+
+	m_Ball->SetPosition(startPos.x, 5, startPos.z);
+	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
+
 	m_Goal->SetShader(defaultShader);
 
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
@@ -324,7 +329,7 @@ bool Application::Frame(float deltaTime)
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
 
-	m_WaterObstacle->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ);
+	m_ObstacleHandler->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ);
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
@@ -354,7 +359,10 @@ void Application::RenderGraphics()
 			m_Goal->Render(m_Direct3D);
 
 			m_Direct3D->TurnOnAlphaBlending();
-			m_WaterObstacle->Render(m_Direct3D);
+			m_ObstacleHandler->Render(m_Direct3D);
+			m_Direct3D->TurnOnAlphaBlending();
+
+			m_Direct3D->TurnOnAlphaBlending();
 			m_Direct3D->TurnOnAlphaBlending();
 
 			m_Direct3D->BeginLightStage();
@@ -410,11 +418,11 @@ void Application::Shutdown()
 		m_Skybox = 0;
 	}
 
-	//Release the obstacle object
-	if (m_WaterObstacle)
+	//Release the obstacleHandler object
+	if (m_ObstacleHandler)
 	{
-		m_WaterObstacle->Shutdown();
-		m_WaterObstacle = 0;
+		m_ObstacleHandler->Shutdown();
+		m_ObstacleHandler = 0;
 	}
 
 	//Release the goal object

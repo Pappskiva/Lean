@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Level.h"
-#include "LevelLoaderClass.h"
 
 Level::Level()
 {
@@ -18,7 +17,7 @@ Level::Level()
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
 
-	m_scale = 25.0f;
+	m_scale = 1.0f;
 
 	m_MaximumRotationValue = 20.0f; //Degrees
 
@@ -311,20 +310,17 @@ void Level::ShutdownBuffers()
 	return;
 }
 
-void Level::LoadLevel(const uint levelIndex, D3D* direct3D)
+void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::ObstacleType *&obstacles, v3 &startPos, v3 &goalPos, int &nrOfObst)
 {
 	LevelLoaderClass loader;
 	int tempHeight, tempWidth;
-	v3 pos;
 
-	const float LEVEL_POINT_DISTANCE = 1.0f / 75.0f;
-	const float LEVEL_MAX_HEIGHT = 1.0f / 255.0f;
+	const float LEVEL_POINT_DISTANCE = 0.5f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
+	const float LEVEL_MAX_HEIGHT = 1.0f;
 	
 	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
-	v3 startPos;
-	LevelLoaderClass::ObstacleType *obstacles;
 
-	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, pos, startPos, obstacles);
+	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, goalPos, startPos, obstacles, nrOfObst);
 	uint height = (uint)tempHeight, width = (uint)tempWidth;
 	
 	struct Vertex
