@@ -235,11 +235,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
 	}
 
+	delete [] obstacles;
+
 	m_ObstacleHandler->Initialize(m_Direct3D);
 	m_ObstacleHandler->SetShader(obstacleShader);
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
+	m_Goal->SetNextLevelNumber(2); //För stunden leder målet till sig själv.
 
 	m_Goal->SetShader(defaultShader);
 
@@ -510,5 +513,15 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
-	//m_Level->LoadLevel(levelNumber, m_Direct3D);
+	LevelLoaderClass::ObstacleType *obstacles;
+	v3 startPos;
+	v3 goalPos;
+	int nrOfObst;
+	m_Level->LoadLevel(levelNumber, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
+
+	delete[] obstacles;
+
+	m_Ball->SetPosition(startPos.x, 5, startPos.z);
+	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
+	m_Goal->SetNextLevelNumber(1); //Den leder till sig själv, men detta värdet bör ökas med ett.
 }

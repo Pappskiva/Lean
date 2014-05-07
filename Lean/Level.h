@@ -61,6 +61,8 @@ private:
 	bool	InitializeBuffers(D3D*);
 	void	ShutdownBuffers();
 
+	void	SetTextureBasedOnNumber(int, D3D*);
+
 private:
 	Mesh *m_mesh;
 	Shader *m_shader;

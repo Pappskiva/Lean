@@ -121,6 +121,11 @@ int Goal::GetNextLevelNumber()
 	return m_nextLevelNumber;
 }
 
+void Goal::SetNextLevelNumber(int number)
+{
+	m_nextLevelNumber = number;
+}
+
 void Goal::UpdateWorldMatrix()
 {
 	/*Ändra worldmatrisen baserat på postion, rotation och skala.*/

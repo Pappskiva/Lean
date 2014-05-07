@@ -52,8 +52,9 @@ public:
 	void	UpdateWorldMatrix();
 	void	GetWorldMatrix(m4&);
 
-	/*Hämta vilken bana som målet ska leda till*/
+	/*Hämta eller få vilken bana som målet ska leda till*/
 	int		GetNextLevelNumber();
+	void	SetNextLevelNumber(int);
 
 	/*Sätt vilken shader som används*/
 	void	SetShader(const Shader *shader);

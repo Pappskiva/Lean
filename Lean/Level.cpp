@@ -395,4 +395,33 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	direct3D->LoadMeshIntoDevice(m_mesh);
 
 	delete[] vertices;	
+
+	SetTextureBasedOnNumber(levelIndex, direct3D);
+}
+
+void Level::SetTextureBasedOnNumber(int levelIndex, D3D* direct3D)
+{
+	//Ladda in texturen baserad på vilket nummer banan har
+
+	if (levelIndex == 1)
+	{
+		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testSpringGround.png");
+	}
+	else if (levelIndex == 2)
+	{
+		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testSummerGround.png");
+	}
+	else if (levelIndex == 3)
+	{
+		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testAutumnGround.png");
+	}
+	else if (levelIndex == 4)
+	{
+		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testWinterGround.png");
+	}
+	else
+	{
+		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testSpringGround.png");
+	}
+	
 }
