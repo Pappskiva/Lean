@@ -76,19 +76,24 @@ void PhysicsBridge::Initialize(Level* level)
 
 void PhysicsBridge::StepSimulation(float deltaTime, float rotX, float rotY, float rotZ, Ball* ball, Level* level)
 {
-	//Ger bollen rätt världsmatris så att fysiken funkar
-	ball->SetWorldMatrix(GetBallTransformMatrix());
-	level->SetWorldMatrix(GetPlaneTransformMatrix());
+	btVector3 newGravity = btVector3(0, GRAVITY, 0);
 
-	btTransform asdf;
-	heightmapMotionState->getWorldTransform(asdf);
-	btQuaternion quat;
-	quat.setEuler(-rotY, -rotX, -rotZ);
-	asdf.setRotation(quat);
-	heightmapRigidBody->setCenterOfMassTransform(asdf);
-	heightmapMotionState->setWorldTransform(asdf);
-
+	newGravity = newGravity.rotate(btVector3(1, 0, 0), rotX); // Rot X
+	newGravity = newGravity.rotate(btVector3(0, 1, 0), rotY); // Rot Y
+	newGravity = newGravity.rotate(btVector3(0, 0, 1), rotZ); // Rot Z
+	dynamicsWorld->setGravity(newGravity);
 	dynamicsWorld->stepSimulation(deltaTime);
+
+	//Ger bollen rätt världsmatris så att fysiken funkar
+	m4 world = GetBallTransformMatrix();
+	m4 rotationL = m4::CreateYawPitchRoll(0, rotX, rotZ);
+	world = world*rotationL;
+	ball->SetWorldMatrix(world);
+
+	world = GetPlaneTransformMatrix();
+	m4 rotationMatrix = m4::CreateYawPitchRoll(rotY, rotX, rotZ);
+	world = rotationMatrix * world;
+	level->SetWorldMatrix(world);
 }
 
 m4 PhysicsBridge::GetBallTransformMatrix()

@@ -382,15 +382,19 @@ bool Application::Frame(float deltaTime)
 	//m_Level->Update(deltaTime);
 
 	m_Level->Update(deltaTime);
-	m_Ball->Update(deltaTime);
+	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
+
 	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
 
-	ballPosition = v3(m_PhysicsBridge.GetBallTransformMatrix().GetPos().x, m_PhysicsBridge.GetBallTransformMatrix().GetPos().y, m_PhysicsBridge.GetBallTransformMatrix().GetPos().z);
 	//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
 	//m_Camera->LookAt(ballPosition);
-	m_Camera->LookAt(ballPosition);
-	v3 camPos = m_PhysicsBridge.GetBallTransformMatrix().GetPos();
+
+	//Hämta bollens world, sätt kamerans position efter bollens position.
+	m4 ballWorldM;
+	m_Ball->GetWorldMatrix(ballWorldM);
+	v3 camPos = ballWorldM.GetPos();
+	m_Camera->LookAt(camPos);
 	m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
 
 
