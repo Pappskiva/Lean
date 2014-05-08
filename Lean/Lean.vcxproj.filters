@@ -241,40 +241,49 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ball.ps">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="ball.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="DuckRenderer\MathStructs.inl">
       <Filter>Header Files\DuckRenderer</Filter>
     </None>
     <None Include="DuckRenderer\Array.inl">
       <Filter>Header Files\DuckRenderer</Filter>
     </None>
-    <None Include="level.ps">
+    <None Include="shader\ball.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="level.vs">
+    <None Include="shader\ball.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="finalComposition.ps">
+    <None Include="shader\finalComposition.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="pointLight.ps">
+    <None Include="shader\fullScreenQuad.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="fullScreenQuad.vs">
+    <None Include="shader\level.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="pointLight.vs">
+    <None Include="shader\level.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="obstacle.ps">
+    <None Include="shader\obstacle.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="obstacle.vs">
+    <None Include="shader\obstacle.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\pointLight.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\pointLight.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\skybox.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\skybox.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\DirectionalLightingWithShadows.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -332,5 +341,10 @@
     <Image Include="data\ball.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shader\shadowFill.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

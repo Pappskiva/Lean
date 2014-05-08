@@ -44,6 +44,11 @@ public:
 	void				BeginLightStage();
 	void				EndLightStage();
 
+	void				BeginShadowPass();
+	void				EndShadowPass();
+
+	bool				CreateShadowmap(const uint width, const uint height);
+
 	Texture*			LoadTextureFromFile(const HString &filePath);
 	Mesh*				CreateMeshFromRam(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices = nullptr, const uint nrIndices = 0);
 	Mesh*				LoadMeshFromOBJ(const std::string filePath);
@@ -53,11 +58,19 @@ public:
 
 	void				SetShader(const Shader *shader);
 	void				RenderMesh(const Mesh *mesh, const int subset = -1) const;
+	void				RenderFullScreenQuad() const;
 
+	//it sets the shadowmapSRView to the current shader
+	void				ApplyShadowmapResource(const uint slot);
+	//it sets the m_depthStencilShaderResourceView to the current shader
+	void				ApplyDepthResource(const uint slot);
+	//it sets any of the gBufferShaderResourceView[ index ] to the current shader
+	void				ApplyGBufferResource(const uint index, const uint slot);
 	void				ApplyTexture(const Texture *texture, const uint slot);
 	void				ApplyConstantBuffers();
 
 	Shader*				GetCurrentShader();
+	Shader*				GetShadowFill();
 	//void				ReloadMesh(const Mesh *mesh);
 
 
@@ -90,6 +103,12 @@ private:
 	ID3D11BlendState* m_alphaEnableBlendingState;
 	ID3D11BlendState* m_alphaDisableBlendingState;
 
+	//shadow stuff
+	bool						shadowPass;
+	Shader						*shadowFillShader;
+	ID3D11DepthStencilView		*shadowmapDSView;
+	ID3D11ShaderResourceView	*shadowmapSRView;
+
 	//deferred
 	ID3D11RenderTargetView		*gBufferRenderTargetView[2], *lightRenderTargetView;
 	ID3D11ShaderResourceView	*gBufferShaderResourceView[2], *lightShaderResourceView;
@@ -104,6 +123,11 @@ private:
 inline Shader* D3D::GetCurrentShader()
 {
 	return currentShader;
+}
+
+inline Shader* D3D::GetShadowFill()
+{
+	return shadowFillShader;
 }
 
 #endif

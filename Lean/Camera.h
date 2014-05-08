@@ -11,39 +11,102 @@ Camera klassen är kameran som används för att få view matrisen. Den har position
 #define CAMERA_H
 
 #include "DuckRenderer\DMath.h"
+#include "DuckRenderer\DCollision.h"
 
 class Camera
 {
 public:
+	v3		position;
+	float	xRotation, yRotation;
+	m3		orientation;
+	m4		projection;
+	m4		view;
+
+	float	nearPlane;
+	float	farPlane;
+	float	fieldOfView;
+	int		screenWidth;
+	int 	screenHeight;
+
+	float	minDepth;
+	float	maxDepth;
+
+	//2D
+	float	zoom;
+
+public:
+
 	Camera();
-	Camera(const Camera&);
-	~Camera();
+	void	Update();
 
-	/*Sätt och få position*/
-	void		SetPosition(float, float, float);
-	void		GetPosition(v3&);
+	void	RotateY(const float rotation);
+	void	RotateX(const float rotation);
 
-	/*Sätt och få rotation*/
-	void		SetRotation(float, float, float);
-	void		GetRotation(v3&);
-	
-	/*Sätt vart den ska titta mot, t.ex. ett objekt*/
-	void		SetTargetToLookAt(float, float, float);
+	void	LookAt(const v3 &at);
+	void	LookAlong(const v3 &dir);
 
-	/*Rendera en viewmatris baserat på position, rotation och riktning*/
-	void		Render();
-	/*Få viewmatrisen*/
-	void		GetViewMatrix(m4&);
+	void	SetNearPlane(const float nearPlane);
+	void	SetFarPlane(const float farPlane);
+	void	SetFieldOfView(const float fov);
+	void	SetScreenSize(const int screenWidth, const int screenHeight);
+	void	SetMinDepth(const float minDepth);
+	void	SetMaxDepth(const float maxDepth);
 
-private:
-	/*Position*/
-	float m_positionX, m_positionY, m_positionZ;
-	/*Rotation*/
-	float m_rotationX, m_rotationY, m_rotationZ;
-	/*Riktning*/
-	float m_LookAtX, m_LookAtY, m_LookAtZ;
-	/*Viewmatris*/
-	m4 m_viewMatrix;
+	void	SetPosition(const v3 &position);
+	v3		GetPosition() const;
+
+	void	GenerateOrthoProjectionMatrix();
+	void	GeneratePerspectiveProjectionMatrix();
+	void	Generate2DViewMatrix();
+	void	Generate3DViewMatrix();
+	void	GenerateDirectionalLightCamera();
+
+	Ray		GenerateRay(const v2 &screenCoordinate) const;
+	m3		GetOrientation() const;
+	m4&		GetViewMatrix(m4 &view);
+	m4&		GetProjectionMatrix(m4 &proj);
+
+	friend class Renderer;
 };
 
+inline void Camera::SetNearPlane(const float nearPlane)
+{
+	this->nearPlane = nearPlane;
+}
+
+inline void Camera::SetFarPlane(const float farPlane)
+{
+	this->farPlane = farPlane;
+}
+
+inline void Camera::SetFieldOfView(const float fov)
+{
+	this->fieldOfView = fov;
+}
+
+inline void Camera::SetScreenSize(const int screenWidth, const int screenHeight)
+{
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
+}
+
+inline void Camera::SetMinDepth(const float minDepth)
+{
+	this->minDepth = minDepth;
+}
+
+inline void Camera::SetMaxDepth(const float maxDepth)
+{
+	this->maxDepth = maxDepth;
+}
+
+inline v3 Camera::GetPosition() const
+{
+	return position;
+}
+
+inline m3 Camera::GetOrientation() const
+{
+	return orientation;
+}
 #endif

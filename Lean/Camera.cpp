@@ -6,120 +6,118 @@
 
 Camera::Camera()
 {
-	/*Sätt alla variabler till 0 eller standard/testvärden*/
-	m_positionX = 0.0f;
-	m_positionY = 0.0f;
-	m_positionZ = 0.0f;
+	position = v3(0.0f);
 
-	m_rotationX = 0.0f;
-	m_rotationY = 0.0f;
-	m_rotationZ = 0.0f;
+	xRotation = 0.0f;
+	yRotation = 0.0f;
 
-	m_LookAtX = 0.0f;
-	m_LookAtY = 0.0f;
-	m_LookAtZ = 1.0f;
+	orientation.Identity();
 
+	minDepth = 0.0f;
+	maxDepth = 1.0f;
+
+	zoom = 1.0f;
+	//direction = v3(1.0, 0.0f, 0.0f);
 }
 
-
-Camera::Camera(const Camera& other)
+void Camera::Update()
 {
+	if (xRotation < -1.5707964f)
+		xRotation = -1.5707964f;
+
+	if (xRotation > 1.5707962f)
+		xRotation = 1.5707962f;
+
 }
 
-
-Camera::~Camera()
+void Camera::RotateY(const float rotation)
 {
+	yRotation += rotation;
+
+	orientation = m3::CreateRotateX(xRotation) * m3::CreateRotateY(yRotation);
 }
 
-void Camera::SetPosition(float x, float y, float z)
+void Camera::RotateX(const float rotation)
 {
-	/*Sätt positionen*/
-	m_positionX = x;
-	m_positionY = y;
-	m_positionZ = z;
-	return;
+	xRotation += rotation;
+
+	orientation = m3::CreateRotateX(xRotation) * m3::CreateRotateY(yRotation);
 }
 
-
-void Camera::GetPosition(v3& pos)
+void Camera::LookAt(const v3 &at)
 {
-	/*Få positionen*/
-	pos = v3(m_positionX, m_positionY, m_positionZ);
+	orientation.FromDir(at - position);
 }
 
-void Camera::SetRotation(float x, float y, float z)
+void Camera::LookAlong(const v3 &dir)
 {
-	/*Sätt rotationen*/
-	m_rotationX = x;
-	m_rotationY = y;
-	m_rotationZ = z;
-	return;
+	orientation.FromDir(dir);
 }
 
-void Camera::GetRotation(v3& rot)
+void Camera::SetPosition(const v3 &position)
 {
-	/*Få rotationen*/
-	rot = v3(m_rotationX, m_rotationY, m_rotationZ);
+	this->position = position;
 }
 
-void Camera::SetTargetToLookAt(float x, float y, float z)
+void Camera::GeneratePerspectiveProjectionMatrix()
 {
-	/*Sätt vilken riktning som kameran ska titta åt. Positionen på det man vill titta mot läggs in, och en normaliserad vector mellan kamerans och objektets position fås fram*/
-	v3 betweenCameraAndTarget(x - m_positionX, y - m_positionY, z - m_positionZ);
-	betweenCameraAndTarget.Normalize();
-
-	m_LookAtX = betweenCameraAndTarget.x;
-	m_LookAtY = betweenCameraAndTarget.y;
-	m_LookAtZ = betweenCameraAndTarget.z;
+	projection.Projection(fieldOfView, nearPlane, farPlane, (float)screenWidth / (float)screenHeight);
 }
 
-void Camera::Render()
+void Camera::GenerateOrthoProjectionMatrix()
 {
-	v3 up, position, lookAt;
-	float yaw, pitch, roll;
-	m4 rotationMatrix;
-
-	/*Skapa en vektor som pekar uppåt*/
-	up.x = 0.0f;
-	up.y = 1.0f;
-	up.z = 0.0f;
-
-	/*Ta kamerans position*/
-	position.x = m_positionX;
-	position.y = m_positionY;
-	position.z = m_positionZ;
-
-	/*Ta riktningen den tittar mot*/
-	lookAt.x = m_LookAtX;
-	lookAt.y = m_LookAtY;
-	lookAt.z = m_LookAtZ;
-
-	/*Bestäm pitch, yaw och roll i radianer*/
-	pitch = m_rotationX * 0.0174532925f;
-	yaw = m_rotationY * 0.0174532925f;
-	roll = m_rotationZ * 0.0174532925f;
-
-	/*Skapa rotationsmatrisen baserat på rotation*/
-	rotationMatrix = m4::CreateYawPitchRoll(yaw, pitch, roll);
-
-	/*Ändra lookAt och up vektorerna baserat på rotationsmatrisen så de är rätt*/ 
-	lookAt = rotationMatrix.Transform(lookAt);
-	up = rotationMatrix.Transform(up);
-
-	/*Ändra så att lookAt blir rätt baserat på kamerans position*/
-	lookAt = position + lookAt;
-
-	/*Skapa view matrisen från de tre vektorerna*/
-	m_viewMatrix.ViewAtLH(position, lookAt, up);
-	
-	return;
+	projection = m4::CreateOrthographicLH((float)screenWidth, (float)screenHeight, nearPlane, farPlane);
 }
 
-void Camera::GetViewMatrix(m4& viewMatrix)
+void Camera::Generate2DViewMatrix()
 {
-	viewMatrix = m_viewMatrix;
-	return;
+	float doubleZoom = zoom * 2.0f;
+	view = m4::CreateScale(v3(doubleZoom / screenWidth, doubleZoom / screenHeight, 1.0f));
+	view._41 = (doubleZoom * -position.x) / (float)screenWidth;
+	view._42 = (doubleZoom * -position.y) / (float)screenHeight;
+	view._43 = 0.0f;
 }
 
+void Camera::Generate3DViewMatrix()
+{
+	view.ViewAlongLH(position, orientation.GetZDir());
+}
 
+void Camera::GenerateDirectionalLightCamera()
+{
+	//http://www.gamedev.net/topic/505893-orthographic-projection-for-shadow-mapping/
+}
 
+Ray Camera::GenerateRay(const v2 &screenCoordinate) const
+{
+	Ray ray;
+	m4 invVP;
+
+	invVP = view.Inverse();
+
+	float screenX = ((2.0f * ((float)screenCoordinate.x / screenWidth)) - 1.0f) / projection._11;
+	float screenY = -((2.0f * ((float)screenCoordinate.y / screenHeight)) - 1.0f) / projection._22;
+
+	ray.pos.x = screenX * invVP._11 + screenY * invVP._21 + invVP._31 + invVP._41;
+	ray.pos.y = screenX * invVP._12 + screenY * invVP._22 + invVP._32 + invVP._42;
+	ray.pos.z = screenX * invVP._13 + screenY * invVP._23 + invVP._33 + invVP._43;
+
+	ray.dir = ray.pos - position;
+	ray.dir.Normalize();
+
+	return ray;
+}
+
+m4& Camera::GetViewMatrix(m4 &view)
+{
+	view = this->view;
+
+	return view;
+}
+
+m4& Camera::GetProjectionMatrix(m4 &proj)
+{
+	proj = projection;
+
+	return projection;
+}

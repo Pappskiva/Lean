@@ -1,0 +1,77 @@
+cbuffer LightInfo
+{
+	float4x4 viewProjectionInverse;
+	float4x4 shadowViewProjection;
+
+	float3 lightDir;
+	float3 lightColor;
+	float3 ambientColor;
+	float3 cameraPosition;
+};
+
+Texture2D diffusemap : register(t0);
+Texture2D normalmap : register(t1);
+Texture2D depthmap : register(t2);
+
+Texture2D shadowmap : register(t3);
+
+SamplerState fullscreenQuadSampler;
+
+struct DeferredVertex
+{
+	float4 pos : SV_Position;
+	float2 uv :TEXCOORD0;
+};
+
+float4 LightPassPS(DeferredVertex input) : SV_Target
+{
+	float depth = depthmap.Sample(fullscreenQuadSampler, input.uv).r;
+
+	/*if(depth == 0.0f)
+	{
+		discard;
+		return float4(1,1,1,1);
+	}*/
+
+	float4 pos;
+	pos.x = input.uv.x * 2.0f - 1.0f;
+	pos.y = -(input.uv.y * 2.0f - 1.0f);
+	pos.z = depth;
+	pos.w = 1.0f;
+
+	pos = mul(pos, viewProjectionInverse);
+	pos /= pos.w;
+
+    float4 normalData = normalmap.Sample(fullscreenQuadSampler, input.uv);
+    float3 normal = (2.0f * normalData.xyz) - 1.0f;
+
+    float NdL = max(0, dot(normal, lightDir));
+    float3 diffuseLight = max(min(NdL * lightColor.rgb, 1), ambientColor);
+
+	float4 lightPos = mul(pos, shadowViewProjection);
+	lightPos.xy /= lightPos.w;
+
+	float2 projectedUV = float2(0.5f * lightPos.x, -0.5f * lightPos.y) + 0.5f;
+
+	if(depth != 1.0f && saturate(projectedUV.x) == projectedUV.x && saturate(projectedUV.y) == projectedUV.y)
+    {
+		float realDepth = lightPos.z / lightPos.w;
+		float lightDepth = shadowmap.Sample(fullscreenQuadSampler, projectedUV).r;
+
+		if(lightDepth + .0001f < realDepth)
+		{
+			//return depthmap.Sample(fullscreenQuadSampler, input.uv);
+			//return float4(lightDepth, lightDepth, lightDepth, 0);
+			return float4(ambientColor, 0.0f);
+		}
+	}
+
+	float specularPower = normalData.a * 255;
+	float specularIntensity = diffusemap.Sample(fullscreenQuadSampler, input.uv).a;
+	float3 reflectVect = normalize(reflect(-lightDir, normal));
+    float3 dirToCam = normalize(cameraPosition - pos);
+    float specularLight = specularIntensity * pow( saturate(dot(reflectVect, dirToCam)), specularPower);
+
+	//return float4(diffusemap.Sample(fullscreenQuadSampler, input.uv));
+	return float4(diffuseLight, specularLight);
+}

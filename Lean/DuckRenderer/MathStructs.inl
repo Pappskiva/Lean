@@ -742,7 +742,7 @@ Matrix4<_Type>::Matrix4(const _Type _11, const _Type _12, const _Type _13, const
 	this->_11 = _11;	this->_12 = _12;	this->_13 = _13;	this->_14 = _14;
 	this->_21 = _21;	this->_22 = _22;	this->_23 = _23;	this->_24 = _24;
 	this->_31 = _31;	this->_32 = _32;	this->_33 = _33;	this->_34 = _34;
-	this->_41 = _31;	this->_42 = _32;	this->_43 = _33;	this->_44 = _44;
+	this->_41 = _41;	this->_42 = _42;	this->_43 = _43;	this->_44 = _44;
 }
 
 template <typename _Type>

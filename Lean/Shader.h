@@ -8,7 +8,11 @@
 #include <D3D11.h>
 #include <fstream>
 #include <string>
-
+/*
+DESCRIPTION
+The shader class contains all the necessary stages and states to render an object to the screen
+The vertex stage is the only required stage that has to be set!
+*/
 enum ShaderVariableFlags : uint
 {
 	SVF_VERTEXSHADER = 0x1,
@@ -57,14 +61,14 @@ struct ShaderVariable
 
 	ShaderVariable& operator = (const ShaderVariable &member);
 
-	ShaderVariable(){flag = (int) 0;}
+	ShaderVariable(){ flag = (int)0; }
 	ShaderVariable(const int flag, const uint bufferPlace);
 };
 
 struct ConstantBuffer
 {
 	int flag;
-	uint slotNumber;	
+	uint slotNumber;
 	uint bufferSize;
 	uint nrMembers;
 	ID3D11Buffer *gpuBuffer;
@@ -89,9 +93,13 @@ struct SamplerState
 class Shader
 {
 public:
-	ID3D11VertexShader			*vertexShader;
-	ID3D11PixelShader			*pixelShader;
-	ID3D11RasterizerState		*rasterizer; 
+	ID3D11VertexShader			*vertexStage;
+	ID3D11GeometryShader		*geometryStage;
+	ID3D11HullShader			*hullStage;
+	ID3D11DomainShader			*domainStage;
+	ID3D11PixelShader			*pixelStage;
+	ID3D11ComputeShader			*computeStage;
+	ID3D11RasterizerState		*rasterizer;
 	ID3D11DepthStencilState		*depthStencilState;
 	ID3D11InputLayout			*inputLayout;
 	Array<SamplerState>			samplerStates;
@@ -103,7 +111,7 @@ public:
 
 public:
 
-								Shader();
+	Shader();
 	void						Flush();
 
 	void						AddPass(Shader const* newPass);
@@ -120,11 +128,10 @@ public:
 
 	void						SetVertexShader(const Shader &shader);
 	void						SetPixelShader(const Shader &shader);
-	
-	void						UpdateConstantBuffer(const uint index, void *data, const uint size);
-
 	//not fast!
 	bool						SetVariable(const HString &name, void *data, const uint dataSize);
+	//fast :D
+	void						UpdateConstantBuffer(const uint index, void *data, const uint size);
 
 	uint						GetID() const;
 

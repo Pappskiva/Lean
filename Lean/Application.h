@@ -24,7 +24,7 @@
 /////////////
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
-const float SCREEN_DEPTH = 1000.0f;
+const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 
 
@@ -94,7 +94,23 @@ private:
 	Array<LightPack>	lights;
 	Mesh			*lightSphereMesh;
 	Shader			*pointLightShader;
+	Shader			*directionalLightShader;
+	Camera			shadowCamera;
 
+	struct FirstLightPassData 
+	{
+		m4 viewProjInverse;
+		m4 shadowViewProj;
+
+		v3 directionalLightDirection;
+		float padding;
+		v3 directionalLightColor;
+		float padding2;
+		v3 ambientColor;
+		float padding3;
+		v3 cameraPos;
+		float padding4;
+	}firstLightPassData;
 };
 #endif
 

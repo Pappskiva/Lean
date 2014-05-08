@@ -12,14 +12,14 @@ struct MeshSubset
 	uint startVertex;
 	uint length;
 };
-
+//The Mesh class contains all the required data to render a "model" onto the screen!
 class Mesh
 {
 protected:
 	uint				vertexSize;
 	uint				nrVertices;
 	void				*vertices;
-	
+
 	uint				nrIndices;
 	uint				*indices;
 
@@ -31,20 +31,20 @@ protected:
 
 	ID3D11Buffer		*vertexBuffer;
 	ID3D11Buffer		*indexBuffer;
-	
+
 public:
-	
-						Mesh();
-				
+
+	Mesh();
+
 	void				Flush();
 	void				ReleaseFromGPU();
 	void				DeleteFromRam();
 
-	void				Initialize(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices, const uint nrIndices);
+	//Vertex data is a must to pass, but not necessary the index data. It depends on the topology!
+	void				Initialize(void *vertexData, const uint vertexSize, const uint nrVertices, uint *indices = nullptr, const uint nrIndices = 0);
 
 	void				SaveAsDMesh(std::string filePath);
 	uint				GetMeshID();
-	//void				GetTriangles(Triangle *&triangleArray, uint &numTriangles) const;//wrongo, Måste fixa en vertexlayout. //test
 
 	const MeshSubset&	GetMeshSubset(const uint index) const;
 	uint				GetNumberOfSubsets() const;
@@ -54,7 +54,7 @@ public:
 
 	friend class D3D;
 
-private: 
+private:
 	bool				LoadMeshFromObjToRam(std::string filePath);
 };
 

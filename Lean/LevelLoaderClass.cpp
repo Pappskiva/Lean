@@ -176,11 +176,13 @@ void LevelLoaderClass::NormalizeHeightMap(float* heightMap)
 {
 	int i, j;
 
+	const float heightFactor = 1.0f / 255.0f;
+
 	for (j = 0; j<m_terrainHeight; j++)
 	{
 		for (i = 0; i<m_terrainWidth; i++)
 		{
-			heightMap[(m_terrainHeight * j) + i] /= 100.0f;
+			heightMap[(m_terrainHeight * j) + i] *= heightFactor;
 		}
 	}
 

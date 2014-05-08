@@ -7,29 +7,33 @@
 
 ShaderVariable& ShaderVariable::operator = (const ShaderVariable &in)
 {
-	this->flag =		in.flag;
+	this->flag = in.flag;
 	this->bufferPlace = in.bufferPlace;
-	this->size =		in.size;
-	this->name =		in.name;
+	this->size = in.size;
+	this->name = in.name;
 
 	return *this;
 }
 
 Shader::Shader() : constantBuffers(8, false)
 {
-	vertexShader		= nullptr;
-	pixelShader			= nullptr;
-	rasterizer			= nullptr;
-	depthStencilState	= nullptr;
-	inputLayout			= nullptr;
-	nextPass			= nullptr;
+	vertexStage = nullptr;
+	geometryStage = nullptr;
+	hullStage = nullptr;
+	domainStage = nullptr;
+	computeStage = nullptr;
+	pixelStage = nullptr;
+	rasterizer = nullptr;
+	depthStencilState = nullptr;
+	inputLayout = nullptr;
+	nextPass = nullptr;
 }
 
 void Shader::AddPass(Shader const* newPass)
 {
 	if (!nextPass)
 	{
-		nextPass = (Shader *) newPass;
+		nextPass = (Shader *)newPass;
 		return;
 	}
 
@@ -38,9 +42,9 @@ void Shader::AddPass(Shader const* newPass)
 	{
 		if (walker->nextPass)
 			walker = nextPass;
-	}while(walker->nextPass);
+	} while (walker->nextPass);
 
-	walker->nextPass = (Shader *) newPass;
+	walker->nextPass = (Shader *)newPass;
 }
 
 void Shader::SetRasterizer(const Shader &shader)
@@ -60,7 +64,7 @@ void Shader::SetDepthStencilState(const Shader &shader)
 void Shader::SetDepthStencilState(const ID3D11DepthStencilState *depthSS)
 {
 	SAFE_RELEASE(this->depthStencilState);
-	this->depthStencilState = (ID3D11DepthStencilState *) depthSS;
+	this->depthStencilState = (ID3D11DepthStencilState *)depthSS;
 	this->depthStencilState->AddRef();
 }
 
@@ -73,9 +77,9 @@ void Shader::SetInputLayout(const Shader &shader)
 
 void Shader::SetPixelShader(const Shader &shader)
 {
-	SAFE_RELEASE(this->pixelShader);
-	this->pixelShader = shader.pixelShader;
-	this->pixelShader->AddRef();
+	SAFE_RELEASE(this->pixelStage);
+	this->pixelStage = shader.pixelStage;
+	this->pixelStage->AddRef();
 }
 
 void Shader::AddTextureSampler(const Shader &shader, int inSlot, const uint resultSlot)
@@ -112,7 +116,7 @@ void Shader::AddTextureSampler(const ID3D11SamplerState *sampler, const uint slo
 		if (samplerStates[i].slot == slot)
 		{
 			SAFE_RELEASE(samplerStates[i].samplerState);
-			samplerStates[i].samplerState = (ID3D11SamplerState *) sampler;
+			samplerStates[i].samplerState = (ID3D11SamplerState *)sampler;
 			samplerStates[i].samplerState->AddRef();
 			break;
 		}
@@ -123,7 +127,7 @@ void Shader::UpdateConstantBuffer(const uint index, void *data, const uint size)
 {
 	assert(index < constantBuffers.Length());
 
-	if(constantBuffers[index].bufferSize != size)
+	if (constantBuffers[index].bufferSize != size)
 	{
 		uint lol = constantBuffers[index].bufferSize;
 		WBOX(L"Invalid Size Parameter!\nMust Be The Same Size As ConstantBuffer!");
@@ -136,27 +140,31 @@ void Shader::UpdateConstantBuffer(const uint index, void *data, const uint size)
 bool Shader::SetVariable(const HString &name, void *data, const uint dataSize)
 {
 	for (uint c = 0; c < constantBuffers.Length(); ++c)
-	for (uint i = 0; i < constantBuffers[c].nrMembers; ++i)
-	{
+		for (uint i = 0; i < constantBuffers[c].nrMembers; ++i)
+		{
 		ShaderVariable &cVar = constantBuffers[c].members[i];
-		
+
 		if (dataSize > cVar.size)
 			continue;
-		
+
 		if (name == cVar.name)
 		{
 			memcpy(constantBuffers[c].data + cVar.bufferPlace, data, dataSize);
 			return true;
 		}
-	}
+		}
 
 	return false;
 }
 
 void Shader::Flush()
 {
-	SAFE_RELEASE(vertexShader);
-	SAFE_RELEASE(pixelShader);
+	SAFE_RELEASE(vertexStage);
+	SAFE_RELEASE(geometryStage);
+	SAFE_RELEASE(hullStage);
+	SAFE_RELEASE(domainStage);
+	SAFE_RELEASE(computeStage);
+	SAFE_RELEASE(pixelStage);
 	SAFE_RELEASE(rasterizer);
 	SAFE_RELEASE(depthStencilState);
 	SAFE_RELEASE(inputLayout);

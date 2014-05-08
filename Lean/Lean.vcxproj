@@ -83,18 +83,20 @@
     <ClInclude Include="Windows\WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ball.ps" />
-    <None Include="ball.vs" />
     <None Include="DuckRenderer\Array.inl" />
     <None Include="DuckRenderer\MathStructs.inl" />
-    <None Include="finalComposition.ps" />
-    <None Include="fullScreenQuad.vs" />
-    <None Include="level.ps" />
-    <None Include="level.vs" />
-    <None Include="obstacle.ps" />
-    <None Include="obstacle.vs" />
-    <None Include="pointLight.ps" />
-    <None Include="pointLight.vs" />
+    <None Include="shader\ball.ps" />
+    <None Include="shader\ball.vs" />
+    <None Include="shader\finalComposition.ps" />
+    <None Include="shader\fullScreenQuad.vs" />
+    <None Include="shader\level.ps" />
+    <None Include="shader\level.vs" />
+    <None Include="shader\obstacle.ps" />
+    <None Include="shader\obstacle.vs" />
+    <None Include="shader\pointLight.ps" />
+    <None Include="shader\pointLight.vs" />
+    <None Include="shader\skybox.ps" />
+    <None Include="shader\skybox.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Bullet\BulletCollision_Debug.lib" />
@@ -116,6 +118,15 @@
     <Image Include="testWinterGround.png" />
     <Image Include="trampoline.png" />
     <Image Include="water.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\DirectionalLightingWithShadows.ps">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Text</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shader\shadowFill.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F638B05-F9B3-4238-A88C-F4A6FC99C859}</ProjectGuid>

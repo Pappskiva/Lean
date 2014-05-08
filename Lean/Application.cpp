@@ -132,6 +132,22 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		SVF_PIXELSHADER))
 		return false;
 
+	D3D11_INPUT_ELEMENT_DESC dirLightElemDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	directionalLightShader = m_Direct3D->LoadVertexShader(ShaderInfo("shader//fullScreenQuad.vs", "VS", "vs_4_0"),
+		dirLightElemDesc,
+		2);
+	if (!directionalLightShader)
+		return false;
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//DirectionalLightingWithShadows.ps", "LightPassPS", "ps_4_0"),
+		directionalLightShader,
+		SVF_PIXELSHADER))
+		return false;
+
 	//Create the ballshaderclass object
 	//Initialize  the ballshaderclass object
 	D3D11_INPUT_ELEMENT_DESC ballShaderElem[] =
@@ -250,7 +266,25 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
 	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
 	AddPointLight(v3(1.0f, 0.5f, 1.0f), 2.0f, v3(1, 1, 0), 1.0f);
-		
+	
+
+	m_Direct3D->CreateShadowmap(1024, 1024);
+
+	v3 lightDir = v3(5, 10, -3).GetNormalized();
+	v3 camPos = lightDir * 40.0f;
+	shadowCamera.SetPosition(camPos);
+	shadowCamera.LookAt(v3(0.0f));
+	shadowCamera.SetScreenSize(1024, 1024);
+	shadowCamera.SetFarPlane(100.0f);
+	shadowCamera.SetNearPlane(10.0f);
+	shadowCamera.SetFieldOfView((float)PI * 0.125f);
+	shadowCamera.GeneratePerspectiveProjectionMatrix();
+	shadowCamera.Generate3DViewMatrix();
+
+	firstLightPassData.directionalLightDirection = lightDir;
+	firstLightPassData.directionalLightColor = v3(1.0f, 1.0f, 1.0f);
+	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
+	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
 	return true;
 }
@@ -326,8 +360,11 @@ bool Application::Frame(float deltaTime)
 	m_Level->Update(deltaTime);
 	m_Ball->Update(deltaTime);
 
-	m_Camera->SetPosition(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f);
-	m_Camera->SetTargetToLookAt(ballPosition.x, ballPosition.y, ballPosition.z);
+	m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
+	m_Camera->LookAt(ballPosition);
+
+	shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 40.0f + ballPosition);
+	shadowCamera.Generate3DViewMatrix();
 	
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
@@ -347,9 +384,6 @@ bool Application::Frame(float deltaTime)
 	{
 		//ChangeLevel(m_Goal->GetNextLevelNumber());
 	}
-	
-
-
 
 	// Render the graphics.
 	RenderGraphics();
@@ -364,10 +398,15 @@ void Application::RenderGraphics()
 
 	_UpdateShaderVariables();
 
+	m_Direct3D->BeginShadowPass();
+
+		m_Ball->Render(m_Direct3D);
+
+	m_Direct3D->EndShadowPass();
+
+
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	//Render the ball buffers.
-	
 		m_Direct3D->BeginDeferredRenderingScene(clearColor);
 		
 			m_Ball->Render(m_Direct3D);
@@ -466,7 +505,7 @@ void Application::_UpdateShaderVariables()
 		ballPosition);*/
 
 	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
-	m_Camera->Render();
+	m_Camera->Generate3DViewMatrix();
 
 	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
 	m_Camera->GetViewMatrix(viewMatrix);
@@ -480,8 +519,7 @@ void Application::_UpdateShaderVariables()
 	obstacleShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 
 	// Updatera Skyboxens shader variabler
-	v3 camPos;
-	m_Camera->GetPosition(camPos);
+	v3 camPos = m_Camera->GetPosition();
 	m_Skybox->UpdateShaderVariables(camPos, viewMatrix, projectionMatrix);
 
 	m4 viewProj = viewMatrix * projectionMatrix;
@@ -490,6 +528,20 @@ void Application::_UpdateShaderVariables()
 	//pointLightShader->UpdateConstantBuffer(0, &test, sizeof(stuff));
 	pointLightShader->SetVariable("viewProj", &viewProj, sizeof(m4));
 	pointLightShader->SetVariable("viewProjInverted", &viewProjInverted, sizeof(m4));
+
+	//directional light
+	m4 shadowView, shadowProjection;
+	shadowCamera.GetViewMatrix(shadowView);
+	shadowCamera.GetProjectionMatrix(shadowProjection);
+
+	viewProj = shadowView * shadowProjection;
+	pointLightShader->SetVariable("viewProjectionInverse", &viewProjInverted, sizeof(m4));
+	pointLightShader->SetVariable("shadowViewProjection", &viewProj, sizeof(m4));
+
+	//shadowfill
+	Shader *shadowFillShader = m_Direct3D->GetShadowFill();
+	shadowFillShader->SetVariable("shadowView", &shadowView, sizeof(m4));
+	shadowFillShader->SetVariable("shadowProjection", &shadowProjection, sizeof(m4));
 }
 
 void Application::_RenderLights()
@@ -509,6 +561,15 @@ void Application::_RenderLights()
 
 		m_Direct3D->RenderMesh(lights[i].mesh);
 	}
+
+
+	m_Direct3D->SetShader(directionalLightShader);
+	m_Direct3D->ApplyGBufferResource(0, 0);
+	m_Direct3D->ApplyGBufferResource(1, 1);
+	m_Direct3D->ApplyDepthResource(2);
+	m_Direct3D->ApplyShadowmapResource(3);
+
+	m_Direct3D->RenderFullScreenQuad();
 }
 
 void Application::AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity)

@@ -9,17 +9,18 @@
 
 D3D::D3D()
 {
-	m_swapChain = 0;
-	m_device = 0;
-	m_deviceContext = 0;
-	m_renderTargetView = 0;
-	m_depthStencilBuffer = 0;
-	m_depthStencilState = 0;
-	m_depthStencilView = 0;
-	m_rasterState = 0;
-	m_depthDisabledStencilState = 0;
-	m_alphaEnableBlendingState = 0;
-	m_alphaDisableBlendingState = 0;
+	m_swapChain						= nullptr;
+	m_device						= nullptr;
+	m_deviceContext					= nullptr;
+	m_renderTargetView				= nullptr;
+	m_depthStencilBuffer			= nullptr;
+	m_depthStencilState				= nullptr;
+	m_depthStencilView				= nullptr;
+	m_rasterState					= nullptr;
+	m_depthDisabledStencilState		= nullptr;
+	m_alphaEnableBlendingState		= nullptr;
+	m_alphaDisableBlendingState		= nullptr;
+	shadowPass						= false;
 }
 
 
@@ -711,7 +712,7 @@ void			D3D::BeginDeferredRenderingScene(float clearColor[])
 	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[0], clearColor);
 	m_deviceContext->ClearRenderTargetView(gBufferRenderTargetView[1], clearColor);
 
-	static float lightClearColor[4] = { 0.5f, 0.5f, 0.5f, 0.0f };
+	static float lightClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	m_deviceContext->ClearRenderTargetView(lightRenderTargetView, lightClearColor);
 
 	m_deviceContext->OMSetRenderTargets(2, gBufferRenderTargetView, m_depthStencilView);
@@ -753,6 +754,77 @@ void			D3D::EndLightStage()
 		, nullptr, nullptr, nullptr, nullptr };
 
 	m_deviceContext->PSSetShaderResources(0, 8, pSRV);
+}
+
+void			D3D::BeginShadowPass()
+{
+	m_deviceContext->ClearDepthStencilView(shadowmapDSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	SetShader(shadowFillShader);
+	shadowPass = true;
+}
+
+void			D3D::EndShadowPass()
+{
+	shadowPass = false;
+}
+
+bool			D3D::CreateShadowmap(const uint width, const uint height)
+{
+	D3D11_TEXTURE2D_DESC descDepth;
+	descDepth.Width = width;
+	descDepth.Height = height;
+	descDepth.MipLevels = 1;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
+	descDepth.SampleDesc.Count = 1;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
+
+	ID3D11Texture2D *depthTexture = nullptr;
+	if (FAILED(m_device->CreateTexture2D(&descDepth, nullptr, &depthTexture)))
+		return false;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	ZeroMemory(&depthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+	if (FAILED(m_device->CreateDepthStencilView(depthTexture, &depthStencilViewDesc, &shadowmapDSView)))
+	{
+		depthTexture->Release();
+		return false;
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
+	ZeroMemory(&srDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	srDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srDesc.Texture2D.MostDetailedMip = 0;
+	srDesc.Texture2D.MipLevels = 1;
+
+	if (FAILED(m_device->CreateShaderResourceView(depthTexture, &srDesc, &shadowmapSRView)))
+	{
+		depthTexture->Release();
+		shadowmapDSView->Release();
+		return false;
+	}
+	depthTexture->Release();
+
+	D3D11_INPUT_ELEMENT_DESC elements[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	shadowFillShader = LoadVertexShader(ShaderInfo("shader//shadowFill.vs", "ShadowVS", "vs_4_0"), elements, 1);
+
+	if (!shadowFillShader)
+		return false;
+
+	return true;
 }
 
 Texture*		D3D::LoadTextureFromFile(const HString &filePath)
@@ -901,7 +973,7 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 		return nullptr;
 	}
 
-	result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+	result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexStage);
 
 	if (result != S_OK)
 	{
@@ -924,7 +996,7 @@ Shader*			D3D::LoadVertexShader(const ShaderInfo &shaderInfo, const D3D11_INPUT_
 			WBOX(L"Cannot create input layout.");
 
 			SAFE_RELEASE(shaderBlob);
-			SAFE_RELEASE(shader->vertexShader);
+			SAFE_RELEASE(shader->vertexStage);
 
 			return nullptr;
 		}
@@ -970,10 +1042,10 @@ bool			D3D::LoadShaderStageIntoShader(const ShaderInfo &shaderInfo, Shader *shad
 	switch (shaderType)
 	{
 	case SVF_VERTEXSHADER:
-		result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexShader);
+		result = m_device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->vertexStage);
 		break;
 	case SVF_PIXELSHADER:
-		result = m_device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->pixelShader);
+		result = m_device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &shader->pixelStage);
 	}
 
 	if (result != S_OK)
@@ -1149,6 +1221,9 @@ void			D3D::_ShaderReflection(Shader *shader, ID3D10Blob *shaderBlob, const uint
 
 void			D3D::SetShader(const Shader *shader)
 {
+	if (shadowPass)
+		return;
+
 	assert(shader);
 
 	if (currentShader == shader)
@@ -1156,8 +1231,8 @@ void			D3D::SetShader(const Shader *shader)
 
 	currentShader = (Shader *)shader;
 
-	m_deviceContext->VSSetShader(shader->vertexShader, nullptr, 0);
-	m_deviceContext->PSSetShader(shader->pixelShader, nullptr, 0);
+	m_deviceContext->VSSetShader(shader->vertexStage, nullptr, 0);
+	m_deviceContext->PSSetShader(shader->pixelStage, nullptr, 0);
 
 	if (shader->inputLayout)
 		m_deviceContext->IASetInputLayout(shader->inputLayout);
@@ -1209,6 +1284,11 @@ void			D3D::RenderMesh(const Mesh *mesh, const int subset) const
 	}	
 }
 
+void			D3D::RenderFullScreenQuad() const
+{
+	RenderMesh(fullscreenQuadMesh);
+}
+
 void			D3D::ApplyTexture(const Texture *texture, const uint slot)
 {
 	for (uint i = 0; currentShader->textureSlots.Length(); ++i)
@@ -1221,6 +1301,58 @@ void			D3D::ApplyTexture(const Texture *texture, const uint slot)
 				m_deviceContext->VSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&texture->m_texture);
 			else if ( (texVar.flag & SVF_PIXELSHADER) != 0)
 				m_deviceContext->PSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&texture->m_texture);
+			break;
+		}
+	}
+}
+
+void			D3D::ApplyShadowmapResource(const uint slot)
+{
+	for (uint i = 0; currentShader->textureSlots.Length(); ++i)
+	{
+		ShaderVariable &texVar = currentShader->textureSlots[i];
+
+		if (texVar.bufferPlace == slot)
+		{
+			if ((texVar.flag & SVF_VERTEXSHADER) != 0)
+				m_deviceContext->VSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&shadowmapSRView);
+			else if ((texVar.flag & SVF_PIXELSHADER) != 0)
+				m_deviceContext->PSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&shadowmapSRView);
+			break;
+		}
+	}
+}
+
+void			D3D::ApplyDepthResource(const uint slot)
+{
+	for (uint i = 0; currentShader->textureSlots.Length(); ++i)
+	{
+		ShaderVariable &texVar = currentShader->textureSlots[i];
+
+		if (texVar.bufferPlace == slot)
+		{
+			if ((texVar.flag & SVF_VERTEXSHADER) != 0)
+				m_deviceContext->VSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&m_depthStencilShaderResourceView);
+			else if ((texVar.flag & SVF_PIXELSHADER) != 0)
+				m_deviceContext->PSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&m_depthStencilShaderResourceView);
+			break;
+		}
+	}
+}
+
+void			D3D::ApplyGBufferResource(const uint index, const uint slot)
+{
+	assert(index < 2);
+	for (uint i = 0; currentShader->textureSlots.Length(); ++i)
+	{
+		ShaderVariable &texVar = currentShader->textureSlots[i];
+
+		if (texVar.bufferPlace == slot)
+		{
+			if ((texVar.flag & SVF_VERTEXSHADER) != 0)
+				m_deviceContext->VSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&gBufferShaderResourceView[index]);
+			else if ((texVar.flag & SVF_PIXELSHADER) != 0)
+				m_deviceContext->PSSetShaderResources(texVar.bufferPlace, 1, (ID3D11ShaderResourceView **)&gBufferShaderResourceView[index]);
 			break;
 		}
 	}

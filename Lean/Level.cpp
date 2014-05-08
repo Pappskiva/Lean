@@ -98,7 +98,8 @@ void Level::Render(D3D* direct3D)
 	UpdateWorldMatrix();
 
 	direct3D->SetShader(m_shader);
-	m_shader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
+	Shader *currentShader = direct3D->GetCurrentShader();
+	currentShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
 	direct3D->ApplyConstantBuffers();
 	direct3D->ApplyTexture(m_Texture1, 0);
 	direct3D->ApplyTexture(m_Texture2, 1);
@@ -119,7 +120,8 @@ ID3D11ShaderResourceView* Level::GetTexture(int textureNumber)
 	{
 		return m_Texture2->GetTexture();
 	}
-	
+
+	return nullptr;
 }
 
 void Level::SetPosition(float positionX, float positionY, float positionZ)
@@ -324,7 +326,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	int tempHeight, tempWidth;
 
 	const float LEVEL_POINT_DISTANCE = 0.5f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
-	const float LEVEL_MAX_HEIGHT = 1.0f;
+	const float LEVEL_MAX_HEIGHT = 2.5f;
 	
 	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
 
@@ -342,7 +344,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 		for (uint x = 0; x < width; x++)
 		{
 			vertices[x + z * width].pos.x = (x - width * 0.5f) * LEVEL_POINT_DISTANCE;
-			vertices[x + z * width].pos.y = heightmap[x + z * width] * LEVEL_MAX_HEIGHT;
+			vertices[x + z * width].pos.y = heightmap[x + z * width] *LEVEL_MAX_HEIGHT;
 			vertices[x + z * width].pos.z = (z - height * 0.5f) * LEVEL_POINT_DISTANCE;
 			vertices[x + z * width].uv.v[0] = (float)x / width;
 			vertices[x + z * width].uv.v[1] = (float)z / height;
