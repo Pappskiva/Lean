@@ -375,6 +375,7 @@ bool Application::Frame(float deltaTime)
 	m_Level->Update(deltaTime);
 	m_Ball->Update(deltaTime);
 
+
 	m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
 	m_Camera->LookAt(ballPosition);
 
@@ -479,9 +480,7 @@ void Application::RenderGraphics()
 			{
 				m_Goal->Render(m_Direct3D);
 
-				m_Direct3D->TurnOnAlphaBlending();
-				m_ObstacleHandler->Render(m_Direct3D);
-				m_Direct3D->TurnOffAlphaBlending();
+				
 			}
 
 			m_Direct3D->BeginLightStage();
@@ -491,6 +490,13 @@ void Application::RenderGraphics()
 			m_Direct3D->EndLightStage();
 
 		m_Direct3D->EndDeferredRenderingScene();
+		
+		if (!switchLevel)
+		{
+			m_Direct3D->TurnOnAlphaBlending();
+			m_ObstacleHandler->Render(m_Direct3D);
+			m_Direct3D->TurnOffAlphaBlending();
+		}
 
 		m_Skybox->Render(m_Direct3D);
 
