@@ -45,6 +45,7 @@ public:
 
 	void	UpdateWorldMatrix();
 	void	GetWorldMatrix(m4&);
+	void	SetWorldMatrix(m4 world);
 
 	void	SetShader(const Shader *shader);
 

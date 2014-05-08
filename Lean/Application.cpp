@@ -289,6 +289,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
+
+
+	m_PhysicsBridge.Initialize(m_Level);
+	m_PhysicsBridge.GenerateDebug(m_Direct3D);
+
+
 	return true;
 }
 
@@ -358,26 +364,32 @@ bool Application::Frame(float deltaTime)
 	m_Ball->GetPosition(ballPosition);
 	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
 	float value2 = sqrtf(testNormal.x * testNormal.x + testNormal.y * testNormal.y + testNormal.z * testNormal.z);
-	float distance = value1 / value2;
+	float distance = value1 / value2;////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
-	if (distance >= m_Ball->GetRadius())
-	{
-		m_Ball->SetPosition(ballPosition.x, ballPosition.y - 1.0f * deltaTime, ballPosition.z);
-	}
-	if (distance <= m_Ball->GetRadius())
-	{
-		float testRollSpeed = 8.0f;
-		m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
-	}
+	//if (distance >= m_Ball->GetRadius())
+	//{
+	//	m_Ball->SetPosition(ballPosition.x, ballPosition.y - 1.0f * deltaTime, ballPosition.z);
+	//}
+	//if (distance <= m_Ball->GetRadius())
+	//{
+	//	float testRollSpeed = 8.0f;
+	//	m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
+	//}
 
-	m_Level->Update(deltaTime);
+	//m_Level->Update(deltaTime);
 
 	m_Level->Update(deltaTime);
 	m_Ball->Update(deltaTime);
+	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
 
-	m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
+	ballPosition = v3(m_PhysicsBridge.GetBallTransformMatrix().GetPos().x, m_PhysicsBridge.GetBallTransformMatrix().GetPos().y, m_PhysicsBridge.GetBallTransformMatrix().GetPos().z);
+	//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
+	//m_Camera->LookAt(ballPosition);
 	m_Camera->LookAt(ballPosition);
+	v3 camPos = m_PhysicsBridge.GetBallTransformMatrix().GetPos();
+	m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
+
 
 	shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 40.0f + ballPosition);
 	shadowCamera.Generate3DViewMatrix();

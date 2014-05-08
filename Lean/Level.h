@@ -57,6 +57,9 @@ public:
 
 	void SetShader(const Shader *shader);
 
+	void SetWorldMatrix(m4& world);
+	float* GetHeighMapData();
+
 private:
 	bool	InitializeBuffers(D3D*);
 	void	ShutdownBuffers();
@@ -76,6 +79,7 @@ private:
 
 	//maybe for collision detection!
 	float *heightmap;
+	float *heightmapToPhys;
 	uint triangleCount;
 	Triangle *collisionTriangles;
 

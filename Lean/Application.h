@@ -15,6 +15,7 @@
 #include "ObstacleHandler.h"
 #include "Goal.h"
 #include "Skybox.h"
+#include "PhysicsBridge.h"
 
 //FPS kollare för debug
 #include "FPSClass.h"
@@ -86,6 +87,7 @@ private:
 	Goal			*m_Goal; //För testningsyften
 
 	FPSClass		m_fps;
+	PhysicsBridge m_PhysicsBridge;
 
 	Shader			*defaultShader, *levelShader, *obstacleShader;
 

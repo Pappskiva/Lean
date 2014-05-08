@@ -72,7 +72,7 @@ void Ball::Update(float deltaTime)
 void Ball::Render(D3D *direct3D)
 {
 	//direct3D->SetTexture(blabla)
-	UpdateWorldMatrix();
+	//UpdateWorldMatrix();
 	direct3D->SetShader(m_shader);
 	Shader *currentShader = direct3D->GetCurrentShader();
 
@@ -154,4 +154,8 @@ void Ball::ShutdownBuffers()
 {
 	// Release indexbuffern
 	return;
+}
+void Ball::SetWorldMatrix(m4 world)
+{
+	worldMatrix = world;
 }

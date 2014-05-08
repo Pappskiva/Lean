@@ -21,6 +21,7 @@
     <ClCompile Include="DuckRenderer\MathFuncs.cpp" />
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Goal.cpp" />
+    <ClCompile Include="Heightfield.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="LeafObstacle.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -32,6 +33,7 @@
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="ObstacleHandler.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
+    <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -59,6 +61,7 @@
     <ClInclude Include="DuckRenderer\MathStructs.h" />
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Goal.h" />
+    <ClInclude Include="Heightfield.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="LeafObstacle.h" />
     <ClInclude Include="Level.h" />
@@ -69,6 +72,7 @@
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="ObstacleHandler.h" />
     <ClInclude Include="PhysicsBridge.h" />
+    <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sound.h" />
@@ -173,7 +177,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Grupp9Comp1\Desktop\Litet spel\Lean\Lean\Bullet\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Bullet\src;C:\Users\Grupp9Comp1\Desktop\Litet spel\Lean\Lean\Bullet\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

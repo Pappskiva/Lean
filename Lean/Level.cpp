@@ -95,7 +95,7 @@ void Level::Update(float deltaTime)
 void Level::Render(D3D* direct3D)
 {
 	// Lägg in vertex och index buffrarna på grafikpipelinen för att förbereda dem för rendering.
-	UpdateWorldMatrix();
+	//UpdateWorldMatrix();
 
 	direct3D->SetShader(m_shader);
 	Shader *currentShader = direct3D->GetCurrentShader();
@@ -343,9 +343,9 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	for (uint z = 0; z < height; z++)
 		for (uint x = 0; x < width; x++)
 		{
-			vertices[x + z * width].pos.x = (x - width * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].pos.x = (x - width * 0.5f)/* * LEVEL_POINT_DISTANCE*/;
 			vertices[x + z * width].pos.y = heightmap[x + z * width] *LEVEL_MAX_HEIGHT;
-			vertices[x + z * width].pos.z = (z - height * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].pos.z = (z - height * 0.5f)/* * LEVEL_POINT_DISTANCE*/;
 			vertices[x + z * width].uv.v[0] = (float)x / width;
 			vertices[x + z * width].uv.v[1] = (float)z / height;
 		}
@@ -403,6 +403,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	m_mesh->Flush();
 	m_mesh->Initialize(vertices, sizeof(Vertex), width * height, indices, (height - 1) * (width - 1) * 6);
 	direct3D->LoadMeshIntoDevice(m_mesh);
+	heightmapToPhys = heightmap;
 
 	delete[] vertices;	
 	delete[] indices;
@@ -435,4 +436,13 @@ void Level::SetTextureBasedOnNumber(int levelIndex, D3D* direct3D)
 		m_Texture1 = direct3D->LoadTextureFromFile(L"data//testSpringGround.png");
 	}
 	
+}
+void Level::SetWorldMatrix(m4& world)
+{
+	worldMatrix = world;
+}
+
+float* Level::GetHeighMapData()
+{
+	return heightmapToPhys;
 }
