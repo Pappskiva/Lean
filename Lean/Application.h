@@ -89,6 +89,9 @@ private:
 
 	Shader			*defaultShader, *levelShader, *obstacleShader;
 
+	//Variabler för att byta bana på rätt sätt
+	bool			switchLevel;
+	bool			finishedSwitch;
 
 	//kanske borde vara i någon sceneManager	
 	Array<LightPack>	lights;

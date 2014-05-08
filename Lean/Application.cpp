@@ -18,6 +18,9 @@ Application::Application()
 	defaultShader = nullptr;
 	levelShader = nullptr;
 	obstacleShader = nullptr;
+
+	switchLevel = false;
+	finishedSwitch = true;
 }
 
 
@@ -258,7 +261,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	m_Goal->SetNextLevelNumber(1);
+	m_Goal->SetNextLevelNumber(2);
 
 	m_Goal->SetShader(defaultShader);
 
@@ -310,25 +313,37 @@ bool Application::Frame(float deltaTime)
 	//Check if the user is pressing buttons to rotate the level in the x-axis
 	if (m_Input->IsUpPressed() || m_Input->IsWPressed())
 	{
-		float rotationAroundX = m_Level->GetRotationX();
-		m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+		if (!switchLevel)
+		{
+			float rotationAroundX = m_Level->GetRotationX();
+			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+		}
 	}
 	else if (m_Input->IsDownPressed() || m_Input->IsSPressed())
 	{
-		float rotationAroundX = m_Level->GetRotationX();
-		m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+		if (!switchLevel)
+		{
+			float rotationAroundX = m_Level->GetRotationX();
+			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+		}
 	}
 
 	//Check if the user is pressing buttons to rotate the level in the z-axis
 	if (m_Input->IsLeftPressed() || m_Input->IsAPressed())
 	{
-		float rotationAroundZ = m_Level->GetRotationZ();
-		m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+		if (!switchLevel)
+		{
+			float rotationAroundZ = m_Level->GetRotationZ();
+			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+		}
 	}
 	else if (m_Input->IsRightPressed() || m_Input->IsDPressed())
 	{
-		float rotationAroundZ = m_Level->GetRotationZ();
-		m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+		if (!switchLevel)
+		{
+			float rotationAroundZ = m_Level->GetRotationZ();
+			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+		}
 	}
 
 	if (m_Input->IsSpacePressed())
@@ -373,16 +388,63 @@ bool Application::Frame(float deltaTime)
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
-	//Titta om målet och bollen är nära nog för att kollidera
-	v3 goalPosition;
-	m_Ball->GetPosition(ballPosition);
-	m_Goal->GetPosition(goalPosition);
-	v3 relPos = ballPosition - goalPosition;
-	distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
-	float minDist = m_Ball->GetRadius() + 2.0f;
-	if (distance < minDist * minDist)
+	//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
+	if (!switchLevel)
 	{
-		//ChangeLevel(m_Goal->GetNextLevelNumber());
+		//Titta om målet och bollen är nära nog för att kollidera
+		v3 goalPosition;
+		m_Ball->GetPosition(ballPosition);
+		m_Goal->GetPosition(goalPosition);
+		v3 relPos = ballPosition - goalPosition;
+		distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
+		float minDist = m_Ball->GetRadius() + 2.0f;
+		if (distance < minDist * minDist)
+		{
+			//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
+			switchLevel = true; 
+			finishedSwitch = false;
+		}
+	}
+
+
+	if (switchLevel)
+	{
+		//Värdet för hur banan ändras
+		float maximumRiseLevel = 20.0f;
+		float minimumRiseLevel = -20.0f;
+		float riseSpeed = 10.0f;
+		v3 levelPosition;
+		m_Level->GetPosition(levelPosition);
+		if (!finishedSwitch) //Om banan inte har stigit upp utanför synhåll, så låt den göra det.
+		{
+			levelPosition.y += riseSpeed * deltaTime;
+			m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
+			if (levelPosition.y >= maximumRiseLevel)
+			{
+				//Banan har stigit upp utanför synhåll. Byta den och lägg den långt nedanför.
+				finishedSwitch = true;
+				ChangeLevel(m_Goal->GetNextLevelNumber());
+				levelPosition.y = minimumRiseLevel;
+				m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
+			}
+		}
+		else
+		{
+			//Banan är vid det här laget nedanför bollen, och måste stiga upp.
+			if (levelPosition.y <= 0.0f)
+			{
+				levelPosition.y += riseSpeed * deltaTime;
+				if (levelPosition.y > 0.0f)
+				{
+					//Banan är nära noll, så sätt den helt rätt och möjliggör så att vi kollar om målet är nära bollen igen.
+					levelPosition.y = 0.0f;
+					switchLevel = false;
+				}
+				m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
+			}
+		}
+		
+
 	}
 
 	// Render the graphics.
@@ -591,6 +653,9 @@ void Application::ChangeLevel(int levelNumber)
 	v3 goalPos;
 	int nrOfObst;
 	m_Level->LoadLevel(levelNumber, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
+
+	m_Level->SetRotationX(0.0f);
+	m_Level->SetRotationZ(0.0f);
 
 	//Ta bort alla tidigare hinder
 	m_ObstacleHandler->RemoveAllObstacles();
