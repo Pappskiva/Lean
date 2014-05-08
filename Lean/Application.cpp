@@ -242,16 +242,17 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Ball->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
-	
-	LevelLoaderClass::ObstacleType *obstacles;
+	m_ObstacleHandler = new ObstacleHandler();
+
+	/*LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;
 	int nrOfObst;
 	m_Level->LoadLevel(1, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
-	m_ObstacleHandler = new ObstacleHandler();
+
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
+	m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
 	}
 
 	delete [] obstacles;
@@ -261,7 +262,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	m_Goal->SetNextLevelNumber(2);
+	m_Goal->SetNextLevelNumber(1);*/
+
+	ChangeLevel(1);
 
 	m_Goal->SetShader(defaultShader);
 
@@ -680,5 +683,12 @@ void Application::ChangeLevel(int levelNumber)
 
 	m_Ball->SetPosition(startPos.x, 5, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	m_Goal->SetNextLevelNumber(1);
+	if (m_Goal->GetNextLevelNumber() < MAX_LEVELS)
+	{
+		m_Goal->SetNextLevelNumber(m_Goal->GetNextLevelNumber() + 1);
+	}
+	else
+	{
+		m_Goal->SetNextLevelNumber(0);
+	}
 }

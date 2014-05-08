@@ -26,6 +26,7 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
+const int MAX_LEVELS = 2;
 
 
 enum LightType : char

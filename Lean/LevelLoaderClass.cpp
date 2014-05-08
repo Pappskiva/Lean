@@ -80,18 +80,18 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 	//Eftersom positionerna är räknade från översta vänstra hörnet och projektets origo är i mitten av banan placeras positionerna om.
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		obstacles[i].pos.x -= 16;
-		obstacles[i].pos.z = 32 - obstacles[i].pos.z;
-		obstacles[i].pos.z -= 16;
+		obstacles[i].pos.x -= m_terrainWidth/4;
+		obstacles[i].pos.z = m_terrainHeight/2 - obstacles[i].pos.z;
+		obstacles[i].pos.z -= m_terrainHeight/4;
 		obstacles[i].pos.x -= 0.5f; //Eftersom pixlarna på kartan är så stora måste vi lägga om dem lite för att hamna där vi vill.
 		obstacles[i].pos.z -= 0.5f;
 	}
-	startPos.x -= 16;
-	startPos.z = 32 - startPos.z;
-	startPos.z -= 16;
-	goalPos.x -= 16;
-	goalPos.z = 32 - goalPos.z;
-	goalPos.z -= 16;
+	startPos.x -= m_terrainWidth/4;
+	startPos.z = m_terrainHeight/2 - startPos.z;
+	startPos.z -= m_terrainHeight/4;
+	goalPos.x -= m_terrainWidth/4;
+	goalPos.z = m_terrainHeight/2 - goalPos.z;
+	goalPos.z -= m_terrainHeight/4;
 
 	return true;
 }
