@@ -475,11 +475,14 @@ void Application::RenderGraphics()
 
 			m_Level->Render(m_Direct3D);
 
-			m_Goal->Render(m_Direct3D);
+			if (!switchLevel)
+			{
+				m_Goal->Render(m_Direct3D);
 
-			m_Direct3D->TurnOnAlphaBlending();
-			m_ObstacleHandler->Render(m_Direct3D);
-			m_Direct3D->TurnOffAlphaBlending();
+				m_Direct3D->TurnOnAlphaBlending();
+				m_ObstacleHandler->Render(m_Direct3D);
+				m_Direct3D->TurnOffAlphaBlending();
+			}
 
 			m_Direct3D->BeginLightStage();
 
