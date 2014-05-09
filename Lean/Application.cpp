@@ -360,25 +360,6 @@ bool Application::Frame(float deltaTime)
 		
 	}
 
-	v3 testNormal;
-	m_Level->GetNormal(testNormal);
-	v3 ballPosition;	
-
-	m_Ball->GetPosition(ballPosition);
-	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
-	float value2 = sqrtf(testNormal.x * testNormal.x + testNormal.y * testNormal.y + testNormal.z * testNormal.z);
-	float distance = value1 / value2;////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-
-	//if (distance >= m_Ball->GetRadius())
-	//{
-	//	m_Ball->SetPosition(ballPosition.x, ballPosition.y - 1.0f * deltaTime, ballPosition.z);
-	//}
-	//if (distance <= m_Ball->GetRadius())
-	//{
-	//	float testRollSpeed = 8.0f;
-	//	m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
-	//}
-
 	//m_Level->Update(deltaTime);
 
 	m_Level->Update(deltaTime);
@@ -390,12 +371,11 @@ bool Application::Frame(float deltaTime)
 	//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
 	//m_Camera->LookAt(ballPosition);
 
-	//Hämta bollens world, sätt kamerans position efter bollens position.
-	m4 ballWorldM;
-	m_Ball->GetWorldMatrix(ballWorldM);
-	v3 camPos = ballWorldM.GetPos();
-	m_Camera->LookAt(camPos);
-	m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
+	//Sätt kamerans position efter bollens position.
+	v3 ballPosition;
+	m_Ball->GetPosition(ballPosition);
+	m_Camera->LookAt(ballPosition);
+	m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
 
 
 	shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 40.0f + ballPosition);
@@ -413,16 +393,15 @@ bool Application::Frame(float deltaTime)
 	{
 		//Titta om målet och bollen är nära nog för att kollidera
 		v3 goalPosition;
-		m_Ball->GetPosition(ballPosition);
 		m_Goal->GetPosition(goalPosition);
 		v3 relPos = ballPosition - goalPosition;
-		distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
+		float distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
 		float minDist = m_Ball->GetRadius() + 2.0f;
 		if (distance < minDist * minDist)
 		{
 			//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
-			switchLevel = true; 
-			finishedSwitch = false;
+		//	switchLevel = true; 
+		//	finishedSwitch = false;
 		}
 	}
 

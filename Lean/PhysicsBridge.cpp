@@ -89,6 +89,10 @@ void PhysicsBridge::StepSimulation(float deltaTime, float rotX, float rotY, floa
 	m4 rotationL = m4::CreateYawPitchRoll(0, rotX, rotZ);
 	world = world*rotationL;
 	ball->SetWorldMatrix(world);
+	
+	//Tillagd för att man ska kunna få ut rätt position direkt från bollen
+	v3 newBallPosition = world.GetPos();
+	ball->SetPosition(newBallPosition.x, newBallPosition.y, newBallPosition.z);
 
 	world = GetPlaneTransformMatrix();
 	m4 rotationMatrix = m4::CreateYawPitchRoll(rotY, rotX, rotZ);
