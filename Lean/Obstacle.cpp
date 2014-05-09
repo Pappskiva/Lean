@@ -18,6 +18,8 @@ Obstacle::Obstacle()
 	m_rotationZ = 0.0f;
 
 	worldMatrix = m4::IDENTITY;
+
+	cooldown = 0;
 }
 
 Obstacle::Obstacle(const Obstacle& other)
@@ -62,13 +64,18 @@ void Obstacle::Shutdown()
 	return;
 }
 
-void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ)
+void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
 {
 	/*Uppdatera hindret så det ligger utmed banan rätt*/
 	m_rotationX = planeRotationX;
 	m_rotationZ = planeRotationZ;
 	/*billboarding rotation*/
 	m_rotationY = -atan2(m_position.x - cameraPosX, m_position.z - cameraPosZ) * 57.2957795131f; //I grader, då vi gör det till radianer igen i updateworldmatrix funktionen
+
+	if (cooldown > 0)
+	{
+		cooldown -= deltaTime;
+	}
 }
 
 void Obstacle::Render(D3D *direct3D)

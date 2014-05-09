@@ -49,6 +49,11 @@ public:
 
 	void	SetShader(const Shader *shader);
 
+	void	MakeSlippery(); // För vattenhindret
+	float	GetFriction();
+	void	AddForce(v3); // För trampolin och magnet
+	v3		GetAndZeroAddedForce(); // OBS: Nollställer AddedForce
+
 private:
 	void	ShutdownBuffers();
 	void	RenderBuffers(ID3D11DeviceContext*);
@@ -64,6 +69,8 @@ private:
 	v3 m_velocity;
 	float m_rotationX, m_rotationY, m_rotationZ;
 	float m_radius;
+	float m_friction;
+	v3 m_addedForce; // För kraftpåverkningar som studsmatta och magnet
 
 	m4 worldMatrix;
 };

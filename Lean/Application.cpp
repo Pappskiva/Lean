@@ -363,7 +363,7 @@ bool Application::Frame(float deltaTime)
 	//m_Level->Update(deltaTime);
 
 	m_Level->Update(deltaTime);
-	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
+	m_Ball->Update(deltaTime); // Uppdaterar endast friktion. Position osv uppdateras i PhysicsBridge::StepSimulation
 
 	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
@@ -384,7 +384,7 @@ bool Application::Frame(float deltaTime)
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
 
-	m_ObstacleHandler->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ);
+	m_ObstacleHandler->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ, m_Ball);
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 

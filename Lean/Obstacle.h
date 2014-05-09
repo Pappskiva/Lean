@@ -19,6 +19,7 @@ Objektet i sig är billboardat så att det alltid är vänt mot kameran
 #include <fstream>
 
 #include "Texture.h"
+#include "Ball.h"
 
 //För stunden är det tänkt att detta ska vara en basklass till alla hindren. Detta kan ändras på behov om så behövs.
 //I nuläget är klassen inte abstrakt
@@ -44,7 +45,7 @@ public:
 	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
 	/*Update tar deltatid, position x och z på kameran och även rotation x och y på planet*/
-	virtual void Update(float, float, float, float, float);
+	virtual void Update(float, float, float, float, float, Ball*);
 	virtual void Render(D3D *direct3D);
 
 	ID3D11ShaderResourceView* GetTexture();
@@ -94,6 +95,8 @@ protected:
 
 	/*Worldmatris*/
 	m4 worldMatrix;
+
+	float cooldown; // Detta behövs främst för studsmattan
 };
 
 inline void	Obstacle::SetMesh(const Mesh *mesh)

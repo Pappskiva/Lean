@@ -105,3 +105,19 @@ delete[] vertices;
 return true;
 }
 */
+void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
+{
+	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball);
+
+	// Räknar ut avstånd till boll
+	v3 ballPos;
+	ball->GetPosition(ballPos);
+	v3 vectorToBall = ballPos - m_position;
+	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
+
+	if (squaredDistance < 5 && cooldown <= 0)
+	{
+		ball->MakeSlippery();
+		cooldown = 5;
+	}
+}

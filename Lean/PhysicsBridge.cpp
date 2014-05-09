@@ -76,6 +76,15 @@ void PhysicsBridge::Initialize(Level* level)
 
 void PhysicsBridge::StepSimulation(float deltaTime, float rotX, float rotY, float rotZ, Ball* ball, Level* level)
 {
+	// Uppdatera bollens halhet
+	fallRigidBody->setFriction(ball->GetFriction());
+	v3 forceToApply = ball->GetAndZeroAddedForce();
+	if (forceToApply != 0)
+	{
+		fallRigidBody->applyCentralImpulse(btVector3(forceToApply.x, forceToApply.y, forceToApply.z));
+	}
+
+	// Gravitation
 	btVector3 newGravity = btVector3(0, GRAVITY, 0);
 
 	newGravity = newGravity.rotate(btVector3(1, 0, 0), rotX); // Rot X

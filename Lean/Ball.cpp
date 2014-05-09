@@ -19,6 +19,7 @@ Ball::Ball()
 	m_radius = 0.5f;
 
 	m_velocity = v3(0.0f);
+	m_friction = 1;
 
 	worldMatrix = m4::IDENTITY;
 }
@@ -61,12 +62,17 @@ void Ball::Shutdown()
 
 void Ball::Update(float deltaTime)
 {
-	//Uppdatera bollen
+	// Position och rotation uppdateras i PhysicsBridge
+	////Uppdatera bollen
+	//m_position += m_velocity * deltaTime;
 
-	m_position += m_velocity * deltaTime;
+	////Testrotation
+	//this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
 
-	//Testrotation
-	this->m_rotationY = this->m_rotationY + 20.0f * deltaTime;
+	if (m_friction < 1)
+	{
+		m_friction += 0.1 * deltaTime;
+	}
 }
 
 void Ball::Render(D3D *direct3D)
@@ -158,4 +164,30 @@ void Ball::ShutdownBuffers()
 void Ball::SetWorldMatrix(m4 world)
 {
 	worldMatrix = world;
+}
+
+void Ball::MakeSlippery()
+{
+	m_friction = 0.01;
+}
+float Ball::GetFriction()
+{
+	return m_friction;
+}
+void Ball::AddForce(v3 force)
+{
+	m_addedForce += force;
+}
+v3 Ball::GetAndZeroAddedForce()
+{
+	if (m_addedForce.Length() != 0)
+	{
+		v3 returnForce = m_addedForce;
+		m_addedForce = v3(0, 0, 0);
+		return returnForce;
+	}
+	else
+	{
+		return 0;
+	}
 }
