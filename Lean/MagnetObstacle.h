@@ -18,6 +18,7 @@ public:
 
 	MagnetObstacle();
 	~MagnetObstacle();
+	void Update(float, float, float, float, float, Ball*);
 
 	/*Initialisering och nedstängning*/
 	virtual bool Initialize(D3D*);

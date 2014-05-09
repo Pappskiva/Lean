@@ -104,3 +104,19 @@ delete[] vertices;
 return true;
 }
 */
+void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
+{
+	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball);
+
+	// Räknar ut avstånd till boll
+	v3 ballPos;
+	ball->GetPosition(ballPos);
+	v3 vectorToBall = ballPos - m_position;
+	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
+
+	if (squaredDistance < 100) // Använder inte cooldown
+	{
+		v3 forceToAdd = -vectorToBall / squaredDistance; // drar bollen till sig
+		ball->AddForce(forceToAdd);
+	}
+}
