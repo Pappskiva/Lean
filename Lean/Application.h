@@ -16,6 +16,8 @@
 #include "Goal.h"
 #include "Skybox.h"
 #include "PhysicsBridge.h"
+#include "ImageClass.h"
+#include "SentenceClass.h"
 
 //FPS kollare för debug
 #include "FPSClass.h"

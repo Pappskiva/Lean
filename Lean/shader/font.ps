@@ -1,0 +1,36 @@
+// Globals
+Texture2D shaderTexture;
+SamplerState SampleType;
+
+cbuffer PixelBuffer : register( b1 )
+{
+    float4 pixelColor;
+};
+
+// Typedefs
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+};
+
+// Pixel Shader
+float4 FontPixelShader(PixelInputType input) : SV_TARGET
+{
+    float4 color;
+	
+    color = shaderTexture.Sample(SampleType, input.tex);
+	
+    // Om färgen är svart, gör den transparent
+    if(color.r == 0.0f)
+    {
+        color.a = 0.0f;
+    }	
+    else
+    {
+        color.a = 1.0f;
+        color = color * pixelColor;
+    }
+
+    return color;
+}

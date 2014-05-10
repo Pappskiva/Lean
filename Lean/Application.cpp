@@ -498,6 +498,15 @@ void Application::RenderGraphics()
 
 		m_Skybox->Render(m_Direct3D);
 
+		// 2D rendering
+		m_Direct3D->TurnZBufferOff();
+		m_Direct3D->TurnOnAlphaBlending();
+		
+
+
+		m_Direct3D->TurnOffAlphaBlending();
+		m_Direct3D->TurnZBufferOn();
+
 	m_Direct3D->EndScene();
 
 }
