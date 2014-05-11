@@ -1,0 +1,23 @@
+Texture2D diffuseMap : register( t0 );
+SamplerState standardSampler;
+
+struct PixelIn
+{
+	float4 pos : SV_Position;
+	float2 uv : UV;
+	float alpha : ALPHA;
+};
+
+float4 ParticlePixelShader(PixelIn input) : SV_Target0
+{
+	float4 color = (float4) 0;
+
+
+	color = diffuseMap.Sample(standardSampler, input.uv);
+	//color = float4(1,0,0,1);
+	color.a *= input.alpha;
+
+	//output.color.rgb += float3(1.0f, 200.0f / 255.0f, 14.0f / 255.0f);
+
+	return color;
+}

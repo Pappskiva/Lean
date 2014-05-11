@@ -16,9 +16,7 @@
 #include "Goal.h"
 #include "Skybox.h"
 #include "PhysicsBridge.h"
-#include "ImageClass.h"
-#include "SentenceClass.h"
-
+#include "ParticleEmitter.h"
 //FPS kollare för debug
 #include "FPSClass.h"
 
@@ -92,11 +90,17 @@ private:
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;
 
-	Shader			*defaultShader, *levelShader, *obstacleShader;
+	Shader			*defaultShader, *levelShader, *obstacleShader, *particleBillboard;
+
+	uint			gameTimer;
+
+	InstanceRenderer particleRenderer;
+	ParticleEmitter testEmitter;
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;
 	bool			finishedSwitch;
+
 
 	//kanske borde vara i någon sceneManager	
 	Array<LightPack>	lights;

@@ -33,7 +33,6 @@ Application::~Application()
 {
 }
 
-
 bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight)
 {
 	this->screenWidth = screenWidth;
@@ -292,19 +291,103 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
-
-
 	m_PhysicsBridge.Initialize(m_Level);
 	m_PhysicsBridge.GenerateDebug(m_Direct3D);
 
+	gameTimer = 0;
+
+	//Particle test;
+	struct ParticleVertex
+	{
+		float uv[2];
+	} vertices[] = {
+			{ 0.0f, 0.0f },
+			{ 1.0f, 0.0f },
+			{ 0.0f, 1.0f },
+
+			{ 1.0f, 0.0f },
+			{ 1.0f, 1.0f },
+			{ 0.0f, 1.0f },
+	};
+
+	Mesh *particleMesh = m_Direct3D->CreateMeshFromRam(vertices, sizeof(ParticleVertex), 6);
+	
+	particleRenderer.Initialize(512, 36, particleMesh);
+	m_Direct3D->PrepareInstanceRenderer(particleRenderer);
+
+	Texture *leaf = m_Direct3D->LoadTextureFromFile("data//64x64LeafParticleColored.png");
+
+	D3D11_INPUT_ELEMENT_DESC particleElem[] =
+	{
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "SCALE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 12, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "ROTATION", 0, DXGI_FORMAT_R32_FLOAT, 1, 20, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "ALPHA", 0, DXGI_FORMAT_R32_FLOAT, 1, 24, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+	};
+
+	particleBillboard = m_Direct3D->LoadVertexShader(ShaderInfo("shader//particleBillboard.vs", "BillboardVertexShader", "vs_4_0"),
+		particleElem,
+		5);
+	if (!particleBillboard)
+		return false;
+	if (!m_Direct3D->LoadShaderStageIntoShader(ShaderInfo("shader//particleDefault.ps", "ParticlePixelShader", "ps_4_0"),
+		particleBillboard,
+		SVF_PIXELSHADER))
+		return false;
+
+	struct ParticleRenderData
+	{
+		v3 pos;
+		float scale[2];
+		float rot;
+		float alpha;
+	};
+
+	ParticleRenderLayoutMember layout[] = {
+			{ 0, Particle_Position },
+			{ 0, Particle_XScale },
+			{ 0, Particle_YScale },
+			{ 0, Particle_Rotation },
+			{ 0, Particle_Alpha },
+	};
+	ParticleBase particleBase;
+	particleBase.fadeInTime = 0;
+	particleBase.fadeOutTime = 100;
+	particleBase.rotSpeed = 3.9f;
+	particleBase.scaleXInTime = 1000;
+	particleBase.scaleXOutTime = 100;
+	particleBase.scaleYInTime = 1000;
+	particleBase.scaleYOutTime = 100;
+	particleBase.speed = 1.0f;
+	particleBase.timeToLive = 2000;
+	particleBase.weight = 0;
+	particleBase.xSize = 1.0f;
+	particleBase.ySize = 1.0f;
+
+	ParticleEmitterBase emitterBase;
+	emitterBase.SetTimeToLive(0);
+	emitterBase.SetSpawnFrequency(25);
+	emitterBase.SetMaximumParticles(100);
+	emitterBase.SetParticleMove(v3(0, 1, 0));
+	emitterBase.SetRandomMove(true);
+	emitterBase.SetShader(particleBillboard);
+	emitterBase.SetTexture(leaf);
+	emitterBase.SetRenderLayout(layout, 5);
+	emitterBase.SetParticleBase(particleBase);
+	emitterBase.SetParticleRenderer(&particleRenderer);
+
+	testEmitter.SetParticleEmitterBase(emitterBase);
 
 	return true;
 }
 
 bool Application::Frame(float deltaTime)
 {
-	//m_fps.Frame();	
-
+	if (deltaTime < 0.32f)
+		gameTimer += (uint) (deltaTime * 1000);
+	//m_fps.Frame();
 	//Sleep(3000);
 
 	bool result = true;
@@ -360,10 +443,29 @@ bool Application::Frame(float deltaTime)
 		
 	}
 
+	v3 testNormal;
+	m_Level->GetNormal(testNormal);
+	v3 ballPosition;	
+
+	m_Ball->GetPosition(ballPosition);
+	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
+	float value2 = sqrtf(testNormal.x * testNormal.x + testNormal.y * testNormal.y + testNormal.z * testNormal.z);
+	float distance = value1 / value2;////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
+	//if (distance >= m_Ball->GetRadius())
+	//{
+	//	m_Ball->SetPosition(ballPosition.x, ballPosition.y - 1.0f * deltaTime, ballPosition.z);
+	//}
+	//if (distance <= m_Ball->GetRadius())
+	//{
+	//	float testRollSpeed = 8.0f;
+	//	m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
+	//}
+
 	//m_Level->Update(deltaTime);
 
 	m_Level->Update(deltaTime);
-	m_Ball->Update(deltaTime); // Uppdaterar endast friktion. Position osv uppdateras i PhysicsBridge::StepSimulation
+	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
 
 	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
@@ -371,15 +473,16 @@ bool Application::Frame(float deltaTime)
 	//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
 	//m_Camera->LookAt(ballPosition);
 
-	//Sätt kamerans position efter bollens position.
-	v3 ballPosition;
-	m_Ball->GetPosition(ballPosition);
-	m_Camera->LookAt(ballPosition);
-	m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
+	//Hämta bollens world, sätt kamerans position efter bollens position.
+	m4 ballWorldM;
+	m_Ball->GetWorldMatrix(ballWorldM);
+	v3 camPos = ballWorldM.GetPos();
+	m_Camera->LookAt(camPos);
+	//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
+	m_Camera->SetPosition(v3(camPos.x - 2.5f * 2, camPos.y + 3.65f * 2, camPos.z - 7.0f * 2));
 
-
-	shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 40.0f + ballPosition);
-	shadowCamera.Generate3DViewMatrix();
+	//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
+	//shadowCamera.Generate3DViewMatrix();
 	
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
@@ -393,15 +496,16 @@ bool Application::Frame(float deltaTime)
 	{
 		//Titta om målet och bollen är nära nog för att kollidera
 		v3 goalPosition;
+		m_Ball->GetPosition(ballPosition);
 		m_Goal->GetPosition(goalPosition);
 		v3 relPos = ballPosition - goalPosition;
-		float distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
+		distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
 		float minDist = m_Ball->GetRadius() + 2.0f;
 		if (distance < minDist * minDist)
 		{
 			//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
-		//	switchLevel = true; 
-		//	finishedSwitch = false;
+			switchLevel = true; 
+			finishedSwitch = false;
 		}
 	}
 
@@ -446,6 +550,9 @@ bool Application::Frame(float deltaTime)
 
 	}
 
+	testEmitter.Update(gameTimer, deltaTime);
+	particleRenderer.Update();
+
 	// Render the graphics.
 	RenderGraphics();
 
@@ -461,7 +568,17 @@ void Application::RenderGraphics()
 
 	m_Direct3D->BeginShadowPass();
 
-		m_Ball->Render(m_Direct3D);
+		//m_Ball->Render(m_Direct3D);
+		
+
+		/*static m4 worldMatrix = m4::CreateTranslation(firstLightPassData.directionalLightDirection * 2.0f);
+		Shader *currentShader = m_Direct3D->GetCurrentShader();
+
+		currentShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
+
+		m_Direct3D->RenderMesh(lightSphereMesh);*/
+
+		//m_Level->Render(m_Direct3D);
 
 	m_Direct3D->EndShadowPass();
 
@@ -476,9 +593,7 @@ void Application::RenderGraphics()
 
 			if (!switchLevel)
 			{
-				m_Goal->Render(m_Direct3D);
-
-				
+				m_Goal->Render(m_Direct3D);				
 			}
 
 			m_Direct3D->BeginLightStage();
@@ -498,11 +613,11 @@ void Application::RenderGraphics()
 
 		m_Skybox->Render(m_Direct3D);
 
-		// 2D rendering
-		m_Direct3D->TurnZBufferOff();
+		m_Direct3D->TurnZBufferReadOnWriteOff();
 		m_Direct3D->TurnOnAlphaBlending();
-		
 
+		particleRenderer.Render();
+		particleRenderer.ClearInstances();
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
@@ -612,14 +727,20 @@ void Application::_UpdateShaderVariables()
 	shadowCamera.GetViewMatrix(shadowView);
 	shadowCamera.GetProjectionMatrix(shadowProjection);
 
-	viewProj = shadowView * shadowProjection;
-	pointLightShader->SetVariable("viewProjectionInverse", &viewProjInverted, sizeof(m4));
-	pointLightShader->SetVariable("shadowViewProjection", &viewProj, sizeof(m4));
+	m4 shadowViewProj = shadowView * shadowProjection;
+	directionalLightShader->SetVariable("viewProjectionInverse", &viewProjInverted, sizeof(m4));
+	directionalLightShader->SetVariable("shadowViewProjection", &shadowViewProj, sizeof(m4));
+	directionalLightShader->SetVariable("cameraPosition", &camPos, sizeof(v3));
 
 	//shadowfill
 	Shader *shadowFillShader = m_Direct3D->GetShadowFill();
 	shadowFillShader->SetVariable("shadowView", &shadowView, sizeof(m4));
 	shadowFillShader->SetVariable("shadowProjection", &shadowProjection, sizeof(m4));
+
+	//ParticleShader
+	particleBillboard->SetVariable("viewProjection", &viewProj, sizeof(m4));
+	particleBillboard->SetVariable("cameraPosition", &camPos, sizeof(v3));
+
 }
 
 void Application::_RenderLights()

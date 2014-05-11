@@ -23,6 +23,7 @@
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Heightfield.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="InstanceRenderer.cpp" />
     <ClCompile Include="LeafObstacle.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelLoaderClass.cpp" />
@@ -32,6 +33,8 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="ObstacleHandler.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -63,6 +66,7 @@
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Heightfield.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="InstanceRenderer.h" />
     <ClInclude Include="LeafObstacle.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelLoaderClass.h" />
@@ -71,6 +75,8 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="ObstacleHandler.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="Shader.h" />
@@ -92,11 +98,17 @@
     <None Include="shader\ball.ps" />
     <None Include="shader\ball.vs" />
     <None Include="shader\finalComposition.ps" />
+    <None Include="shader\font.ps" />
+    <None Include="shader\font.vs" />
     <None Include="shader\fullScreenQuad.vs" />
+    <None Include="shader\image.ps" />
+    <None Include="shader\image.vs" />
     <None Include="shader\level.ps" />
     <None Include="shader\level.vs" />
     <None Include="shader\obstacle.ps" />
     <None Include="shader\obstacle.vs" />
+    <None Include="shader\particleBillboard.vs" />
+    <None Include="shader\particleDefault.ps" />
     <None Include="shader\pointLight.ps" />
     <None Include="shader\pointLight.vs" />
     <None Include="shader\skybox.ps" />

@@ -65,8 +65,8 @@ PixelOutput LevelPixelShader(PixelInputType input)
 
 	outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);
 	
-	outColors.diffuse.a = 0.5f;//specualarIntensity;
-	outColors.normal.a = 0.5f;//specualarPower;
+	outColors.diffuse.a = 0.0f;//specualarIntensity;
+	outColors.normal.a = 0.0f;//specualarPower;
 
     return outColors;
 }

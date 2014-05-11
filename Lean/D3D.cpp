@@ -381,6 +381,17 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 		return false;
 	}
 
+
+	//creates a depthstencil that do depth check but doesn't write to the depthBuffer!
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;	
+
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthReadOnWriteOff);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Clear the blend state description.
 	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
 
@@ -671,6 +682,10 @@ void D3D::TurnZBufferOff()
 	return;
 }
 
+void D3D::TurnZBufferReadOnWriteOff()
+{
+	m_deviceContext->OMSetDepthStencilState(m_depthReadOnWriteOff, 1);
+}
 
 void D3D::TurnOnAlphaBlending()
 {
@@ -759,6 +774,7 @@ void			D3D::EndLightStage()
 void			D3D::BeginShadowPass()
 {
 	m_deviceContext->ClearDepthStencilView(shadowmapDSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_deviceContext->OMSetRenderTargets(0, nullptr, shadowmapDSView);
 	SetShader(shadowFillShader);
 	shadowPass = true;
 }
@@ -1385,4 +1401,50 @@ void			D3D::ApplyConstantBuffers()
 
 	m_deviceContext->VSSetConstantBuffers(0, 8, vsBuffers);
 	m_deviceContext->PSSetConstantBuffers(0, 8, psBuffers);
+}
+
+bool			D3D::PrepareInstanceRenderer(InstanceRenderer &instanceRenderer)
+{
+	D3D11_BUFFER_DESC instBuffDesc;
+	ZeroMemory(&instBuffDesc, sizeof(instBuffDesc));
+	instBuffDesc.Usage = D3D11_USAGE_DYNAMIC;
+	instBuffDesc.ByteWidth = instanceRenderer.maxInstances * instanceRenderer.instanceMaxSize;
+	instBuffDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instBuffDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	instBuffDesc.MiscFlags = 0;
+	instBuffDesc.StructureByteStride = instanceRenderer.instanceMaxSize;
+
+	if (FAILED(m_device->CreateBuffer(&instBuffDesc, nullptr, &instanceRenderer.instanceBuffer)))
+		return false;
+
+	instanceRenderer.direct3D = this;
+
+	return true;
+}
+
+bool			D3D::UpdateInstanceRenderer(InstanceRenderer &instanceRenderer)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedSub;
+	if (m_deviceContext->Map(instanceRenderer.instanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSub) != S_OK)
+	{
+		WBOX(L"Couldn't Map() InstanceBuffer");
+		return false;
+	}
+
+	memcpy(mappedSub.pData, instanceRenderer.instanceData, instanceRenderer.instanceMaxSize * instanceRenderer.numberOfInstances);
+
+	m_deviceContext->Unmap(instanceRenderer.instanceBuffer, 0);
+
+	return true;
+}
+
+bool			D3D::RenderInstancerenderer(InstanceRenderer &instanceRenderer, const uint instanceOffset, const uint nrInstances)
+{
+	uint offset = 0;
+	m_deviceContext->IASetVertexBuffers(1, 1, &instanceRenderer.instanceBuffer, &instanceRenderer.instanceMaxSize, &offset);
+	m_deviceContext->IASetVertexBuffers(0, 1, &instanceRenderer.mesh->vertexBuffer, &instanceRenderer.mesh->vertexSize, &offset);
+
+	m_deviceContext->DrawInstanced(instanceRenderer.mesh->nrVertices, nrInstances, 0, instanceOffset);
+
+	return true;
 }

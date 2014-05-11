@@ -11,6 +11,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "InstanceRenderer.h"
 
 class D3D
 {
@@ -34,6 +35,8 @@ public:
 
 	void TurnZBufferOn();
 	void TurnZBufferOff();
+
+	void TurnZBufferReadOnWriteOff();
 
 	void TurnOnAlphaBlending();
 	void TurnOffAlphaBlending();
@@ -71,6 +74,10 @@ public:
 
 	Shader*				GetCurrentShader();
 	Shader*				GetShadowFill();
+	
+	bool				PrepareInstanceRenderer(InstanceRenderer &instanceRenderer);
+	bool				UpdateInstanceRenderer(InstanceRenderer &instanceRenderer);
+	bool				RenderInstancerenderer(InstanceRenderer &instanceRenderer, const uint instanceOffset, const uint nrInstances);
 	//void				ReloadMesh(const Mesh *mesh);
 
 
@@ -99,6 +106,7 @@ private:
 	m4 m_orthoMatrix;
 
 	ID3D11DepthStencilState* m_depthDisabledStencilState;
+	ID3D11DepthStencilState* m_depthReadOnWriteOff;
 
 	ID3D11BlendState* m_alphaEnableBlendingState;
 	ID3D11BlendState* m_alphaDisableBlendingState;

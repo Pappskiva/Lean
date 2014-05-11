@@ -135,6 +135,15 @@
     <ClCompile Include="PhysicsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InstanceRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -251,6 +260,15 @@
     <ClInclude Include="PhysicsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InstanceRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DuckRenderer\MathStructs.inl">
@@ -296,6 +314,24 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="shader\DirectionalLightingWithShadows.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\font.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\font.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\image.ps">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\image.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\particleBillboard.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shader\particleDefault.ps">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
