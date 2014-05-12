@@ -487,7 +487,7 @@ bool Application::Frame(float deltaTime)
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
 
-	m_ObstacleHandler->Update(deltaTime, ballPosition.x - 2.5f, ballPosition.z - 7.0f, planeRotX, planeRotZ, m_Ball);
+	m_ObstacleHandler->Update(deltaTime, camPos.x - 2.5f * 2, camPos.z - 7.0f * 2, planeRotX, planeRotZ, m_Ball);
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
