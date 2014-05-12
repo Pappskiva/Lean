@@ -20,7 +20,7 @@ public:
 	PhysicsBridge();
 	~PhysicsBridge();
 
-	void Initialize(Level* level);
+	void Initialize(Level* level, Ball* ball);
 	void StepSimulation(float deltaTime,
 		float rotX, float rotY, float rotZ,
 		Ball* ball, Level* level);
@@ -58,11 +58,6 @@ private:
 	int m_UpAxis;		//		// start with Y-axis as "up"
 	PHY_ScalarType m_HeightDataType;//
 	bool m_FlipQuadEdges;//
-
-
-
-
-
 
 	// Ball
 	btCollisionShape* fallShape;

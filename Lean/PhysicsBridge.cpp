@@ -26,7 +26,7 @@ PhysicsBridge::~PhysicsBridge()
 	delete dispatcher;
 	delete broadphase;
 }
-void PhysicsBridge::Initialize(Level* level)
+void PhysicsBridge::Initialize(Level* level, Ball* ball)
 {
 	heightMap = level->GetHeighMapData();
 	// Build the broadphase
@@ -65,7 +65,9 @@ void PhysicsBridge::Initialize(Level* level)
 	// Ball
 	fallShape = new btSphereShape(1);
 	//fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 5, 0)));
-	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(-2, 10, 5)));
+	v3 ballStartPos;
+	ball->GetPosition(ballStartPos);
+	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(ballStartPos.x, ballStartPos.y, ballStartPos.z)));
 	btScalar mass = 2;
 	btVector3 fallInertia(0, 0, 0);
 	fallShape->calculateLocalInertia(mass, fallInertia);
