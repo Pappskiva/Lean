@@ -27,7 +27,7 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
-const int MAX_LEVELS = 2;
+const int MAX_LEVELS = 1;
 
 
 enum LightType : char
@@ -100,6 +100,7 @@ private:
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;
 	bool			finishedSwitch;
+	bool			CompletedFirstPass;
 
 
 	//kanske borde vara i någon sceneManager	

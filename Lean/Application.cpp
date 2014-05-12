@@ -21,6 +21,7 @@ Application::Application()
 
 	switchLevel = false;
 	finishedSwitch = true;
+	CompletedFirstPass = false;
 }
 
 
@@ -264,6 +265,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Goal->SetNextLevelNumber(1);*/
 
 	ChangeLevel(1);
+	//m_Goal->SetNextLevelNumber(2);
 
 	m_Goal->SetShader(defaultShader);
 
@@ -380,6 +382,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	testEmitter.SetParticleEmitterBase(emitterBase);
 
+	CompletedFirstPass = true;
+
 	return true;
 }
 
@@ -443,27 +447,6 @@ bool Application::Frame(float deltaTime)
 		
 	}
 
-	v3 testNormal;
-	m_Level->GetNormal(testNormal);
-	v3 ballPosition;	
-
-	m_Ball->GetPosition(ballPosition);
-	float value1 = (testNormal.x * ballPosition.x + testNormal.y * ballPosition.y + testNormal.z * ballPosition.z);
-	float value2 = sqrtf(testNormal.x * testNormal.x + testNormal.y * testNormal.y + testNormal.z * testNormal.z);
-	float distance = value1 / value2;////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-
-	//if (distance >= m_Ball->GetRadius())
-	//{
-	//	m_Ball->SetPosition(ballPosition.x, ballPosition.y - 1.0f * deltaTime, ballPosition.z);
-	//}
-	//if (distance <= m_Ball->GetRadius())
-	//{
-	//	float testRollSpeed = 8.0f;
-	//	m_Ball->SetPosition(ballPosition.x + testNormal.x * testRollSpeed * deltaTime, ballPosition.y + testNormal.y * deltaTime, ballPosition.z + testNormal.z * testRollSpeed * deltaTime);
-	//}
-
-	//m_Level->Update(deltaTime);
-
 	m_Level->Update(deltaTime);
 	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
 
@@ -491,6 +474,9 @@ bool Application::Frame(float deltaTime)
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
+	v3 ballPosition;
+	float distance;
+	float radiusOfGoal = 3.0f;
 	//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 	if (!switchLevel)
 	{
@@ -500,7 +486,7 @@ bool Application::Frame(float deltaTime)
 		m_Goal->GetPosition(goalPosition);
 		v3 relPos = ballPosition - goalPosition;
 		distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
-		float minDist = m_Ball->GetRadius() + 2.0f;
+		float minDist = m_Ball->GetRadius() + radiusOfGoal;
 		if (distance < minDist * minDist)
 		{
 			//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
@@ -514,11 +500,16 @@ bool Application::Frame(float deltaTime)
 	{
 		if (!finishedSwitch)
 		{
-			finishedSwitch = true;
-			//ChangeLevel(m_Goal->GetNextLevelNumber());
+			/*m_Ball->GetPosition(ballPosition);
+			if (ballPosition.y <= -20.0f)
+			{*/
+				finishedSwitch = true;
+				ChangeLevel(m_Goal->GetNextLevelNumber());
+			/*}*/
 		}
 		else
 		{
+			
 			switchLevel = false;
 		}
 	}
@@ -779,7 +770,7 @@ void Application::ChangeLevel(int levelNumber)
 	m_ObstacleHandler->SetShader(obstacleShader);
 	delete[] obstacles;
 
-	m_Ball->SetPosition(startPos.x, 5, startPos.z);
+	m_Ball->SetPosition(startPos.x, 10, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
 	if (m_Goal->GetNextLevelNumber() < MAX_LEVELS)
 	{
@@ -787,6 +778,12 @@ void Application::ChangeLevel(int levelNumber)
 	}
 	else
 	{
-		m_Goal->SetNextLevelNumber(0);
+		m_Goal->SetNextLevelNumber(1);
 	}
+
+	if (CompletedFirstPass)
+	{
+		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
+	}
+	
 }

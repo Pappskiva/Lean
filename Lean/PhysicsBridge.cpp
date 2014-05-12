@@ -14,9 +14,12 @@ PhysicsBridge::~PhysicsBridge()
 	delete fallRigidBody;
 
 
-	dynamicsWorld->removeRigidBody(heightmapRigidBody);
-	delete heightmapRigidBody->getMotionState();
-	delete heightmapRigidBody;
+	if (heightmapRigidBody)
+	{
+		dynamicsWorld->removeRigidBody(heightmapRigidBody);
+		delete heightmapRigidBody->getMotionState();
+		delete heightmapRigidBody;
+	}
 
 	delete fallShape;
 
@@ -75,16 +78,20 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	dynamicsWorld->addRigidBody(fallRigidBody);
 }
+
 void PhysicsBridge::ReInitialize(Level* level, Ball* ball)
 {
 	dynamicsWorld->removeRigidBody(fallRigidBody);
 	delete fallRigidBody->getMotionState();
 	delete fallRigidBody;
 
-
-	dynamicsWorld->removeRigidBody(heightmapRigidBody);
-	delete heightmapRigidBody->getMotionState();
-	delete heightmapRigidBody;
+	if (heightmapRigidBody)
+	{
+		dynamicsWorld->removeRigidBody(heightmapRigidBody);
+		delete heightmapRigidBody->getMotionState();
+		delete heightmapRigidBody;
+	}
+	
 
 	delete fallShape;
 
