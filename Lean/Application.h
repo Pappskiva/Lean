@@ -17,6 +17,7 @@
 #include "Skybox.h"
 #include "PhysicsBridge.h"
 #include "ParticleEmitter.h"
+#include "Sound.h"
 //FPS kollare för debug
 #include "FPSClass.h"
 
@@ -86,6 +87,7 @@ private:
 	Skybox			*m_Skybox;
 	ObstacleHandler	*m_ObstacleHandler;
 	Goal			*m_Goal; //För testningsyften
+	Sound			*m_Sound;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;

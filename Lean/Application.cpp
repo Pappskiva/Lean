@@ -14,6 +14,7 @@ Application::Application()
 	m_Level = nullptr;
 	m_ObstacleHandler = nullptr;
 	m_Goal = nullptr;
+	m_Sound = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -384,6 +385,19 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	CompletedFirstPass = true;
 
+	m_Sound = new Sound;
+	if (!m_Sound)
+	{
+		return false;
+	}
+	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/SuperMario1Dual.wav");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
+		return false;
+	}
+	m_Sound->PlayLoop();
+
 	return true;
 }
 
@@ -597,6 +611,12 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	if (m_Sound)
+	{
+		m_Sound->Shutdown();
+		delete m_Sound;
+		m_Sound = 0;
+	}
 	//Release the level object
 	if (m_Level)
 	{
