@@ -20,12 +20,14 @@ public:
 	PhysicsBridge();
 	~PhysicsBridge();
 
-	void Initialize(Level* level);
+	void Initialize(Level* level, Ball* ball);
 	void StepSimulation(float deltaTime,
 		float rotX, float rotY, float rotZ,
 		Ball* ball, Level* level);
 	m4 GetBallTransformMatrix();
 	m4 GetPlaneTransformMatrix();
+
+	void ReInitialize(Level* level, Ball* ball);
 
 	void DebugRender(D3D* d3d);
 	void GenerateDebug(D3D* d3d);
@@ -58,11 +60,6 @@ private:
 	int m_UpAxis;		//		// start with Y-axis as "up"
 	PHY_ScalarType m_HeightDataType;//
 	bool m_FlipQuadEdges;//
-
-
-
-
-
 
 	// Ball
 	btCollisionShape* fallShape;

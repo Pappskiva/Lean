@@ -291,7 +291,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
-	m_PhysicsBridge.Initialize(m_Level);
+	m_PhysicsBridge.Initialize(m_Level, m_Ball);
 	m_PhysicsBridge.GenerateDebug(m_Direct3D);
 
 	gameTimer = 0;
