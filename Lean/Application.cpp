@@ -571,12 +571,7 @@ void Application::RenderGraphics()
 
 		m_Direct3D->EndDeferredRenderingScene();
 		
-		if (!switchLevel)
-		{
-			m_Direct3D->TurnOnAlphaBlending();
-			m_ObstacleHandler->Render(m_Direct3D);
-			m_Direct3D->TurnOffAlphaBlending();
-		}
+		
 
 		m_Skybox->Render(m_Direct3D);
 
@@ -588,6 +583,13 @@ void Application::RenderGraphics()
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
+
+		if (!switchLevel)
+		{
+			m_Direct3D->TurnOnAlphaBlending();
+			m_ObstacleHandler->Render(m_Direct3D);
+			m_Direct3D->TurnOffAlphaBlending();
+		}
 
 	m_Direct3D->EndScene();
 
