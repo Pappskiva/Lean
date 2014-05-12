@@ -27,6 +27,8 @@ public:
 	m4 GetBallTransformMatrix();
 	m4 GetPlaneTransformMatrix();
 
+	void ReInitialize(Level* level, Ball* ball);
+
 	void DebugRender(D3D* d3d);
 	void GenerateDebug(D3D* d3d);
 
