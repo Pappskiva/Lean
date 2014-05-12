@@ -512,42 +512,15 @@ bool Application::Frame(float deltaTime)
 
 	if (switchLevel)
 	{
-		//Värdet för hur banan ändras
-		float maximumRiseLevel = 20.0f;
-		float minimumRiseLevel = -20.0f;
-		float riseSpeed = 10.0f;
-		v3 levelPosition;
-		m_Level->GetPosition(levelPosition);
-		if (!finishedSwitch) //Om banan inte har stigit upp utanför synhåll, så låt den göra det.
+		if (!finishedSwitch)
 		{
-			levelPosition.y += riseSpeed * deltaTime;
-			m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
-			if (levelPosition.y >= maximumRiseLevel)
-			{
-				//Banan har stigit upp utanför synhåll. Byta den och lägg den långt nedanför.
-				finishedSwitch = true;
-				ChangeLevel(m_Goal->GetNextLevelNumber());
-				levelPosition.y = minimumRiseLevel;
-				m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
-			}
+			finishedSwitch = true;
+			//ChangeLevel(m_Goal->GetNextLevelNumber());
 		}
 		else
 		{
-			//Banan är vid det här laget nedanför bollen, och måste stiga upp.
-			if (levelPosition.y <= 0.0f)
-			{
-				levelPosition.y += riseSpeed * deltaTime;
-				if (levelPosition.y > 0.0f)
-				{
-					//Banan är nära noll, så sätt den helt rätt och möjliggör så att vi kollar om målet är nära bollen igen.
-					levelPosition.y = 0.0f;
-					switchLevel = false;
-				}
-				m_Level->SetPosition(levelPosition.x, levelPosition.y, levelPosition.z);
-			}
+			switchLevel = false;
 		}
-		
-
 	}
 
 	testEmitter.Update(gameTimer, deltaTime);
