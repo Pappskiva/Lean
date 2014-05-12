@@ -444,7 +444,7 @@ bool Application::Frame(float deltaTime)
 
 	if (m_Input->IsSpacePressed())
 	{
-		
+
 	}
 
 	m_Level->Update(deltaTime);
@@ -462,7 +462,10 @@ bool Application::Frame(float deltaTime)
 	v3 camPos = ballWorldM.GetPos();
 	m_Camera->LookAt(camPos);
 	//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
-	m_Camera->SetPosition(v3(camPos.x - 2.5f * 2, camPos.y + 3.65f * 2, camPos.z - 7.0f * 2));
+	camPos.x = camPos.x - 2.5f * 2;
+	camPos.y = camPos.y + 3.65f * 2;
+	camPos.z = camPos.z - 7.0f * 2;
+	m_Camera->SetPosition(camPos);
 
 	//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
 	//shadowCamera.Generate3DViewMatrix();
@@ -470,7 +473,7 @@ bool Application::Frame(float deltaTime)
 	float planeRotX = m_Level->GetRotationX();
 	float planeRotZ = m_Level->GetRotationZ();
 
-	m_ObstacleHandler->Update(deltaTime, camPos.x - 2.5f * 2, camPos.z - 7.0f * 2, planeRotX, planeRotZ, m_Ball);
+	m_ObstacleHandler->Update(deltaTime, camPos.x, camPos.z, planeRotX, planeRotZ, m_Ball);
 
 	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 

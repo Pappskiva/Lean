@@ -21,6 +21,7 @@ public:
 	/*Initialisering och nedstängning*/
 	virtual bool Initialize(D3D*);
 	virtual void Shutdown();
+	void Update(float, float, float, float, float, Ball*);
 	//virtual void Update(float, float, float);
 
 protected:
