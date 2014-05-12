@@ -104,7 +104,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Skybox objektet
-	result = m_Skybox->Initialize(m_Direct3D, "data/BackgroundCube.dds");
+	result = m_Skybox->Initialize(m_Direct3D, "data/skybox_abovesea.dds");
 	if (!result)
 	{
 		return false;
