@@ -64,6 +64,17 @@ void ParticleEmitter::SpawnParticle()
 		newParticle->moveDir += v3((float)x, (float)y, (float)z).GetNormalized();
 	}
 
+	if (base.randomStartPlacement)
+	{
+		int x, z, x1, z1;
+		x1 = base.startVariantConstraints.x;
+		z1 = base.startVariantConstraints.y;
+		x = rand() % x1 - x1/2;
+		z = rand() % z1 - z1/2;
+		newParticle->pos.x += (float)x;
+		newParticle->pos.z += (float)z;
+	}
+
 	timeOfLastParticleSpawn = timeOfSpawn;
 };
 

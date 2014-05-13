@@ -105,9 +105,9 @@ return true;
 }
 */
 
-void LeafObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
+void LeafObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles)
 {
-	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball);
+	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball, particles);
 
 	// Räknar ut avstånd till boll
 	v3 ballPos;
@@ -117,7 +117,7 @@ void LeafObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, f
 
 	if (squaredDistance < 10 && cooldown <= 0)
 	{
-		
-		cooldown = 1;
+		particles->AddParticles(1);
+		cooldown = 31;
 	}
 }

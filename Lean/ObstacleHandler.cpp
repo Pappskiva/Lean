@@ -56,11 +56,11 @@ void ObstacleHandler::Render(D3D *direct3D)
 	}
 }
 
-void ObstacleHandler::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
+void ObstacleHandler::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles)
 {
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		obstacles[i]->Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball);
+		obstacles[i]->Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball, particles);
 	}
 }
 

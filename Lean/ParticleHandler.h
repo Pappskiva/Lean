@@ -31,12 +31,14 @@ public:
 
 	/*Lägg till en partikel, int är för stunden ett värde som säger åt oss
 	vilken typ av partikel man vill ha. Detta lär behövas utökas senare. så att position och sådant finns*/
-	void AddParticles(int, const v3&);
+	void AddParticles(int);
 	/*Ta bort alla partiklar, som när man byter bana, till exempel*/
 	void RemoveAllParticles();
 
 private:
 	InstanceRenderer particleRenderer;
 	Array<ParticleEmitter> emitters;
+	Shader* particleBillboard;
+	Texture *leaf;
 };
 #endif

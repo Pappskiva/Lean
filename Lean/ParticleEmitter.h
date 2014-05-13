@@ -19,7 +19,9 @@ class ParticleEmitterBase
 
 	v3							startPos;
 	v3							particleMove;
+	v2							startVariantConstraints;
 	bool						randomMove;
+	bool						randomStartPlacement;
 	Texture						*texture;
 	Shader						*shader;
 
@@ -34,8 +36,11 @@ public:
 	void						SetMaximumParticles(const uint max);
 
 	void						SetStartPosition(const v3 &v);
+	void						SetStartVariation(const v2 &v);
+	void						SetRandomVariation(const bool variant);
 	void						SetParticleMove(const v3 &v);
 	void						SetRandomMove(const bool move);
+	
 
 	void						SetTexture(const Texture *texture);
 	void						SetShader(const Shader *shader);
@@ -109,6 +114,16 @@ inline void ParticleEmitterBase::SetMaximumParticles(const uint max)
 inline void ParticleEmitterBase::SetStartPosition(const v3 &v)
 {
 	startPos = v;
+}
+
+inline void ParticleEmitterBase::SetStartVariation(const v2 &v)
+{
+	startVariantConstraints = v;
+}
+
+inline void ParticleEmitterBase::SetRandomVariation(const bool variant)
+{
+	randomStartPlacement = variant;
 }
 
 inline void ParticleEmitterBase::SetParticleMove(const v3 &v)

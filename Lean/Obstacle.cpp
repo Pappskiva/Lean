@@ -64,7 +64,7 @@ void Obstacle::Shutdown()
 	return;
 }
 
-void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball)
+void Obstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles)
 {
 	/*Uppdatera hindret så det ligger utmed banan rätt*/
 	m_rotationX = planeRotationX;

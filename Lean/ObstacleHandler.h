@@ -19,7 +19,7 @@ public:
 	~ObstacleHandler();
 	void AddObstacle(string type, v3 pos);
 	void Render(D3D *direct3D);
-	void Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball);
+	void Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles);
 	void RemoveAllObstacles();
 	void Shutdown();
 	bool Initialize(D3D*);

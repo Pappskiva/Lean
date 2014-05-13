@@ -18,7 +18,7 @@ public:
 
 	MagnetObstacle();
 	~MagnetObstacle();
-	void Update(float, float, float, float, float, Ball*);
+	void Update(float, float, float, float, float, Ball*, ParticleHandler*);
 
 	/*Initialisering och nedstängning*/
 	virtual bool Initialize(D3D*);
