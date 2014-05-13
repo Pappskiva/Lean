@@ -16,7 +16,7 @@
 #include "Goal.h"
 #include "Skybox.h"
 #include "PhysicsBridge.h"
-#include "ParticleEmitter.h"
+#include "ParticleHandler.h"
 #include "Sound.h"
 //FPS kollare för debug
 #include "FPSClass.h"
@@ -93,6 +93,7 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
+	ParticleHandler	m_Particles;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;
@@ -100,9 +101,6 @@ private:
 	Shader			*defaultShader, *levelShader, *obstacleShader, *particleBillboard;
 
 	uint			gameTimer;
-
-	InstanceRenderer particleRenderer;
-	ParticleEmitter testEmitter;
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;
