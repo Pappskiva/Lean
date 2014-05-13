@@ -208,3 +208,8 @@ void PhysicsBridge::GenerateDebug(D3D* d3d)
 {
 	heightmapShape->GenerateDebugHeightmap(d3d);
 }
+
+void PhysicsBridge::ActivateBall()
+{
+	fallRigidBody->activate();
+}

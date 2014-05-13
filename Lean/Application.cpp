@@ -427,6 +427,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
 			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 	else if (m_Input->IsDownPressed() || m_Input->IsSPressed())
@@ -435,6 +436,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
 			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 
@@ -445,6 +447,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
 			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 	else if (m_Input->IsRightPressed() || m_Input->IsDPressed())
@@ -453,6 +456,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
 			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 
@@ -462,7 +466,7 @@ bool Application::Frame(float deltaTime)
 	}
 
 	m_Level->Update(deltaTime);
-	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
+	m_Ball->Update(deltaTime); //OBS: Används bara för friktionen! Annat uppdateras i PhysicsBridge::StepSimulation
 
 	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
