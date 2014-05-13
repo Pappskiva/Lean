@@ -325,7 +325,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	LevelLoaderClass loader;
 	int tempHeight, tempWidth;
 
-	const float LEVEL_POINT_DISTANCE = 0.5f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
+	const float LEVEL_POINT_DISTANCE = 1.0f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
 	const float LEVEL_MAX_HEIGHT = 2.5f;
 	
 	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
