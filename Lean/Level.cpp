@@ -343,9 +343,9 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	for (uint z = 0; z < height; z++)
 		for (uint x = 0; x < width; x++)
 		{
-			vertices[x + z * width].pos.x = (x - width * 0.5f)/* * LEVEL_POINT_DISTANCE*/;
+			vertices[x + z * width].pos.x = (x - width * 0.5f) * LEVEL_POINT_DISTANCE;
 			vertices[x + z * width].pos.y = heightmap[x + z * width] *LEVEL_MAX_HEIGHT;
-			vertices[x + z * width].pos.z = (z - height * 0.5f)/* * LEVEL_POINT_DISTANCE*/;
+			vertices[x + z * width].pos.z = (z - height * 0.5f) * LEVEL_POINT_DISTANCE;
 			vertices[x + z * width].uv.v[0] = (float)x / width;
 			vertices[x + z * width].uv.v[1] = (float)z / height;
 		}

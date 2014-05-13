@@ -59,7 +59,7 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	m_FlipQuadEdges = false;
 
 	heightmapShape = new Heightfield(m_HeightStickWidth, m_HeightStickLeangth, m_HeightMapData, m_HeightScale, m_MinHeight, m_MaxHeight, m_UpAxis, m_HeightDataType, m_FlipQuadEdges);
-	heightmapShape->setLocalScaling(btVector3(1.0f, 2.5f, 1.0f));
+	heightmapShape->setLocalScaling(btVector3(0.5f, 2.5f, 0.5f));
 	heightmapMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
 	btRigidBody::btRigidBodyConstructionInfo heightmapRigidBodyCI(0, heightmapMotionState, heightmapShape, btVector3(0, 0, 0));
 	heightmapRigidBody = new btRigidBody(heightmapRigidBodyCI);
