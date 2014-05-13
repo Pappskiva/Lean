@@ -114,9 +114,9 @@ void TrampolineObstacle::Update(float deltaTime, float cameraPosX, float cameraP
 	v3 vectorToBall = ballPos - m_position;
 	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
 
-	if (squaredDistance < 10 && cooldown <= 0)
+	if (squaredDistance < 9 && cooldown <= 0)
 	{
-		ball->AddForce(v3(0, 50, 0));
+		ball->AddForce(v3(0, 75, 0));
 		cooldown = 1;
 	}
 }
