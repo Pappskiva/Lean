@@ -534,6 +534,21 @@ bool Application::Frame(float deltaTime)
 
 		// Resetta klockan
 		m_Clock->RestartClock();
+
+		/*v3 ballPos;
+		m_Ball->GetPosition(ballPos);
+		stringstream ss;
+		ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
+		string str = ss.str();
+		wstring wstr;
+		WCHAR* wcharstr;
+
+		for (int i = 0; i < str.length(); ++i)
+			wstr += wchar_t(str[i]);
+
+		wcharstr = (WCHAR*)wstr.c_str();
+
+		WBOX(wcharstr);*/
 	}
 
 	// Render the graphics.
