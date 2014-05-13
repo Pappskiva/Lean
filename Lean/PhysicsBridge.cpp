@@ -213,3 +213,10 @@ void PhysicsBridge::ActivateBall()
 {
 	fallRigidBody->activate();
 }
+
+void PhysicsBridge::ResetBall(Ball* ball)
+{
+	fallRigidBody->setAngularVelocity(btVector3(0, 0, 0));
+	fallRigidBody->setLinearVelocity(btVector3(0, 0, 0));
+	fallRigidBody->setWorldTransform(fallMotionState->m_startWorldTrans);
+}

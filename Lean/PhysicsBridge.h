@@ -32,6 +32,7 @@ public:
 
 	void DebugRender(D3D* d3d);
 	void GenerateDebug(D3D* d3d);
+	void ResetBall(Ball* ball);
 
 	float* heightMap;
 
