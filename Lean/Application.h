@@ -20,6 +20,9 @@
 #include "Sound.h"
 //FPS kollare för debug
 #include "FPSClass.h"
+#include "Clock.h"
+#include "SentenceClass.h"
+#include "ImageClass.h"
 
 /////////////
 // GLOBALS //
@@ -88,6 +91,8 @@ private:
 	ObstacleHandler	*m_ObstacleHandler;
 	Goal			*m_Goal; //För testningsyften
 	Sound			*m_Sound;
+	Clock			*m_Clock;
+	SentenceClass	*m_Text;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;

@@ -15,6 +15,7 @@ Application::Application()
 	m_ObstacleHandler = nullptr;
 	m_Goal = nullptr;
 	m_Sound = nullptr;
+	m_Clock = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -25,11 +26,9 @@ Application::Application()
 	CompletedFirstPass = false;
 }
 
-
 Application::Application(const Application& other)
 {
 }
-
 
 Application::~Application()
 {
@@ -810,5 +809,5 @@ void Application::ChangeLevel(int levelNumber)
 	{
 		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
 	}
-	
+	m_Clock = new Clock();
 }
