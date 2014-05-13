@@ -532,8 +532,8 @@ bool Application::Frame(float deltaTime)
 		// Resetta boll-friction
 		m_Ball->SetFriction(1.0f);
 
-		// Resetta klockan (NYI)
-
+		// Resetta klockan
+		m_Clock->RestartClock();
 	}
 
 	// Render the graphics.
