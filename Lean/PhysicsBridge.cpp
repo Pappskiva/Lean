@@ -72,8 +72,8 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	ball->GetPosition(ballStartPos);
 	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(ballStartPos.x, ballStartPos.y, ballStartPos.z)));
 	btScalar mass = 2;
-	btVector3 fallInertia(0, 0, 0);
-	fallShape->calculateLocalInertia(mass, fallInertia);
+	btVector3 fallInertia(9, 9, 9);
+	//fallShape->calculateLocalInertia(mass, fallInertia);
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	dynamicsWorld->addRigidBody(fallRigidBody);

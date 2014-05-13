@@ -1,3 +1,4 @@
+
 #ifndef PARTICLE_EMITTER_H
 
 //#include 
@@ -16,11 +17,12 @@ class ParticleEmitterBase
 	uint						spawnFrequence;//in ms
 	uint						maxParticles;
 
+	v3							startPos;
 	v3							particleMove;
 	bool						randomMove;
 	Texture						*texture;
 	Shader						*shader;
-	
+
 	ParticleRenderLayoutMember	*layout;
 	uint						layoutSize;
 	ParticleBase				particleBase;
@@ -31,6 +33,7 @@ public:
 	void						SetSpawnFrequency(const uint milliSec);
 	void						SetMaximumParticles(const uint max);
 
+	void						SetStartPosition(const v3 &v);
 	void						SetParticleMove(const v3 &v);
 	void						SetRandomMove(const bool move);
 
@@ -41,7 +44,7 @@ public:
 	void						SetParticleBase(const ParticleBase & particleBase);
 	void						SetParticleRenderer(InstanceRenderer *particleRenderer);
 
-	void						Flush();											
+	void						Flush();
 
 	//void Set
 
@@ -60,20 +63,20 @@ protected:
 	v3							pos;
 
 	uint						renderDataSize;
-	byte						*renderData;	
-	Array<Particle>				particles;	
+	byte						*renderData;
+	Array<Particle>				particles;
 
-	void						SpawnParticle(const uint frameTimeStamp);
-	void						UpdateParticle(Particle &particle, const uint frameTimeStamp, const float deltaTimeSeconds);
+	void						SpawnParticle();
+	void						UpdateParticle(Particle &particle, const float deltaTimeSeconds);
 	void						BuildRenderData(const Particle &particle);
 
 public:
 
-								ParticleEmitter(){}
-	virtual void				SetParticleEmitterBase(ParticleEmitterBase &base);
+	ParticleEmitter(){}
+	void						SetParticleEmitterBase(ParticleEmitterBase &base);
 	//virtual void				InitializeParticleEmitter(const ParticleEmitterInitialize &iniData);
-	virtual bool				Update(const uint frameTimeStamp, const float deltaTimeSeconds);
-	virtual void				Flush();
+	bool						Update(const float deltaTimeSeconds);
+	void						Flush();
 
 	const ParticleEmitterBase*	GetBase() const;
 
@@ -103,6 +106,11 @@ inline void ParticleEmitterBase::SetMaximumParticles(const uint max)
 	maxParticles = max;
 }
 
+inline void ParticleEmitterBase::SetStartPosition(const v3 &v)
+{
+	startPos = v;
+}
+
 inline void ParticleEmitterBase::SetParticleMove(const v3 &v)
 {
 	particleMove = v;
@@ -115,7 +123,7 @@ inline void ParticleEmitterBase::SetRandomMove(const bool move)
 
 inline void ParticleEmitterBase::SetTexture(const Texture *texture)
 {
-	this->texture = (Texture *) texture;
+	this->texture = (Texture *)texture;
 }
 
 inline void ParticleEmitterBase::SetShader(const Shader *shader)
@@ -127,7 +135,7 @@ inline void ParticleEmitterBase::SetRenderLayout(ParticleRenderLayoutMember *lay
 {
 	this->layout = new ParticleRenderLayoutMember[layoutSize];
 	this->layoutSize = layoutSize;
-	memcpy(this->layout, layout, sizeof(ParticleRenderLayoutMember) * layoutSize);
+	memcpy(this->layout, layout, sizeof(ParticleRenderLayoutMember)* layoutSize);
 }
 
 inline void ParticleEmitterBase::SetParticleBase(const ParticleBase &particleBase)

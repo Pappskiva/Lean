@@ -16,6 +16,8 @@ Application::Application()
 	m_Goal = nullptr;
 	m_Sound = nullptr;
 	m_Clock = nullptr;
+	m_Text = nullptr;
+	m_Image = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -39,6 +41,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	bool result;
+
+	m_Clock = new Clock();
 
 	// Create the Direct3D object.
 	m_Direct3D = new D3D();
@@ -107,6 +111,42 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	result = m_Skybox->Initialize(m_Direct3D, "data/skybox_abovesea.dds");
 	if (!result)
 	{
+		return false;
+	}
+
+	// Skapa Text objekt
+	m_Text = new SentenceClass;
+	if (!m_Text)
+	{
+		return false;
+	}
+
+	// Initialisera Text objekt
+	v3 prevCamPos = m_Camera->GetPosition();
+	m4 baseViewMatrix;
+	m_Camera->SetPosition(v3(0.0f, 0.0f, -1.0f));
+	m_Camera->Generate3DViewMatrix();
+	m_Camera->GetViewMatrix(baseViewMatrix);
+	m_Camera->SetPosition(prevCamPos);
+	result = m_Text->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Skapa Image objekt
+	m_Image = new ImageClass;
+	if (!m_Image)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_Image->Initialize(m_Direct3D, L"data/testAutumnGround.png", screenWidth, screenHeight, 200, 200);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
 		return false;
 	}
 
@@ -264,11 +304,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
 	m_Goal->SetNextLevelNumber(1);*/
 
-	ChangeLevel(1);
-	//m_Goal->SetNextLevelNumber(2);
-
-	m_Goal->SetShader(defaultShader);
-
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
 	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
@@ -293,31 +328,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
-	m_PhysicsBridge.Initialize(m_Level, m_Ball);
-	m_PhysicsBridge.GenerateDebug(m_Direct3D);
-
 	gameTimer = 0;
 
-	//Particle test;
-	struct ParticleVertex
-	{
-		float uv[2];
-	} vertices[] = {
-			{ 0.0f, 0.0f },
-			{ 1.0f, 0.0f },
-			{ 0.0f, 1.0f },
-
-			{ 1.0f, 0.0f },
-			{ 1.0f, 1.0f },
-			{ 0.0f, 1.0f },
-	};
-
-	Mesh *particleMesh = m_Direct3D->CreateMeshFromRam(vertices, sizeof(ParticleVertex), 6);
 	
-	particleRenderer.Initialize(512, 36, particleMesh);
-	m_Direct3D->PrepareInstanceRenderer(particleRenderer);
-
-	Texture *leaf = m_Direct3D->LoadTextureFromFile("data//64x64LeafParticleColored.png");
 
 	D3D11_INPUT_ELEMENT_DESC particleElem[] =
 	{
@@ -339,50 +352,15 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		SVF_PIXELSHADER))
 		return false;
 
-	struct ParticleRenderData
-	{
-		v3 pos;
-		float scale[2];
-		float rot;
-		float alpha;
-	};
+	m_Particles.Initialize(m_Direct3D, particleBillboard);
 
-	ParticleRenderLayoutMember layout[] = {
-			{ 0, Particle_Position },
-			{ 0, Particle_XScale },
-			{ 0, Particle_YScale },
-			{ 0, Particle_Rotation },
-			{ 0, Particle_Alpha },
-	};
-	ParticleBase particleBase;
-	particleBase.fadeInTime = 0;
-	particleBase.fadeOutTime = 100;
-	particleBase.rotSpeed = 3.9f;
-	particleBase.scaleXInTime = 1000;
-	particleBase.scaleXOutTime = 100;
-	particleBase.scaleYInTime = 1000;
-	particleBase.scaleYOutTime = 100;
-	particleBase.speed = 1.0f;
-	particleBase.timeToLive = 2000;
-	particleBase.weight = 0;
-	particleBase.xSize = 1.0f;
-	particleBase.ySize = 1.0f;
+	ChangeLevel(1);
+	//m_Goal->SetNextLevelNumber(2);
 
-	ParticleEmitterBase emitterBase;
-	emitterBase.SetTimeToLive(0);
-	emitterBase.SetSpawnFrequency(25);
-	emitterBase.SetMaximumParticles(100);
-	emitterBase.SetParticleMove(v3(0, 1, 0));
-	emitterBase.SetRandomMove(true);
-	emitterBase.SetShader(particleBillboard);
-	emitterBase.SetTexture(leaf);
-	emitterBase.SetRenderLayout(layout, 5);
-	emitterBase.SetParticleBase(particleBase);
-	emitterBase.SetParticleRenderer(&particleRenderer);
+	m_Goal->SetShader(defaultShader);
 
-	testEmitter.SetParticleEmitterBase(emitterBase);
-
-	CompletedFirstPass = true;
+	m_PhysicsBridge.Initialize(m_Level, m_Ball);
+	m_PhysicsBridge.GenerateDebug(m_Direct3D);
 
 	m_Sound = new Sound;
 	if (!m_Sound)
@@ -396,6 +374,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 	m_Sound->PlayLoop();
+
+	CompletedFirstPass = true;
+
 
 	return true;
 }
@@ -534,8 +515,7 @@ bool Application::Frame(float deltaTime)
 		}
 	}
 
-	testEmitter.Update(gameTimer, deltaTime);
-	particleRenderer.Update();
+	m_Particles.Update(gameTimer, deltaTime);
 
 	// Har bollen fallit av banan?
 	v3 ballPos;
@@ -614,8 +594,20 @@ void Application::RenderGraphics()
 		m_Direct3D->TurnZBufferReadOnWriteOff();
 		m_Direct3D->TurnOnAlphaBlending();
 
-		particleRenderer.Render();
-		particleRenderer.ClearInstances();
+		m_Particles.Render();
+
+		// Render text object
+		char timeText[16];
+		_itoa_s(m_Clock->GetTime(), timeText, 10);
+
+		m_Text->SetText(timeText, m_Direct3D);
+		m_Text->SetPosition(15, 15);
+		m_Text->SetColor(0.1f, 0.5f, 1.0f);
+		m_Text->Render(m_Direct3D);
+
+		// Render image object
+		m_Image->SetPosition(0, 400);
+		m_Image->Render(m_Direct3D);
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
@@ -633,6 +625,7 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	// Release the sound object
 	if (m_Sound)
 	{
 		m_Sound->Shutdown();
@@ -674,6 +667,20 @@ void Application::Shutdown()
 	{
 		m_Skybox->Shutdown();
 		m_Skybox = 0;
+	}
+
+	// Release the sentence object
+	if (m_Text)
+	{
+		m_Text->Shutdown();
+		m_Text = 0;
+	}
+
+	// Release the image object
+	if (m_Image)
+	{
+		m_Image->Shutdown();
+		m_Image = 0;
 	}
 
 	//Release the obstacleHandler object
@@ -832,5 +839,5 @@ void Application::ChangeLevel(int levelNumber)
 	{
 		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
 	}
-	m_Clock = new Clock();
+	m_Clock->RestartClock();
 }

@@ -43,7 +43,7 @@ bool ImageClass::Initialize(D3D* d3d, WCHAR* textureFileName, int screenW, int s
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	mShader = d3d->LoadVertexShader(ShaderInfo("image.vs", "ImageVertexShader", "vs_4_0"),
+	mShader = d3d->LoadVertexShader(ShaderInfo("shader/image.vs", "ImageVertexShader", "vs_4_0"),
 		imageShaderElem,
 		2);
 
@@ -51,7 +51,7 @@ bool ImageClass::Initialize(D3D* d3d, WCHAR* textureFileName, int screenW, int s
 	{
 		return false;
 	}
-	if (!d3d->LoadShaderStageIntoShader(ShaderInfo("image.ps", "ImagePixelShader", "ps_4_0"),
+	if (!d3d->LoadShaderStageIntoShader(ShaderInfo("shader/image.ps", "ImagePixelShader", "ps_4_0"),
 		mShader,
 		SVF_PIXELSHADER))
 	{
@@ -107,7 +107,7 @@ bool ImageClass::Render(D3D* d3d)
 
 	// Sätt shader variabler
 	d3d->GetOrthoMatrix(orthoMatrix);
-	v3 orthoViewTranslation = v3(((mScreenWidth / 2) * -1) + mPosX, (mScreenHeight / 2) - mPosY, 2);
+	v3 orthoViewTranslation = v3(((mScreenWidth / 2) * -1) + mPosX + mImageWidth * 2, (mScreenHeight / 2) - mPosY - mImageHeight*1.5f, 2);
 	worldMatrix = m4::CreateTranslation(orthoViewTranslation);
 
 	mShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
