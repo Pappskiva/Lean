@@ -71,7 +71,7 @@ void Ball::Update(float deltaTime)
 
 	if (m_friction < 1)
 	{
-		m_friction += 0.1 * deltaTime;
+		m_friction += 0.07 * deltaTime;
 	}
 }
 
