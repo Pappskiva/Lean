@@ -66,9 +66,10 @@ void ParticleHandler::Initialize(D3D* direct3D, Shader* particleBillboard)
 	particleBase.ySize = 1.0f;
 
 	ParticleEmitterBase emitterBase;
-	emitterBase.SetTimeToLive(0);
+	emitterBase.SetTimeToLive(10000);
 	emitterBase.SetSpawnFrequency(25);
 	emitterBase.SetMaximumParticles(100);
+	emitterBase.SetStartPosition(v3(0, 4, 0));
 	emitterBase.SetParticleMove(v3(0, 1, 0));
 	emitterBase.SetRandomMove(true);
 	emitterBase.SetShader(particleBillboard);
@@ -77,17 +78,29 @@ void ParticleHandler::Initialize(D3D* direct3D, Shader* particleBillboard)
 	emitterBase.SetParticleBase(particleBase);
 	emitterBase.SetParticleRenderer(&particleRenderer);
 
-	testEmitter.SetParticleEmitterBase(emitterBase);
+	emitters.Append().SetParticleEmitterBase(emitterBase);
+	emitters.Append().SetParticleEmitterBase(emitterBase);
 
 }
 void ParticleHandler::Shutdown()
 {
-	testEmitter.Flush();
+	for (int i = 0; i < emitters.Length(); i++)
+	{
+		emitters[i].Flush();
+	}
 	particleRenderer.Flush();
 }
 void ParticleHandler::Update(const uint frameTimeStamp, const float deltaTimeSeconds)
 {
-	testEmitter.Update(frameTimeStamp, deltaTimeSeconds);
+	for (int i = 0; i < emitters.Length(); i++)
+	{
+		if (!emitters[i].Update(deltaTimeSeconds))
+		{
+			emitters[i].Flush();
+			emitters.Remove(i--);
+		}
+	}
+
 	particleRenderer.Update();
 }
 void ParticleHandler::Render()
@@ -96,7 +109,7 @@ void ParticleHandler::Render()
 	particleRenderer.ClearInstances();
 }
 
-void ParticleHandler::AddParticles(int type)
+void ParticleHandler::AddParticles(int type, const v3& position)
 {
 
 }

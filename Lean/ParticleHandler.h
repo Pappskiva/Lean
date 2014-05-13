@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
-Syftet med denna klassen är att skapa ett objekt som lättare han hantera partiklar, 
+Syftet med denna klassen är att skapa ett objekt som lättare han hantera partiklar,
 så om man vill ha mer än en, eller lägga till och ta bort dem så ska det fungera.
 
 Tanken är att partiklar ska, för det mesta, ha en tid, alltså hur länge partikeleffekten ska finnas innan den försvinner.
@@ -26,17 +26,17 @@ public:
 
 	void Initialize(D3D*, Shader*);
 	void Shutdown();
-	void Update(const uint,  const float);
+	void Update(const uint, const float);
 	void Render();
 
 	/*Lägg till en partikel, int är för stunden ett värde som säger åt oss
 	vilken typ av partikel man vill ha. Detta lär behövas utökas senare. så att position och sådant finns*/
-	void AddParticles(int);
+	void AddParticles(int, const v3&);
 	/*Ta bort alla partiklar, som när man byter bana, till exempel*/
 	void RemoveAllParticles();
 
 private:
 	InstanceRenderer particleRenderer;
-	ParticleEmitter testEmitter;
+	Array<ParticleEmitter> emitters;
 };
 #endif

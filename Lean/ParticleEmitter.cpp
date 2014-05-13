@@ -7,9 +7,9 @@ void ParticleEmitter::SetParticleEmitterBase(ParticleEmitterBase &base)
 	renderDataSize = 0;
 	this->base = base;
 
-	for(uint i = 0; i < base.layoutSize; ++i)
+	for (uint i = 0; i < base.layoutSize; ++i)
 	{
-		switch(base.layout[i].type)
+		switch (base.layout[i].type)
 		{
 		case Particle_Position:
 			renderDataSize += sizeof(v3);
@@ -35,47 +35,51 @@ void ParticleEmitter::SetParticleEmitterBase(ParticleEmitterBase &base)
 		};
 	}
 
-	renderData	= new byte[renderDataSize];	
+	renderData = new byte[renderDataSize];
 	timeOfSpawn = 0;
+	timeOfLastParticleSpawn = 0;
 }
 
-void ParticleEmitter::SpawnParticle(const uint frameTimeStamp)
+void ParticleEmitter::SpawnParticle()
 {
-	if(base.maxParticles == particles.Length())
+	if (base.maxParticles == particles.Length())
 		return;//particles.RemoveLast();
-	
+
 	Particle *newParticle = &particles.Append();
-	newParticle->pos = pos;
-	newParticle->timeToDie = frameTimeStamp + base.particleBase.timeToLive;
+	newParticle->pos = base.startPos;
+	newParticle->timeToDie = timeOfSpawn + base.particleBase.timeToLive;
 	newParticle->xScale = 1.0f;
 	newParticle->yScale = 1.0f;
 	newParticle->alpha = 1.0f; // test
 	newParticle->alive = true;
-	newParticle->rot = (float) 0;//D3DXToRadian((rand() % 360));
+	newParticle->rot = (float)0;//D3DXToRadian((rand() % 360));
 	newParticle->moveDir = base.particleMove;
 
-	if(base.randomMove)
+	if (base.randomMove)
 	{
 		int x, y, z;
 		x = rand() % 100 - 50;
 		y = rand() % 100 - 50;
 		z = rand() % 100 - 50;
-		newParticle->moveDir += v3((float) x, (float) y, (float) z).GetNormalized();
+		newParticle->moveDir += v3((float)x, (float)y, (float)z).GetNormalized();
 	}
 
-	timeOfLastParticleSpawn = frameTimeStamp;
+	timeOfLastParticleSpawn = timeOfSpawn;
 };
 
-bool ParticleEmitter::Update(const uint frameTimeStamp, const float deltaTime)
+bool ParticleEmitter::Update(const float deltaTime)
 {
-	if(base.spawnFrequence && frameTimeStamp - timeOfLastParticleSpawn > base.spawnFrequence)
-		SpawnParticle(frameTimeStamp);
+	timeOfSpawn += deltaTime * 1000;
+	//bool lol = timeOfLastParticleSpawn + base.particleBase.timeToLive < base.timeToLive;
+	if (timeOfLastParticleSpawn + base.particleBase.timeToLive < base.timeToLive &&
+		base.spawnFrequence && timeOfSpawn - timeOfLastParticleSpawn > base.spawnFrequence)
+		SpawnParticle();
 
-	for(uint i = 0; i < particles.Length(); ++i)
+	for (uint i = 0; i < particles.Length(); ++i)
 	{
-		UpdateParticle(particles[i], frameTimeStamp, deltaTime);
-		
-		if(!particles[i].alive)
+		UpdateParticle(particles[i], deltaTime);
+
+		if (!particles[i].alive)
 		{
 			particles.Remove(i--);
 			continue;
@@ -85,39 +89,39 @@ bool ParticleEmitter::Update(const uint frameTimeStamp, const float deltaTime)
 		base.particleInstanceRenderer->AddInstance(renderData, renderDataSize, InstanceID(base.texture, base.shader));
 	}
 
-	return base.timeToLive && frameTimeStamp - timeOfSpawn > base.timeToLive;
+	return base.timeToLive ? timeOfSpawn < base.timeToLive : true;
 }
 
-void ParticleEmitter::UpdateParticle(Particle &particle, const uint frameTimeStamp, const float deltaTimeSeconds)
+void ParticleEmitter::UpdateParticle(Particle &particle, const float deltaTimeSeconds)
 {
-	if(!particle.alive)
+	if (!particle.alive)
 		return;
 
-	if(particle.timeToDie <= frameTimeStamp)
+	if (particle.timeToDie <= timeOfSpawn)
 	{
 		particle.alive = false;
 		return;
 	}
-	
-	uint delta = base.particleBase.timeToLive - (particle.timeToDie - frameTimeStamp);
 
-	if(delta < base.particleBase.fadeInTime)
-		particle.alpha = (float) delta / base.particleBase.fadeInTime;
+	uint delta = base.particleBase.timeToLive - (particle.timeToDie - timeOfSpawn);
 
-	if(delta > base.particleBase.timeToLive - base.particleBase.fadeOutTime)
-		particle.alpha = 1.0f - (float) (delta - (base.particleBase.timeToLive - base.particleBase.fadeOutTime) ) / base.particleBase.fadeOutTime;
-	
-	if(delta < base.particleBase.scaleXInTime)
-		particle.xScale = (float) delta * base.particleBase.xSize / base.particleBase.scaleXInTime;
+	if (delta < base.particleBase.fadeInTime)
+		particle.alpha = (float)delta / base.particleBase.fadeInTime;
 
-	if(delta > base.particleBase.timeToLive - base.particleBase.scaleXOutTime)
-		particle.xScale = (1.0f - (float) (delta - (base.particleBase.timeToLive - base.particleBase.scaleXOutTime) ) / base.particleBase.scaleXOutTime) * base.particleBase.xSize;
+	if (delta > base.particleBase.timeToLive - base.particleBase.fadeOutTime)
+		particle.alpha = 1.0f - (float)(delta - (base.particleBase.timeToLive - base.particleBase.fadeOutTime)) / base.particleBase.fadeOutTime;
 
-	if(delta < base.particleBase.scaleYInTime)
-		particle.yScale = (float) delta * base.particleBase.ySize / base.particleBase.scaleYInTime;
-	
-	if(delta > base.particleBase.timeToLive - base.particleBase.scaleYOutTime)
-		particle.yScale = (1.0f - (float) (delta - (base.particleBase.timeToLive - base.particleBase.scaleYOutTime) ) / base.particleBase.scaleYOutTime) * base.particleBase.ySize;
+	if (delta < base.particleBase.scaleXInTime)
+		particle.xScale = (float)delta * base.particleBase.xSize / base.particleBase.scaleXInTime;
+
+	if (delta > base.particleBase.timeToLive - base.particleBase.scaleXOutTime)
+		particle.xScale = (1.0f - (float)(delta - (base.particleBase.timeToLive - base.particleBase.scaleXOutTime)) / base.particleBase.scaleXOutTime) * base.particleBase.xSize;
+
+	if (delta < base.particleBase.scaleYInTime)
+		particle.yScale = (float)delta * base.particleBase.ySize / base.particleBase.scaleYInTime;
+
+	if (delta > base.particleBase.timeToLive - base.particleBase.scaleYOutTime)
+		particle.yScale = (1.0f - (float)(delta - (base.particleBase.timeToLive - base.particleBase.scaleYOutTime)) / base.particleBase.scaleYOutTime) * base.particleBase.ySize;
 
 	particle.alive = delta < base.particleBase.timeToLive;
 	particle.pos += particle.moveDir * base.particleBase.speed * deltaTimeSeconds;
@@ -128,9 +132,9 @@ void ParticleEmitter::BuildRenderData(const Particle &particle)
 {
 	uint offset = 0;
 
-	for(uint i = 0; i < base.layoutSize; ++i)
+	for (uint i = 0; i < base.layoutSize; ++i)
 	{
-		switch(base.layout[i].type)
+		switch (base.layout[i].type)
 		{
 		case Particle_Position:
 			memcpy(renderData + offset, particle.pos.v, sizeof(v3));
