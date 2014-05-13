@@ -142,7 +142,7 @@ void Obstacle::UpdateWorldMatrix()
 	m4 worldRotationMatrix;
 	worldRotationMatrix = m4::CreateYawPitchRoll(0.0f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	m4 scaleMatrix;
-	scaleMatrix = m4::CreateScale(v3(1.0f, 1.0f, 1.0f));
+	scaleMatrix = m4::CreateScale(v3(3.0f, 3.0f, 3.0f));
 	m4 localSpace;
 	localSpace = m4::CreateTranslation(m_position);
 
