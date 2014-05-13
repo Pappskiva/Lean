@@ -15,6 +15,7 @@ Application::Application()
 	m_ObstacleHandler = nullptr;
 	m_Goal = nullptr;
 	m_Sound = nullptr;
+	m_Clock = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -25,11 +26,9 @@ Application::Application()
 	CompletedFirstPass = false;
 }
 
-
 Application::Application(const Application& other)
 {
 }
-
 
 Application::~Application()
 {
@@ -427,6 +426,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
 			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 	else if (m_Input->IsDownPressed() || m_Input->IsSPressed())
@@ -435,6 +435,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
 			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 
@@ -445,6 +446,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
 			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 	else if (m_Input->IsRightPressed() || m_Input->IsDPressed())
@@ -453,6 +455,7 @@ bool Application::Frame(float deltaTime)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
 			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+			m_PhysicsBridge.ActivateBall();
 		}
 	}
 
@@ -462,7 +465,7 @@ bool Application::Frame(float deltaTime)
 	}
 
 	m_Level->Update(deltaTime);
-	//m_Ball->Update(deltaTime); //OBS: Saknar värde! Bollen uppdateras i PhysicsBridge::StepSimulation
+	m_Ball->Update(deltaTime); //OBS: Används bara för friktionen! Annat uppdateras i PhysicsBridge::StepSimulation
 
 	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
 
@@ -810,5 +813,5 @@ void Application::ChangeLevel(int levelNumber)
 	{
 		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
 	}
-	
+	m_Clock = new Clock();
 }
