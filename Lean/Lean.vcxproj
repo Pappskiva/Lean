@@ -38,6 +38,7 @@
     <ClCompile Include="ObstacleHandler.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleHandler.cpp" />
     <ClCompile Include="PhysicsBridge.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="SentenceClass.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="ObstacleHandler.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleEmitter.h" />
+    <ClInclude Include="ParticleHandler.h" />
     <ClInclude Include="PhysicsBridge.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="SentenceClass.h" />

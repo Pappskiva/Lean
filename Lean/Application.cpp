@@ -264,11 +264,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
 	m_Goal->SetNextLevelNumber(1);*/
 
-	ChangeLevel(1);
-	//m_Goal->SetNextLevelNumber(2);
-
-	m_Goal->SetShader(defaultShader);
-
 	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
 	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
 	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
@@ -293,31 +288,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
-	m_PhysicsBridge.Initialize(m_Level, m_Ball);
-	m_PhysicsBridge.GenerateDebug(m_Direct3D);
-
 	gameTimer = 0;
 
-	//Particle test;
-	struct ParticleVertex
-	{
-		float uv[2];
-	} vertices[] = {
-			{ 0.0f, 0.0f },
-			{ 1.0f, 0.0f },
-			{ 0.0f, 1.0f },
-
-			{ 1.0f, 0.0f },
-			{ 1.0f, 1.0f },
-			{ 0.0f, 1.0f },
-	};
-
-	Mesh *particleMesh = m_Direct3D->CreateMeshFromRam(vertices, sizeof(ParticleVertex), 6);
 	
-	particleRenderer.Initialize(512, 36, particleMesh);
-	m_Direct3D->PrepareInstanceRenderer(particleRenderer);
-
-	Texture *leaf = m_Direct3D->LoadTextureFromFile("data//64x64LeafParticleColored.png");
 
 	D3D11_INPUT_ELEMENT_DESC particleElem[] =
 	{
@@ -339,50 +312,15 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		SVF_PIXELSHADER))
 		return false;
 
-	struct ParticleRenderData
-	{
-		v3 pos;
-		float scale[2];
-		float rot;
-		float alpha;
-	};
+	m_Particles.Initialize(m_Direct3D, particleBillboard);
 
-	ParticleRenderLayoutMember layout[] = {
-			{ 0, Particle_Position },
-			{ 0, Particle_XScale },
-			{ 0, Particle_YScale },
-			{ 0, Particle_Rotation },
-			{ 0, Particle_Alpha },
-	};
-	ParticleBase particleBase;
-	particleBase.fadeInTime = 0;
-	particleBase.fadeOutTime = 100;
-	particleBase.rotSpeed = 3.9f;
-	particleBase.scaleXInTime = 1000;
-	particleBase.scaleXOutTime = 100;
-	particleBase.scaleYInTime = 1000;
-	particleBase.scaleYOutTime = 100;
-	particleBase.speed = 1.0f;
-	particleBase.timeToLive = 2000;
-	particleBase.weight = 0;
-	particleBase.xSize = 1.0f;
-	particleBase.ySize = 1.0f;
+	ChangeLevel(1);
+	//m_Goal->SetNextLevelNumber(2);
 
-	ParticleEmitterBase emitterBase;
-	emitterBase.SetTimeToLive(0);
-	emitterBase.SetSpawnFrequency(25);
-	emitterBase.SetMaximumParticles(100);
-	emitterBase.SetParticleMove(v3(0, 1, 0));
-	emitterBase.SetRandomMove(true);
-	emitterBase.SetShader(particleBillboard);
-	emitterBase.SetTexture(leaf);
-	emitterBase.SetRenderLayout(layout, 5);
-	emitterBase.SetParticleBase(particleBase);
-	emitterBase.SetParticleRenderer(&particleRenderer);
+	m_Goal->SetShader(defaultShader);
 
-	testEmitter.SetParticleEmitterBase(emitterBase);
-
-	CompletedFirstPass = true;
+	m_PhysicsBridge.Initialize(m_Level, m_Ball);
+	m_PhysicsBridge.GenerateDebug(m_Direct3D);
 
 	m_Sound = new Sound;
 	if (!m_Sound)
@@ -396,6 +334,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 	m_Sound->PlayLoop();
+
+	CompletedFirstPass = true;
+
 
 	return true;
 }
@@ -534,8 +475,7 @@ bool Application::Frame(float deltaTime)
 		}
 	}
 
-	testEmitter.Update(gameTimer, deltaTime);
-	particleRenderer.Update();
+	m_Particles.Update(gameTimer, deltaTime);
 
 	// Render the graphics.
 	RenderGraphics();
@@ -595,8 +535,7 @@ void Application::RenderGraphics()
 		m_Direct3D->TurnZBufferReadOnWriteOff();
 		m_Direct3D->TurnOnAlphaBlending();
 
-		particleRenderer.Render();
-		particleRenderer.ClearInstances();
+		m_Particles.Render();
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
