@@ -42,6 +42,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	this->screenHeight = screenHeight;
 	bool result;
 
+	m_Clock = new Clock();
+
 	// Create the Direct3D object.
 	m_Direct3D = new D3D();
 
@@ -818,5 +820,5 @@ void Application::ChangeLevel(int levelNumber)
 	{
 		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
 	}
-	m_Clock = new Clock();
+	m_Clock->RestartClock();
 }

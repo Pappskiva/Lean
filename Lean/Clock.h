@@ -15,10 +15,14 @@ public:
 	Clock(const Clock&);
 	~Clock();
 	int GetTime();
+	void PausClock();
+	void UnPausClock();
+	void RestartClock();
 
 private:
 	int timePerLevel = 60;
 	time_t startTime;
+	int timeGoneBy;
 };
 
 #endif
