@@ -93,6 +93,7 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
+	ImageClass		*m_Image;
 	ParticleHandler	m_Particles;
 
 	FPSClass		m_fps;

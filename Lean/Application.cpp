@@ -16,6 +16,8 @@ Application::Application()
 	m_Goal = nullptr;
 	m_Sound = nullptr;
 	m_Clock = nullptr;
+	m_Text = nullptr;
+	m_Image = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -107,6 +109,42 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	result = m_Skybox->Initialize(m_Direct3D, "data/skybox_abovesea.dds");
 	if (!result)
 	{
+		return false;
+	}
+
+	// Skapa Text objekt
+	m_Text = new SentenceClass;
+	if (!m_Text)
+	{
+		return false;
+	}
+
+	// Initialisera Text objekt
+	v3 prevCamPos = m_Camera->GetPosition();
+	m4 baseViewMatrix;
+	m_Camera->SetPosition(v3(0.0f, 0.0f, -1.0f));
+	m_Camera->Generate3DViewMatrix();
+	m_Camera->GetViewMatrix(baseViewMatrix);
+	m_Camera->SetPosition(prevCamPos);
+	result = m_Text->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Skapa Image objekt
+	m_Image = new ImageClass;
+	if (!m_Image)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_Image->Initialize(m_Direct3D, L"data/testAutumnGround.png", screenWidth, screenHeight, 200, 200);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
 		return false;
 	}
 
@@ -537,6 +575,19 @@ void Application::RenderGraphics()
 
 		m_Particles.Render();
 
+		// Render text object
+		char timeText[16];
+		_itoa_s(m_Clock->GetTime(), timeText, 10);
+
+		m_Text->SetText(timeText, m_Direct3D);
+		m_Text->SetPosition(15, 15);
+		m_Text->SetColor(0.1f, 0.5f, 1.0f);
+		m_Text->Render(m_Direct3D);
+
+		// Render image object
+		m_Image->SetPosition(0, 400);
+		m_Image->Render(m_Direct3D);
+
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
 
@@ -553,6 +604,7 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	// Release the sound object
 	if (m_Sound)
 	{
 		m_Sound->Shutdown();
@@ -594,6 +646,20 @@ void Application::Shutdown()
 	{
 		m_Skybox->Shutdown();
 		m_Skybox = 0;
+	}
+
+	// Release the sentence object
+	if (m_Text)
+	{
+		m_Text->Shutdown();
+		m_Text = 0;
+	}
+
+	// Release the image object
+	if (m_Image)
+	{
+		m_Image->Shutdown();
+		m_Image = 0;
 	}
 
 	//Release the obstacleHandler object
