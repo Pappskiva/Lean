@@ -51,6 +51,7 @@ public:
 
 	void	MakeSlippery(); // För vattenhindret
 	float	GetFriction();
+	void	SetFriction(float);
 	void	AddForce(v3); // För trampolin och magnet
 	v3		GetAndZeroAddedForce(); // OBS: Nollställer AddedForce
 

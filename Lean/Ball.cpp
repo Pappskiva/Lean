@@ -174,6 +174,10 @@ float Ball::GetFriction()
 {
 	return m_friction;
 }
+void Ball::SetFriction(float friction)
+{
+	m_friction = friction;
+}
 void Ball::AddForce(v3 force)
 {
 	m_addedForce += force;

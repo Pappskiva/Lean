@@ -537,6 +537,25 @@ bool Application::Frame(float deltaTime)
 	testEmitter.Update(gameTimer, deltaTime);
 	particleRenderer.Update();
 
+	// Har bollen fallit av banan?
+	v3 ballPos;
+	m_Ball->GetPosition(ballPos);
+
+	if (ballPos.y <= 1)
+	{
+		// Resetta rotationen på banan
+		m_Level->SetRotation(0, 0, 0);
+
+		// Resetta boll i fysiken
+		m_PhysicsBridge.ResetBall(m_Ball);
+
+		// Resetta boll-friction
+		m_Ball->SetFriction(1.0f);
+
+		// Resetta klockan (NYI)
+
+	}
+
 	// Render the graphics.
 	RenderGraphics();
 
