@@ -4,6 +4,7 @@ Clock::Clock()
 {
 	time(&startTime);
 	timeGoneBy = 0;
+	timePerLevel = 100;
 }
 
 Clock::Clock(const Clock&)

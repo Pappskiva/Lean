@@ -20,7 +20,7 @@ public:
 	void RestartClock();
 
 private:
-	int timePerLevel = 60;
+	int timePerLevel;
 	time_t startTime;
 	int timeGoneBy;
 };
