@@ -42,6 +42,7 @@ public:
 	void SetMouseLocation(int, int);
 
 	bool IsEscapePressed();
+	bool IsEnterPressed();
 	bool IsLeftPressed();
 	bool IsRightPressed();
 	bool IsUpPressed();
