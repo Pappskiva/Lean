@@ -43,6 +43,7 @@ enum GameState
 	STATE_PAUSE,
 	STATE_SWITCHLEVEL,
 	STATE_GAMEOVER,
+	STATE_WON,
 };
 
 enum LightType : char
@@ -106,6 +107,7 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
+	SentenceClass	*m_StandardInfoText;
 	ImageClass		*m_Image;
 	ImageClass		*m_WinSignImage;
 	ImageClass		*m_GameOverSignImage;

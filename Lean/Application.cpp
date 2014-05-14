@@ -140,6 +140,13 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	// Skapa Text objekt
+	m_StandardInfoText = new SentenceClass;
+	if (!m_StandardInfoText)
+	{
+		return false;
+	}
+
 	// Skapa baseViewMatrix för text objekt
 	v3 prevCamPos = m_Camera->GetPosition();
 	m4 baseViewMatrix;
@@ -150,6 +157,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	// Initialisera Text objekt
 	result = m_Text->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Initialisera Text objekt
+	result = m_StandardInfoText->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
@@ -200,6 +215,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	m_StandardSignImage->SetPosition(screenWidth / 2 - 320, screenHeight / 2 - 200);
+
+
 	// Skapa Image objekt
 	m_WinSignImage = new ImageClass;
 	if (!m_WinSignImage)
@@ -215,6 +233,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	m_WinSignImage->SetPosition(screenWidth / 2 - 320, screenHeight / 2 - 200);
+
+
 	// Skapa Image objekt
 	m_GameOverSignImage = new ImageClass;
 	if (!m_GameOverSignImage)
@@ -223,12 +244,16 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Image objekt
-	result = m_GameOverSignImage->Initialize(m_Direct3D, L"data/GameOverSign.png", screenWidth, screenHeight, 200, 300);
+	result = m_GameOverSignImage->Initialize(m_Direct3D, L"data/GameOverSign.png", screenWidth, screenHeight, 640, 400);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the image object.");
 		return false;
 	}
+
+	m_GameOverSignImage->SetPosition(screenWidth / 2 - 320, screenHeight/2 - 200);
+
+	m_StandardInfoText->SetPosition(screenWidth / 2 - 90, screenHeight / 2 - 160);
 
 	//Loads the PointLight mesh into vram
 	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("data//LightSphere.obj");
@@ -497,6 +522,15 @@ bool Application::Frame(float deltaTime)
 		{
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
+		}
+	}
+	else if (m_GameState == STATE_WON)
+	{
+		m_Input->Frame();
+		if (m_Input->IsEnterPressed())
+		{
+			m_GameState = STATE_MAINMENU;
+			nrOfLifes = MAX_NR_OF_LIFES;
 			//m_Goal->SetNextLevelNumber(2);
 		}
 	}
@@ -634,13 +668,21 @@ bool Application::Frame(float deltaTime)
 				{*/
 				finishedSwitch = true;
 				points += (m_Clock->GetTime(false) + 100);
-				ChangeLevel(m_Goal->GetNextLevelNumber());
-				m_GameState = STATE_SWITCHLEVEL;
-				/*}*/
-			}
-			else
-			{
+
+				if (m_Goal->GetNextLevelNumber() == MAX_LEVELS)
+				{
+					m_GameState = STATE_WON;
+				}
+				else
+				{
+					ChangeLevel(m_Goal->GetNextLevelNumber());
+					m_GameState = STATE_SWITCHLEVEL;
+				}
+
 				switchLevel = false;
+				
+
+				/*}*/
 			}
 		}
 
@@ -650,22 +692,8 @@ bool Application::Frame(float deltaTime)
 		v3 ballPos;
 		m_Ball->GetFlatPosition(ballPos);
 
-		if (ballPos.y <= 1)
+		if (ballPos.y <= 1.0f)
 		{
-			// Resetta rotationen på banan
-			m_Level->SetRotation(0, 0, 0);
-
-			// Resetta boll i fysiken
-			m_PhysicsBridge.ResetBall(m_Ball);
-
-			// Resetta boll-friction
-			m_Ball->SetFriction(1.0f);
-
-			// Resetta klockan
-			m_Clock->RestartClock();
-
-			//Ta bort alla partiklar
-			m_Particles.RemoveAllParticles();
 
 			/*v3 ballPos;
 			m_Ball->GetPosition(ballPos);
@@ -684,10 +712,25 @@ bool Application::Frame(float deltaTime)
 
 			nrOfLifes--;
 
-			if (nrOfLifes == -1)
+			if (nrOfLifes <= -1)
 			{
 				m_GameState = STATE_GAMEOVER;
 			}
+
+			// Resetta rotationen på banan
+			m_Level->SetRotation(0, 0, 0);
+
+			// Resetta boll i fysiken
+			m_PhysicsBridge.ResetBall(m_Ball);
+
+			// Resetta boll-friction
+			m_Ball->SetFriction(1.0f);
+
+			// Resetta klockan
+			m_Clock->RestartClock();
+
+			//Ta bort alla partiklar
+			m_Particles.RemoveAllParticles();
 		}
 	}
 
@@ -756,7 +799,7 @@ void Application::RenderGraphics()
 
 			// Render text object
 			char timeText[16];
-		_itoa_s(m_Clock->GetTime(m_GameState != STATE_PAUSE), timeText, 10);
+			_itoa_s(m_Clock->GetTime(m_GameState != STATE_PAUSE), timeText, 10);
 
 			m_Text->SetText(timeText, m_Direct3D);
 			m_Text->SetPosition(15, 15);
@@ -772,14 +815,25 @@ void Application::RenderGraphics()
 		if (m_GameState == STATE_SWITCHLEVEL)
 		{
 			// Render image object
-			m_StandardSignImage->SetPosition(0, 400);
 			m_StandardSignImage->Render(m_Direct3D);
+			m_StandardInfoText->SetText("Level Cleared", m_Direct3D);
+			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
+			m_StandardInfoText->Render(m_Direct3D);
+		}
+		if (m_GameState == STATE_WON)
+		{
+			m_WinSignImage->Render(m_Direct3D);
+			m_StandardInfoText->SetText("Victory", m_Direct3D);
+			m_StandardInfoText->SetColor(0.1f, 0.8f, 0.8f);
+			m_StandardInfoText->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_GAMEOVER)
 		{
-			m_GameOverSignImage->SetPosition(0, 0);
 			m_GameOverSignImage->Render(m_Direct3D);
+			m_StandardInfoText->SetText("Game Over", m_Direct3D);
+			m_StandardInfoText->SetColor(0.7f, 0.1f, 0.1f);
+			m_StandardInfoText->Render(m_Direct3D);
 		}
 
 		m_Direct3D->TurnOffAlphaBlending();
@@ -847,7 +901,16 @@ void Application::Shutdown()
 	if (m_Text)
 	{
 		m_Text->Shutdown();
+		delete m_Text;
 		m_Text = 0;
+	}
+
+	// Release the sentence object
+	if (m_StandardInfoText)
+	{
+		m_StandardInfoText->Shutdown();
+		delete m_StandardInfoText;
+		m_StandardInfoText = 0;
 	}
 
 	// Release the image object
