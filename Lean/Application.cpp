@@ -468,6 +468,7 @@ bool Application::Frame(float deltaTime)
 
 		if (res)
 		{
+			m_Clock->UnPausClock();
 			m_GameState = STATE_PLAYING;
 		}
 	}
@@ -501,6 +502,7 @@ bool Application::Frame(float deltaTime)
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PAUSE;
+			m_Clock->PausClock();
 		}
 
 
@@ -638,7 +640,7 @@ bool Application::Frame(float deltaTime)
 			// Resetta klockan
 			m_Clock->RestartClock();
 
-			v3 ballPos;
+			/*v3 ballPos;
 			m_Ball->GetPosition(ballPos);
 			stringstream ss;
 			ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
@@ -651,7 +653,7 @@ bool Application::Frame(float deltaTime)
 
 			wcharstr = (WCHAR*)wstr.c_str();
 
-			WBOX(wcharstr);
+			WBOX(wcharstr);*/
 
 			nrOfLifes--;
 		}
@@ -719,7 +721,7 @@ void Application::RenderGraphics()
 
 		// Render text object
 		char timeText[16];
-		_itoa_s(m_Clock->GetTime(), timeText, 10);
+		_itoa_s(m_Clock->GetTime(m_GameState != STATE_PAUSE), timeText, 10);
 
 		m_Text->SetText(timeText, m_Direct3D);
 		m_Text->SetPosition(15, 15);
@@ -957,6 +959,7 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
+	levelNumber = 1;
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;

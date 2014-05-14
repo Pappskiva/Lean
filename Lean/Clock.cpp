@@ -3,7 +3,7 @@
 Clock::Clock()
 {
 	time(&startTime);
-	timeGoneBy = 0;
+	timeGoneBy = 0.0f;
 	timePerLevel = 100;
 }
 
@@ -17,19 +17,24 @@ Clock::~Clock()
 
 }
 
-int Clock::GetTime()
+int Clock::GetTime(bool pause)
 {
 	time_t nowTime;
 	time(&nowTime);
-	int sek = difftime(nowTime, startTime);
-	return timePerLevel - sek - timeGoneBy;
+	int result = timePerLevel - timeGoneBy;
+	if (pause)
+	{
+		int sek = difftime(nowTime, startTime);
+		result -= sek;
+	}
+	return result;
 }
 
 void Clock::PausClock()
 {
 	time_t nowTime;
 	time(&nowTime);
-	timeGoneBy = difftime(nowTime, startTime);
+	timeGoneBy += difftime(nowTime, startTime);
 }
 
 void Clock::UnPausClock()
