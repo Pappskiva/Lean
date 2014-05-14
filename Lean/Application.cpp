@@ -407,7 +407,7 @@ bool Application::Frame(float deltaTime)
 		if (!switchLevel)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
-			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
 			m_PhysicsBridge.ActivateBall();
 		}
 	}
@@ -416,7 +416,7 @@ bool Application::Frame(float deltaTime)
 		if (!switchLevel)
 		{
 			float rotationAroundX = m_Level->GetRotationX();
-			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
 			m_PhysicsBridge.ActivateBall();
 		}
 	}
@@ -427,7 +427,7 @@ bool Application::Frame(float deltaTime)
 		if (!switchLevel)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
-			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
 			m_PhysicsBridge.ActivateBall();
 		}
 	}
@@ -436,7 +436,7 @@ bool Application::Frame(float deltaTime)
 		if (!switchLevel)
 		{
 			float rotationAroundZ = m_Level->GetRotationZ();
-			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
 			m_PhysicsBridge.ActivateBall();
 		}
 	}
@@ -520,7 +520,7 @@ bool Application::Frame(float deltaTime)
 
 	// Har bollen fallit av banan?
 	v3 ballPos;
-	m_Ball->GetPosition(ballPos);
+	m_Ball->GetFlatPosition(ballPos);
 
 	if (ballPos.y <= 1)
 	{

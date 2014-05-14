@@ -33,6 +33,9 @@ public:
 	void	SetPosition(float, float, float);
 	void	GetPosition(v3&);
 
+	void	SetFlatPosition(float, float, float);
+	void	GetFlatPosition(v3&);
+
 	void	SetRotation(float, float, float);
 	void	GetRotation(v3&);
 
@@ -74,6 +77,7 @@ private:
 	v3 m_addedForce; // För kraftpåverkningar som studsmatta och magnet
 
 	m4 worldMatrix;
+	v3 m_flatPosition; // Bollens position relativt planet, alltså som om planet ej vore roterat.
 };
 
 inline void	Ball::SetMesh(const Mesh *mesh)

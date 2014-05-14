@@ -111,6 +111,20 @@ void Ball::GetPosition(v3& pos)
 	pos = m_position;
 }
 
+void Ball::SetFlatPosition(float positionX, float positionY, float positionZ)
+{
+	//Sätt positionen
+	m_flatPosition.x = positionX;
+	m_flatPosition.y = positionY;
+	m_flatPosition.z = positionZ;
+}
+
+void Ball::GetFlatPosition(v3& pos)
+{
+	//Få positionen
+	pos = m_flatPosition;
+}
+
 void Ball::SetRotation(float rotationX, float rotationY, float rotationZ)
 {
 	//Sätt rotationen
