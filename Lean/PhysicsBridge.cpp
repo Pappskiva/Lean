@@ -47,8 +47,8 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	dynamicsWorld->setGravity(btVector3(0, GRAVITY, 0));
 
 	//HeightMap
-	m_HeightStickWidth = 64;   //Bredd på kartan // must be (2^N) + 1
-	m_HeightStickLeangth = 64; //Längd på kartan // must be (2^N) + 1
+	m_HeightStickWidth = level->GetWidth();   //Bredd på kartan // must be (2^N) + 1
+	m_HeightStickLeangth = level->GetLength(); //Längd på kartan // must be (2^N) + 1
 	m_HeightMapData = heightMap;// getRawHeightfieldData(m_model, m_type, m_minHeight, m_maxHeight);
 	m_HeightScale = 1;//Höjd skala
 	m_MinHeight = -255;//
@@ -118,8 +118,8 @@ void PhysicsBridge::ReInitialize(Level* level, Ball* ball)
 	dynamicsWorld->setGravity(btVector3(0, GRAVITY, 0));
 
 	//HeightMap
-	m_HeightStickWidth = 64;   //Bredd på kartan // must be (2^N) + 1
-	m_HeightStickLeangth = 64; //Längd på kartan // must be (2^N) + 1
+	m_HeightStickWidth = level->GetWidth();   //Bredd på kartan // must be (2^N) + 1
+	m_HeightStickLeangth = level->GetLength(); //Längd på kartan // must be (2^N) + 1
 	m_HeightMapData = heightMap;// getRawHeightfieldData(m_model, m_type, m_minHeight, m_maxHeight);
 	m_HeightScale = 1;//Höjd skala
 	m_MinHeight = -255;//

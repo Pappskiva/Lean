@@ -42,6 +42,7 @@ enum GameState
 	STATE_PLAYING,
 	STATE_PAUSE,
 	STATE_SWITCHLEVEL,
+	STATE_GAMEOVER,
 };
 
 enum LightType : char

@@ -53,6 +53,9 @@ public:
 	void UpdateWorldMatrix();
 	void GetWorldMatrix(m4&);
 
+	uint GetWidth();
+	uint GetLength();
+
 	float SphereHeightmapIntersection(const v3 &center, const float radius, const v3 &velocity);
 
 	void SetShader(const Shader *shader);
@@ -85,6 +88,9 @@ private:
 
 	m4 worldMatrix;
 	v3 m_normal;
+
+	uint m_width;
+	uint m_length;
 
 };
 

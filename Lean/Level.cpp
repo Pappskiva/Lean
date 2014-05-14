@@ -333,6 +333,9 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, goalPos, startPos, obstacles, nrOfObst);
 	uint height = (uint)tempHeight, width = (uint)tempWidth;
 	
+	m_width = width;
+	m_length = height;
+
 	struct Vertex
 	{
 		v3 pos;
@@ -445,4 +448,14 @@ void Level::SetWorldMatrix(m4& world)
 float* Level::GetHeighMapData()
 {
 	return heightmapToPhys;
+}
+
+uint Level::GetWidth()
+{
+	return m_width;
+}
+
+uint Level::GetLength()
+{
+	return m_length;
 }
