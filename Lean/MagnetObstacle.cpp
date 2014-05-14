@@ -112,13 +112,14 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	v3 ballPos;
 	ball->GetPosition(ballPos);
 	v3 vectorToBall = ballPos - m_position;
+	vectorToBall.y = 0;
 	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
 
 	if (squaredDistance < 100) // Använder inte cooldown
 	{
 		if (squaredDistance >= 0.2f) //Så att squaredDistance inte blir ett nollvärde, eller vad det nu är som får det att bugga ur. 
 		{
-		v3 forceToAdd = -vectorToBall / squaredDistance * 0.6; // drar bollen till sig
+		v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig
 		ball->AddForce(forceToAdd);
 		}
 	}
