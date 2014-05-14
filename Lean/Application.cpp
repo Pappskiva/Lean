@@ -444,7 +444,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 
 	CompletedFirstPass = true;
-
+	points = 0;
 
 	return true;
 }
@@ -633,6 +633,7 @@ bool Application::Frame(float deltaTime)
 				if (ballPosition.y <= -20.0f)
 				{*/
 				finishedSwitch = true;
+				points += (m_Clock->GetTime(false) + 100);
 				ChangeLevel(m_Goal->GetNextLevelNumber());
 				m_GameState = STATE_SWITCHLEVEL;
 				/*}*/
