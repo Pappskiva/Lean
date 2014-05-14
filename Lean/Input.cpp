@@ -238,6 +238,17 @@ bool Input::IsEscapePressed()
 	return false;
 }
 
+bool Input::IsEnterPressed()
+{
+	// Do a bitwise and on the keyboard state to check if the enter key is currently being pressed.
+	if (m_keyboardState[DIK_RETURN] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool Input::IsLeftPressed()
 {
 	// Do a bitwise and on the keyboard state to check if the key is currently being pressed.

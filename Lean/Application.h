@@ -23,6 +23,7 @@
 #include "Clock.h"
 #include "SentenceClass.h"
 #include "ImageClass.h"
+#include "Menu.h"
 
 /////////////
 // GLOBALS //
@@ -33,6 +34,14 @@ const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const int MAX_LEVELS = 1;
 
+
+enum GameState
+{
+	STATE_MAINMENU,
+	STATE_PLAYING,
+	STATE_PAUSE,
+	STATE_SWITCHLEVEL,
+};
 
 enum LightType : char
 {
@@ -95,6 +104,8 @@ private:
 	SentenceClass	*m_Text;
 	ImageClass		*m_Image;
 	ParticleHandler	m_Particles;
+	GameState		m_GameState;
+	Menu			*m_Menu;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;

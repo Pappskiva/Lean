@@ -18,6 +18,8 @@ Application::Application()
 	m_Clock = nullptr;
 	m_Text = nullptr;
 	m_Image = nullptr;
+	m_GameState = STATE_MAINMENU;
+	m_Menu = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -47,7 +49,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
-	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/SuperMario1Dual.wav");
+	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/LONELY_ROLLING_STAR.wav");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
@@ -134,17 +136,33 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	// Initialisera Text objekt
+	// Skapa baseViewMatrix för text objekt
 	v3 prevCamPos = m_Camera->GetPosition();
 	m4 baseViewMatrix;
 	m_Camera->SetPosition(v3(0.0f, 0.0f, -1.0f));
 	m_Camera->Generate3DViewMatrix();
 	m_Camera->GetViewMatrix(baseViewMatrix);
 	m_Camera->SetPosition(prevCamPos);
+
+	// Initialisera Text objekt
 	result = m_Text->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Skapa meny objekt
+	m_Menu = new Menu();
+	if (!m_Menu)
+	{
+		return false;
+	}
+
+	// Initialisera meny objekt
+	result = m_Menu->Initialize(m_Direct3D, m_Input, m_Camera, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
 		return false;
 	}
 
@@ -391,165 +409,205 @@ bool Application::Frame(float deltaTime)
 
 	bool result = true;
 
-	//Update the input object
-	result = m_Input->Frame();
-
-	//Check if the user has pressed Escape to close the program
-	if (m_Input->IsEscapePressed())
+	// Pause
+	if (m_GameState == STATE_PAUSE)
 	{
-		return false;
+		bool res = false;
+
+		m_Input->Frame();
+		if (m_Input->IsEnterPressed())
+		{
+			res = true;
+		}
+
+		if (res)
+		{
+			m_GameState = STATE_PLAYING;
+		}
 	}
-
-
-	//Check if the user is pressing buttons to rotate the level in the x-axis
-	if (m_Input->IsUpPressed() || m_Input->IsWPressed())
+	// Main Menu
+	else if (m_GameState == STATE_MAINMENU)
 	{
+		bool res = true;
+
+		res = m_Menu->Update(deltaTime);
+
+		if (!res)
+		{
+			m_GameState = STATE_PLAYING;
+		}
+
+	}
+	// Playing
+	else if (m_GameState == STATE_PLAYING)
+	{
+
+		//Update the input object
+		result = m_Input->Frame();
+
+		//Check if the user has pressed Escape to close the program
+		if (m_Input->IsEscapePressed())
+		{
+			return false;
+		}
+
+		//Check if the user has pressed Enter to pause
+		if (m_Input->IsEnterPressed())
+		{
+			m_GameState = STATE_PAUSE;
+		}
+
+
+		//Check if the user is pressing buttons to rotate the level in the x-axis
+		if (m_Input->IsUpPressed() || m_Input->IsWPressed())
+		{
+			if (!switchLevel)
+			{
+				float rotationAroundX = m_Level->GetRotationX();
+				m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+				m_PhysicsBridge.ActivateBall();
+			}
+		}
+		else if (m_Input->IsDownPressed() || m_Input->IsSPressed())
+		{
+			if (!switchLevel)
+			{
+				float rotationAroundX = m_Level->GetRotationX();
+				m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+				m_PhysicsBridge.ActivateBall();
+			}
+		}
+
+		//Check if the user is pressing buttons to rotate the level in the z-axis
+		if (m_Input->IsLeftPressed() || m_Input->IsAPressed())
+		{
+			if (!switchLevel)
+			{
+				float rotationAroundZ = m_Level->GetRotationZ();
+				m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+				m_PhysicsBridge.ActivateBall();
+			}
+		}
+		else if (m_Input->IsRightPressed() || m_Input->IsDPressed())
+		{
+			if (!switchLevel)
+			{
+				float rotationAroundZ = m_Level->GetRotationZ();
+				m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+				m_PhysicsBridge.ActivateBall();
+			}
+		}
+
+		if (m_Input->IsSpacePressed())
+		{
+
+		}
+
+		m_Level->Update(deltaTime);
+		m_Ball->Update(deltaTime); //OBS: Används bara för friktionen! Annat uppdateras i PhysicsBridge::StepSimulation
+
+		m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
+
+
+		//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
+		//m_Camera->LookAt(ballPosition);
+
+		//Hämta bollens world, sätt kamerans position efter bollens position.
+		m4 ballWorldM;
+		m_Ball->GetWorldMatrix(ballWorldM);
+		v3 camPos = ballWorldM.GetPos();
+		m_Camera->LookAt(camPos);
+		//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
+		camPos.x = camPos.x - 2.5f * 2;
+		camPos.y = camPos.y + 3.65f * 2;
+		camPos.z = camPos.z - 7.0f * 2;
+		m_Camera->SetPosition(camPos);
+
+		//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
+		//shadowCamera.Generate3DViewMatrix();
+
+		float planeRotX = m_Level->GetRotationX();
+		float planeRotZ = m_Level->GetRotationZ();
+
+		m_ObstacleHandler->Update(deltaTime, camPos.x, camPos.z, planeRotX, planeRotZ, m_Ball, &m_Particles);
+
+		m_Goal->Update(deltaTime, planeRotX, planeRotZ);
+
+		v3 ballPosition;
+		float distance;
+		float radiusOfGoal = 3.0f;
+		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 		if (!switchLevel)
 		{
-			float rotationAroundX = m_Level->GetRotationX();
-			m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
-			m_PhysicsBridge.ActivateBall();
+			//Titta om målet och bollen är nära nog för att kollidera
+			v3 goalPosition;
+			m_Ball->GetPosition(ballPosition);
+			m_Goal->GetPosition(goalPosition);
+			v3 relPos = ballPosition - goalPosition;
+			distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
+			float minDist = m_Ball->GetRadius() + radiusOfGoal;
+			if (distance < minDist * minDist)
+			{
+				//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
+				switchLevel = true;
+				finishedSwitch = false;
+			}
 		}
-	}
-	else if (m_Input->IsDownPressed() || m_Input->IsSPressed())
-	{
-		if (!switchLevel)
+
+
+		if (switchLevel)
 		{
-			float rotationAroundX = m_Level->GetRotationX();
-			m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
-			m_PhysicsBridge.ActivateBall();
-		}
-	}
-
-	//Check if the user is pressing buttons to rotate the level in the z-axis
-	if (m_Input->IsLeftPressed() || m_Input->IsAPressed())
-	{
-		if (!switchLevel)
-		{
-			float rotationAroundZ = m_Level->GetRotationZ();
-			m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
-			m_PhysicsBridge.ActivateBall();
-		}
-	}
-	else if (m_Input->IsRightPressed() || m_Input->IsDPressed())
-	{
-		if (!switchLevel)
-		{
-			float rotationAroundZ = m_Level->GetRotationZ();
-			m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
-			m_PhysicsBridge.ActivateBall();
-		}
-	}
-
-	if (m_Input->IsSpacePressed())
-	{
-
-	}
-
-	m_Level->Update(deltaTime);
-	m_Ball->Update(deltaTime); //OBS: Används bara för friktionen! Annat uppdateras i PhysicsBridge::StepSimulation
-
-	m_PhysicsBridge.StepSimulation(deltaTime, m_Level->GetRotationX()*0.0174532925f, 0, m_Level->GetRotationZ()*0.0174532925f, m_Ball, m_Level);
-
-
-	//m_Camera->SetPosition(v3(ballPosition.x - 2.5f, ballPosition.y + 3.65f, ballPosition.z - 7.0f));
-	//m_Camera->LookAt(ballPosition);
-
-	//Hämta bollens world, sätt kamerans position efter bollens position.
-	m4 ballWorldM;
-	m_Ball->GetWorldMatrix(ballWorldM);
-	v3 camPos = ballWorldM.GetPos();
-	m_Camera->LookAt(camPos);
-	//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
-	camPos.x = camPos.x - 2.5f * 2;
-	camPos.y = camPos.y + 3.65f * 2;
-	camPos.z = camPos.z - 7.0f * 2;
-	m_Camera->SetPosition(camPos);
-
-	//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
-	//shadowCamera.Generate3DViewMatrix();
-	
-	float planeRotX = m_Level->GetRotationX();
-	float planeRotZ = m_Level->GetRotationZ();
-
-	m_ObstacleHandler->Update(deltaTime, camPos.x, camPos.z, planeRotX, planeRotZ, m_Ball, &m_Particles);
-
-	m_Goal->Update(deltaTime, planeRotX, planeRotZ);
-
-	v3 ballPosition;
-	float distance;
-	float radiusOfGoal = 3.0f;
-	//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
-	if (!switchLevel)
-	{
-		//Titta om målet och bollen är nära nog för att kollidera
-		v3 goalPosition;
-		m_Ball->GetPosition(ballPosition);
-		m_Goal->GetPosition(goalPosition);
-		v3 relPos = ballPosition - goalPosition;
-		distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
-		float minDist = m_Ball->GetRadius() + radiusOfGoal;
-		if (distance < minDist * minDist)
-		{
-			//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
-			switchLevel = true; 
-			finishedSwitch = false;
-		}
-	}
-
-
-	if (switchLevel)
-	{
-		if (!finishedSwitch)
-		{
-			/*m_Ball->GetPosition(ballPosition);
-			if (ballPosition.y <= -20.0f)
-			{*/
+			if (!finishedSwitch)
+			{
+				/*m_Ball->GetPosition(ballPosition);
+				if (ballPosition.y <= -20.0f)
+				{*/
 				finishedSwitch = true;
 				ChangeLevel(m_Goal->GetNextLevelNumber());
-			/*}*/
+				/*}*/
+			}
+			else
+			{
+
+				switchLevel = false;
+			}
 		}
-		else
+
+		m_Particles.Update(gameTimer, deltaTime);
+
+		// Har bollen fallit av banan?
+		v3 ballPos;
+		m_Ball->GetFlatPosition(ballPos);
+
+		if (ballPos.y <= 1)
 		{
-			
-			switchLevel = false;
-		}
-	}
+			// Resetta rotationen på banan
+			m_Level->SetRotation(0, 0, 0);
 
-	m_Particles.Update(gameTimer, deltaTime);
+			// Resetta boll i fysiken
+			m_PhysicsBridge.ResetBall(m_Ball);
 
-	// Har bollen fallit av banan?
-	v3 ballPos;
-	m_Ball->GetPosition(ballPos);
+			// Resetta boll-friction
+			m_Ball->SetFriction(1.0f);
 
-	if (ballPos.y <= 1)
-	{
-		// Resetta rotationen på banan
-		m_Level->SetRotation(0, 0, 0);
+			// Resetta klockan
+			m_Clock->RestartClock();
 
-		// Resetta boll i fysiken
-		m_PhysicsBridge.ResetBall(m_Ball);
+			/*v3 ballPos;
+			m_Ball->GetPosition(ballPos);
+			stringstream ss;
+			ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
+			string str = ss.str();
+			wstring wstr;
+			WCHAR* wcharstr;
 
-		// Resetta boll-friction
-		m_Ball->SetFriction(1.0f);
-
-		// Resetta klockan
-		m_Clock->RestartClock();
-
-		/*v3 ballPos;
-		m_Ball->GetPosition(ballPos);
-		stringstream ss;
-		ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
-		string str = ss.str();
-		wstring wstr;
-		WCHAR* wcharstr;
-
-		for (int i = 0; i < str.length(); ++i)
+			for (int i = 0; i < str.length(); ++i)
 			wstr += wchar_t(str[i]);
 
-		wcharstr = (WCHAR*)wstr.c_str();
+			wcharstr = (WCHAR*)wstr.c_str();
 
-		WBOX(wcharstr);*/
+			WBOX(wcharstr);*/
+		}
 	}
 
 	// Render the graphics.
@@ -620,6 +678,11 @@ void Application::RenderGraphics()
 		m_Text->SetPosition(15, 15);
 		m_Text->SetColor(0.1f, 0.5f, 1.0f);
 		m_Text->Render(m_Direct3D);
+
+		if (m_GameState == STATE_MAINMENU)
+		{
+			m_Menu->Render(m_Direct3D);
+		}
 
 		// Render image object
 		m_Image->SetPosition(0, 400);
@@ -697,6 +760,13 @@ void Application::Shutdown()
 	{
 		m_Image->Shutdown();
 		m_Image = 0;
+	}
+
+	// Release the menu object
+	if (m_Menu)
+	{
+		m_Menu->Shutdown();
+		m_Menu = 0;
 	}
 
 	//Release the obstacleHandler object
