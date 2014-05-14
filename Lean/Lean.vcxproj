@@ -24,6 +24,7 @@
     <ClCompile Include="FPSClass.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Heightfield.cpp" />
+    <ClCompile Include="Highscore.cpp" />
     <ClCompile Include="ImageClass.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="InstanceRenderer.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="FPSClass.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Heightfield.h" />
+    <ClInclude Include="Highscore.h" />
     <ClInclude Include="ImageClass.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InstanceRenderer.h" />
