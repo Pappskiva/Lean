@@ -42,6 +42,19 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	this->screenHeight = screenHeight;
 	bool result;
 
+	m_Sound = new Sound;
+	if (!m_Sound)
+	{
+		return false;
+	}
+	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/SuperMario1Dual.wav");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
+		return false;
+	}
+	m_Sound->PlayLoop();
+
 	m_Clock = new Clock();
 
 	// Create the Direct3D object.
@@ -362,18 +375,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_PhysicsBridge.Initialize(m_Level, m_Ball);
 	m_PhysicsBridge.GenerateDebug(m_Direct3D);
 
-	m_Sound = new Sound;
-	if (!m_Sound)
-	{
-		return false;
-	}
-	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/SuperMario1Dual.wav");
-	if (!result)
-	{
-		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
-		return false;
-	}
-	m_Sound->PlayLoop();
 
 	CompletedFirstPass = true;
 
