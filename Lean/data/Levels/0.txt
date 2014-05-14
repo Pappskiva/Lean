@@ -1,8 +1,8 @@
 Heightmaps\0.bmp
 0
 s
+15
 8
-4
 g
-8
-12
+15
+23
