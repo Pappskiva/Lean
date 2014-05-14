@@ -33,6 +33,7 @@ const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const int MAX_LEVELS = 1;
+const int MAX_NR_OF_LIFES = 5;
 
 
 enum GameState
@@ -117,6 +118,7 @@ private:
 	Shader			*defaultShader, *levelShader, *obstacleShader, *particleBillboard;
 
 	uint			gameTimer;
+	int				nrOfLifes;
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;

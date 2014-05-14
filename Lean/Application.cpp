@@ -24,6 +24,7 @@ Application::Application()
 	defaultShader = nullptr;
 	levelShader = nullptr;
 	obstacleShader = nullptr;
+	nrOfLifes = MAX_NR_OF_LIFES;
 
 	switchLevel = false;
 	finishedSwitch = true;
@@ -637,7 +638,7 @@ bool Application::Frame(float deltaTime)
 			// Resetta klockan
 			m_Clock->RestartClock();
 
-			/*v3 ballPos;
+			v3 ballPos;
 			m_Ball->GetPosition(ballPos);
 			stringstream ss;
 			ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
@@ -650,7 +651,9 @@ bool Application::Frame(float deltaTime)
 
 			wcharstr = (WCHAR*)wstr.c_str();
 
-			WBOX(wcharstr);*/
+			WBOX(wcharstr);
+
+			nrOfLifes--;
 		}
 	}
 
