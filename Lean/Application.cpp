@@ -18,6 +18,9 @@ Application::Application()
 	m_Clock = nullptr;
 	m_Text = nullptr;
 	m_Image = nullptr;
+	m_GameOverSignImage = nullptr;
+	m_WinSignImage = nullptr;
+	m_StandardSignImage = nullptr;
 	m_GameState = STATE_MAINMENU;
 	m_Menu = nullptr;
 
@@ -220,7 +223,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Image objekt
-	result = m_GameOverSignImage->Initialize(m_Direct3D, L"data/GameOverSign.png", screenWidth, screenHeight, 640, 400);
+	result = m_GameOverSignImage->Initialize(m_Direct3D, L"data/GameOverSign.png", screenWidth, screenHeight, 200, 300);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the image object.");
@@ -469,6 +472,7 @@ bool Application::Frame(float deltaTime)
 		if (res)
 		{
 			m_GameState = STATE_PLAYING;
+			m_Clock->UnPausClock();
 		}
 	}
 	// Main Menu
@@ -481,13 +485,31 @@ bool Application::Frame(float deltaTime)
 		if (!res)
 		{
 			m_GameState = STATE_PLAYING;
+			
 		}
 
+	}
+	else if (m_GameState == STATE_GAMEOVER)
+	{
+		m_Input->Frame();
+		if (m_Input->IsEnterPressed())
+		{
+			m_GameState = STATE_MAINMENU;
+			nrOfLifes = MAX_NR_OF_LIFES;
+			//m_Goal->SetNextLevelNumber(2);
+		}
+	}
+	else if (m_GameState == STATE_SWITCHLEVEL)
+	{
+		m_Input->Frame();
+		if (m_Input->IsEnterPressed())
+		{
+			m_GameState = STATE_PLAYING;
+		}
 	}
 	// Playing
 	else if (m_GameState == STATE_PLAYING)
 	{
-
 		//Update the input object
 		result = m_Input->Frame();
 
@@ -501,6 +523,7 @@ bool Application::Frame(float deltaTime)
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PAUSE;
+			m_Clock->PausClock();
 		}
 
 
@@ -610,6 +633,7 @@ bool Application::Frame(float deltaTime)
 				{*/
 				finishedSwitch = true;
 				ChangeLevel(m_Goal->GetNextLevelNumber());
+				m_GameState = STATE_SWITCHLEVEL;
 				/*}*/
 			}
 			else
@@ -638,7 +662,10 @@ bool Application::Frame(float deltaTime)
 			// Resetta klockan
 			m_Clock->RestartClock();
 
-			v3 ballPos;
+			//Ta bort alla partiklar
+			m_Particles.RemoveAllParticles();
+
+			/*v3 ballPos;
 			m_Ball->GetPosition(ballPos);
 			stringstream ss;
 			ss << "Boll.x: " << ballPos.x << ", Boll.y: " << ballPos.y << ", Boll.z: " << ballPos.z;
@@ -651,9 +678,14 @@ bool Application::Frame(float deltaTime)
 
 			wcharstr = (WCHAR*)wstr.c_str();
 
-			WBOX(wcharstr);
+			WBOX(wcharstr);*/
 
 			nrOfLifes--;
+
+			if (nrOfLifes == -1)
+			{
+				m_GameState = STATE_GAMEOVER;
+			}
 		}
 	}
 
@@ -691,23 +723,24 @@ void Application::RenderGraphics()
 
 		m_Direct3D->BeginDeferredRenderingScene(clearColor);
 		
+		if (m_GameState == STATE_PLAYING || m_GameState == STATE_PAUSE)
+		{
 			m_Ball->Render(m_Direct3D);
 
 			m_Level->Render(m_Direct3D);
 
-			if (!switchLevel)
-			{
-				m_Goal->Render(m_Direct3D);				
-			}
+			m_Goal->Render(m_Direct3D);
 
 			m_Direct3D->BeginLightStage();
 
-				_RenderLights();
+			_RenderLights();
 
 			m_Direct3D->EndLightStage();
 
+		}
+
 		m_Direct3D->EndDeferredRenderingScene();
-		
+
 		
 
 		m_Skybox->Render(m_Direct3D);
@@ -715,35 +748,48 @@ void Application::RenderGraphics()
 		m_Direct3D->TurnZBufferReadOnWriteOff();
 		m_Direct3D->TurnOnAlphaBlending();
 
-		m_Particles.Render();
+		if (m_GameState == STATE_PLAYING || m_GameState == STATE_PAUSE)
+		{
+			m_Particles.Render();
 
-		// Render text object
-		char timeText[16];
-		_itoa_s(m_Clock->GetTime(), timeText, 10);
+			// Render text object
+			char timeText[16];
+			_itoa_s(m_Clock->GetTime(), timeText, 10);
 
-		m_Text->SetText(timeText, m_Direct3D);
-		m_Text->SetPosition(15, 15);
-		m_Text->SetColor(0.1f, 0.5f, 1.0f);
-		m_Text->Render(m_Direct3D);
+			m_Text->SetText(timeText, m_Direct3D);
+			m_Text->SetPosition(15, 15);
+			m_Text->SetColor(0.1f, 0.5f, 1.0f);
+			m_Text->Render(m_Direct3D);
+		}
 
 		if (m_GameState == STATE_MAINMENU)
 		{
 			m_Menu->Render(m_Direct3D);
 		}
 
-		// Render image object
-		m_Image->SetPosition(0, 400);
-		m_Image->Render(m_Direct3D);
+		if (m_GameState == STATE_SWITCHLEVEL)
+		{
+			// Render image object
+			m_WinSignImage->SetPosition(0, 400);
+			m_WinSignImage->Render(m_Direct3D);
+		}
+
+		if (m_GameState == STATE_GAMEOVER)
+		{
+			m_GameOverSignImage->SetPosition(0, 0);
+			m_GameOverSignImage->Render(m_Direct3D);
+		}
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();
 
-		if (!switchLevel)
+		m_Direct3D->TurnOnAlphaBlending();
+		if (m_GameState == STATE_PLAYING || m_GameState == STATE_PAUSE)
 		{
-			m_Direct3D->TurnOnAlphaBlending();
 			m_ObstacleHandler->Render(m_Direct3D);
-			m_Direct3D->TurnOffAlphaBlending();
 		}
+		m_Direct3D->TurnOffAlphaBlending();
+	
 
 	m_Direct3D->EndScene();
 
