@@ -93,6 +93,8 @@ private:
 	int				screenWidth;
 	int				screenHeight;
 
+	int				points;
+
 	D3D				*m_Direct3D;
 	Input			*m_Input;
 	Camera			*m_Camera;

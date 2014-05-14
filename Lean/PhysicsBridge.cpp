@@ -77,6 +77,8 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	dynamicsWorld->addRigidBody(fallRigidBody);
+
+	fallRigidBody->setRollingFriction(0.02);
 }
 
 void PhysicsBridge::ReInitialize(Level* level, Ball* ball)

@@ -107,7 +107,7 @@ bool ImageClass::Render(D3D* d3d)
 
 	// Sätt shader variabler
 	d3d->GetOrthoMatrix(orthoMatrix);
-	v3 orthoViewTranslation = v3(((mScreenWidth / 2) * -1) + mPosX + mImageWidth * 2, (mScreenHeight / 2) - mPosY - mImageHeight*1.5f, 2);
+	v3 orthoViewTranslation = v3(mPosX, -mPosY, 2);
 	worldMatrix = m4::CreateTranslation(orthoViewTranslation);
 
 	mShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));

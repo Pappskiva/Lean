@@ -14,7 +14,7 @@ public:
 	Clock();
 	Clock(const Clock&);
 	~Clock();
-	int GetTime();
+	int GetTime(bool pause);
 	void PausClock();
 	void UnPausClock();
 	void RestartClock();
@@ -22,7 +22,7 @@ public:
 private:
 	int timePerLevel;
 	time_t startTime;
-	int timeGoneBy;
+	float timeGoneBy;
 };
 
 #endif
