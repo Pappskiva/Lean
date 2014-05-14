@@ -133,6 +133,10 @@
   <ItemGroup>
     <Image Include="data\ball.png" />
     <Image Include="blackGoal.png" />
+    <Image Include="data\GameOverSign.png" />
+    <Image Include="data\LeanTitle.png" />
+    <Image Include="data\NormalSign.png" />
+    <Image Include="data\WinSign.png" />
     <Image Include="leaf.png" />
     <Image Include="magnet.png" />
     <Image Include="testAutumnGround.png" />

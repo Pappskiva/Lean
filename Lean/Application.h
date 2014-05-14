@@ -103,6 +103,10 @@ private:
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
 	ImageClass		*m_Image;
+	ImageClass		*m_WinSignImage;
+	ImageClass		*m_GameOverSignImage;
+	ImageClass		*m_StandardSignImage;
+
 	ParticleHandler	m_Particles;
 	GameState		m_GameState;
 	Menu			*m_Menu;

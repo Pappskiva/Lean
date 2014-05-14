@@ -181,6 +181,51 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	// Skapa Image objekt
+	m_StandardSignImage = new ImageClass;
+	if (!m_StandardSignImage)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_StandardSignImage->Initialize(m_Direct3D, L"data/NormalSign.png", screenWidth, screenHeight, 640, 400);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
+		return false;
+	}
+
+	// Skapa Image objekt
+	m_WinSignImage = new ImageClass;
+	if (!m_WinSignImage)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_WinSignImage->Initialize(m_Direct3D, L"data/WinSign.png", screenWidth, screenHeight, 640, 400);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
+		return false;
+	}
+
+	// Skapa Image objekt
+	m_GameOverSignImage = new ImageClass;
+	if (!m_GameOverSignImage)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_GameOverSignImage->Initialize(m_Direct3D, L"data/GameOverSign.png", screenWidth, screenHeight, 640, 400);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
+		return false;
+	}
+
 	//Loads the PointLight mesh into vram
 	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("data//LightSphere.obj");
 
@@ -568,7 +613,6 @@ bool Application::Frame(float deltaTime)
 			}
 			else
 			{
-
 				switchLevel = false;
 			}
 		}
@@ -760,6 +804,27 @@ void Application::Shutdown()
 	{
 		m_Image->Shutdown();
 		m_Image = 0;
+	}
+
+	// Release the image object
+	if (m_StandardSignImage)
+	{
+		m_StandardSignImage->Shutdown();
+		m_StandardSignImage = 0;
+	}
+
+	// Release the image object
+	if (m_WinSignImage)
+	{
+		m_WinSignImage->Shutdown();
+		m_WinSignImage = 0;
+	}
+
+	// Release the image object
+	if (m_GameOverSignImage)
+	{
+		m_GameOverSignImage->Shutdown();
+		m_GameOverSignImage = 0;
 	}
 
 	// Release the menu object

@@ -419,6 +419,18 @@
     <Image Include="data\ball.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="data\GameOverSign.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\LeanTitle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\NormalSign.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\WinSign.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="shader\shadowFill.vs">
