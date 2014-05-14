@@ -770,8 +770,8 @@ void Application::RenderGraphics()
 		if (m_GameState == STATE_SWITCHLEVEL)
 		{
 			// Render image object
-			m_WinSignImage->SetPosition(0, 400);
-			m_WinSignImage->Render(m_Direct3D);
+			m_StandardSignImage->SetPosition(0, 400);
+			m_StandardSignImage->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_GAMEOVER)
