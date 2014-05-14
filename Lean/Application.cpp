@@ -622,9 +622,9 @@ bool Application::Frame(float deltaTime)
 		v3 camPos = ballWorldM.GetPos();
 		m_Camera->LookAt(camPos);
 		//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
-		camPos.x = camPos.x - 2.5f * 2;
-		camPos.y = camPos.y + 3.65f * 2;
-		camPos.z = camPos.z - 7.0f * 2;
+		camPos.x = camPos.x;// -2.5f * 2;
+		camPos.y = camPos.y + 30.0f;
+		camPos.z = camPos.z - 14.0f;
 		m_Camera->SetPosition(camPos);
 
 		//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
