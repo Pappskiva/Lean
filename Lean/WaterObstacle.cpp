@@ -40,7 +40,7 @@ bool WaterObstacle::Initialize(D3D* direct3D, HWND hwnd)
 	}
 
 	m_Sound = new Sound;
-	m_Sound->Initialize2DSound(hwnd, "data/musik//Tetris.wav");
+	m_Sound->Initialize2DSound(hwnd, "data/musik/VattenHinder/WaterSplash.wav");
 
 
 	return true;

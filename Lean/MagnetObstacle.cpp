@@ -13,7 +13,7 @@ MagnetObstacle::~MagnetObstacle()
 
 }
 
-bool MagnetObstacle::Initialize(D3D* direct3D)
+bool MagnetObstacle::Initialize(D3D* direct3D, HWND hwnd)
 {
 	bool result = true;
 	
@@ -36,6 +36,8 @@ bool MagnetObstacle::Initialize(D3D* direct3D)
 	{
 		return false;
 	}
+	m_Sound = new Sound;
+	m_Sound->Initialize2DSound(hwnd, "data/musik/MagnetHinder/MagnetMono.wav");
 
 	return true;
 }

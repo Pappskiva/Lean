@@ -13,7 +13,7 @@ LeafObstacle::~LeafObstacle()
 
 }
 
-bool LeafObstacle::Initialize(D3D* direct3D)
+bool LeafObstacle::Initialize(D3D* direct3D, HWND hwnd)
 {
 	bool result = true;
 
@@ -36,6 +36,8 @@ bool LeafObstacle::Initialize(D3D* direct3D)
 	{
 		return false;
 	}
+	m_Sound = new Sound;
+	m_Sound->Initialize2DSound(hwnd, "data/musik/LövHinder/vindMono.wav");
 
 	return true;
 }
@@ -117,6 +119,7 @@ void LeafObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, f
 
 	if (squaredDistance < 10 && cooldown <= 0)
 	{
+		m_Sound->PlayOnce();
 		particles->AddParticles(1, 0.0f, 0.0f, 0.0f);
 		particles->AddParticles(2, m_position.x, m_position.y, m_position.z);
 		cooldown = 8;

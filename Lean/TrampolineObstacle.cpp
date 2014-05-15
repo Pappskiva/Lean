@@ -14,7 +14,7 @@ TrampolineObstacle::~TrampolineObstacle()
 
 }
 
-bool TrampolineObstacle::Initialize(D3D* direct3D)
+bool TrampolineObstacle::Initialize(D3D* direct3D, HWND hwnd)
 {
 	bool result = true;
 
@@ -38,6 +38,9 @@ bool TrampolineObstacle::Initialize(D3D* direct3D)
 	{
 		return false;
 	}
+
+	m_Sound = new Sound;
+	m_Sound->Initialize2DSound(hwnd, "data/musik/StudsmattaHindret/SpringMono.wav");
 
 	return true;
 }
@@ -116,6 +119,7 @@ void TrampolineObstacle::Update(float deltaTime, float cameraPosX, float cameraP
 
 	if (squaredDistance < 9 && cooldown <= 0)
 	{
+		m_Sound->PlayOnce();
 		ball->AddForce(v3(0, 75, 0));
 		cooldown = 1;
 	}
