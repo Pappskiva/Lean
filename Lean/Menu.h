@@ -21,6 +21,12 @@ public:
 	void Shutdown();
 
 private:
+
+	struct Color
+	{
+		float r, g, b;
+	};
+
 	ImageClass*		mLogo;
 	SentenceClass*	mOption1;
 	SentenceClass*	mOption2;
@@ -29,6 +35,13 @@ private:
 
 	int mScreenWidth, mScreenHeight, decision, nrOfOptions;
 	float inputCooldown;
+
+	Color* colors;
+	Color currentColor;
+	int colorIndex;
+
+	bool ChangeNumber(float &from, float to, float deltaTime);
+
 };
 
 #endif
