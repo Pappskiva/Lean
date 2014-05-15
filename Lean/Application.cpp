@@ -1068,6 +1068,7 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
+	//levelNumber = 2;
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;

@@ -1,4 +1,4 @@
-Heightmaps\1.bmp
+Heightmaps\2.bmp
 4
 g
 29

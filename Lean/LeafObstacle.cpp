@@ -117,7 +117,8 @@ void LeafObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, f
 
 	if (squaredDistance < 10 && cooldown <= 0)
 	{
-		particles->AddParticles(1);
-		cooldown = 31;
+		particles->AddParticles(1, 0.0f, 0.0f, 0.0f);
+		particles->AddParticles(2, m_position.x, m_position.y, m_position.z);
+		cooldown = 8;
 	}
 }

@@ -28,6 +28,8 @@ public:
 protected:
 	//virtual bool 	InitalizeBuffers(D3D*);
 
+	float dripParticleCounter;
+
 
 };
 #endif

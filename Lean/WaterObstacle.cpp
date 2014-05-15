@@ -7,6 +7,7 @@
 WaterObstacle::WaterObstacle() : Obstacle()
 {
 	m_Type = WATER;
+	dripParticleCounter = 0.0f;
 }
 
 WaterObstacle::~WaterObstacle()
@@ -109,6 +110,8 @@ void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, 
 {
 	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball, particles);
 
+	dripParticleCounter -= deltaTime;
+
 	// Räknar ut avstånd till boll
 	v3 ballPos;
 	ball->GetPosition(ballPos);
@@ -117,7 +120,15 @@ void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, 
 
 	if (squaredDistance < 5 && cooldown <= 0)
 	{
+		particles->AddParticles(3, m_position.x, m_position.y, m_position.z);
+		//particles->AddParticles(4, ballPos.x, ballPos.y, ballPos.z);
 		ball->MakeSlippery();
 		cooldown = 5;
+		dripParticleCounter = 0.2f;
+	}
+	if (cooldown > 0 && dripParticleCounter <= 0)
+	{
+		particles->AddParticles(4, ballPos.x, ballPos.y + 1.0f, ballPos.z);
+		dripParticleCounter = 0.2f;
 	}
 }
