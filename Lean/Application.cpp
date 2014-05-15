@@ -44,6 +44,8 @@ Application::~Application()
 
 bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight)
 {
+	m_hwnd = hwnd;
+
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	bool result;
@@ -639,14 +641,16 @@ bool Application::Frame(float deltaTime)
 
 		v3 ballPosition;
 		float distance;
-		float radiusOfGoal = 3.0f;
+		float radiusOfGoal = 0.9f;
 		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 		if (!switchLevel)
 		{
 			//Titta om målet och bollen är nära nog för att kollidera
 			v3 goalPosition;
 			m_Ball->GetPosition(ballPosition);
-			m_Goal->GetPosition(goalPosition);
+			m4 ballWorld;
+			m_Goal->GetWorldMatrix(ballWorld);
+			goalPosition = ballWorld.GetPos();
 			v3 relPos = ballPosition - goalPosition;
 			distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
 			float minDist = m_Ball->GetRadius() + radiusOfGoal;
@@ -1068,7 +1072,7 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
-	//levelNumber = 2;
+	levelNumber = 0;
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;
@@ -1086,7 +1090,7 @@ void Application::ChangeLevel(int levelNumber)
 		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
 	}
 	//Reinitsiera de nya hindren
-	m_ObstacleHandler->Initialize(m_Direct3D);
+	m_ObstacleHandler->Initialize(m_Direct3D, m_hwnd);
 	m_ObstacleHandler->SetShader(obstacleShader);
 	delete[] obstacles;
 

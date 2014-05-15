@@ -94,12 +94,12 @@ void ObstacleHandler::Shutdown()
 	delete[] obstacles;
 }
 
-bool ObstacleHandler::Initialize(D3D* device)
+bool ObstacleHandler::Initialize(D3D* device, HWND hwnd)
 {
 	bool result = true;
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		if (!obstacles[i]->Initialize(device))
+		if (!obstacles[i]->Initialize(device, hwnd))
 		{
 			result = false;
 		}

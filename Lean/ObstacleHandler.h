@@ -22,7 +22,7 @@ public:
 	void Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles);
 	void RemoveAllObstacles();
 	void Shutdown();
-	bool Initialize(D3D*);
+	bool Initialize(D3D*, HWND);
 	void SetShader(const Shader *shader);
 
 private:

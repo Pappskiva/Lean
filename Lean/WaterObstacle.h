@@ -20,7 +20,7 @@ public:
 	~WaterObstacle();
 
 	/*Initialisering och nedstängning*/
-	virtual bool Initialize(D3D*);
+	virtual bool Initialize(D3D*, HWND);
 	virtual void Shutdown();
 	void Update(float, float, float, float, float, Ball*, ParticleHandler*);
 	//virtual void Update(float, float, float);

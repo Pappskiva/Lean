@@ -15,7 +15,7 @@ WaterObstacle::~WaterObstacle()
 
 }
 
-bool WaterObstacle::Initialize(D3D* direct3D)
+bool WaterObstacle::Initialize(D3D* direct3D, HWND hwnd)
 {
 	bool result = true;
 
@@ -39,11 +39,17 @@ bool WaterObstacle::Initialize(D3D* direct3D)
 		return false;
 	}
 
+	m_Sound = new Sound;
+	m_Sound->Initialize2DSound(hwnd, "data/musik//Tetris.wav");
+
+
 	return true;
 }
 void WaterObstacle::Shutdown()
 {
-
+	m_Sound->Shutdown();
+	delete m_Sound;
+	m_Sound = 0;
 }
 //void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ)
 //{
@@ -120,6 +126,7 @@ void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, 
 
 	if (squaredDistance < 5 && cooldown <= 0)
 	{
+		m_Sound->PlayOnce();
 		particles->AddParticles(3, m_position.x, m_position.y, m_position.z);
 		//particles->AddParticles(4, ballPos.x, ballPos.y, ballPos.z);
 		ball->MakeSlippery();

@@ -96,6 +96,8 @@ private:
 
 	int				points;
 
+	HWND			m_hwnd;
+
 	D3D				*m_Direct3D;
 	Input			*m_Input;
 	Camera			*m_Camera;

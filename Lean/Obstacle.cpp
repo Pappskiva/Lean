@@ -32,7 +32,7 @@ Obstacle::~Obstacle()
 
 }
 
-bool Obstacle::Initialize(D3D* direct3D)
+bool Obstacle::Initialize(D3D* direct3D, HWND hwnd)
 {
 	/*Eftersom klassen är virtual så bör detta aldrig faktiskt hända*/
 	bool result = true;
