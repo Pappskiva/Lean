@@ -24,6 +24,7 @@
 #include "SentenceClass.h"
 #include "ImageClass.h"
 #include "Menu.h"
+#include "Highscore.h"
 
 /////////////
 // GLOBALS //
@@ -118,6 +119,7 @@ private:
 	ParticleHandler	m_Particles;
 	GameState		m_GameState;
 	Menu			*m_Menu;
+	Highscore		*m_Highscore;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;

@@ -23,6 +23,7 @@ Application::Application()
 	m_StandardSignImage = nullptr;
 	m_GameState = STATE_MAINMENU;
 	m_Menu = nullptr;
+	m_Highscore = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -472,6 +473,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	CompletedFirstPass = true;
 	points = 0;
+	m_Highscore = new Highscore();
 
 	return true;
 }
@@ -719,6 +721,7 @@ bool Application::Frame(float deltaTime)
 			if (nrOfLifes <= -1)
 			{
 				m_GameState = STATE_GAMEOVER;
+				m_Highscore->SaveScore("tmp", points); // Ingen poäng för tid här
 			}
 
 			// Resetta rotationen på banan
@@ -972,6 +975,12 @@ void Application::Shutdown()
 		m_Direct3D->Shutdown();
 		delete m_Direct3D;
 		m_Direct3D = 0;
+	}
+	if (m_Highscore)
+	{
+		m_Highscore->Shutdown();
+		delete m_Highscore;
+		m_Highscore = 0;
 	}
 }
 
