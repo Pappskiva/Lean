@@ -18,6 +18,7 @@ Application::Application()
 	m_Clock = nullptr;
 	m_Text = nullptr;
 	m_Image = nullptr;
+	m_Logo = nullptr;
 	m_GameOverSignImage = nullptr;
 	m_WinSignImage = nullptr;
 	m_StandardSignImage = nullptr;
@@ -209,6 +210,24 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
+
+	// Skapa Image objekt
+	m_Logo = new ImageClass;
+	if (!m_Logo)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_Logo->Initialize(m_Direct3D, L"data/LeanTitle.png", screenWidth, screenHeight, 400, 250);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
+		return false;
+	}
+
+	m_Logo->SetPosition(screenWidth / 2 - 100, screenHeight / 2 - 125);
+
 
 	// Initialisera Image objekt
 	result = m_StandardSignImage->Initialize(m_Direct3D, L"data/NormalSign.png", screenWidth, screenHeight, 640, 400);
@@ -821,6 +840,7 @@ void Application::RenderGraphics()
 		if (m_GameState == STATE_MAINMENU)
 		{
 			m_Menu->Render(m_Direct3D);
+			m_Logo->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_SWITCHLEVEL)

@@ -112,6 +112,7 @@ private:
 	SentenceClass	*m_Text;
 	SentenceClass	*m_StandardInfoText;
 	ImageClass		*m_Image;
+	ImageClass		*m_Logo;
 	ImageClass		*m_WinSignImage;
 	ImageClass		*m_GameOverSignImage;
 	ImageClass		*m_StandardSignImage;
