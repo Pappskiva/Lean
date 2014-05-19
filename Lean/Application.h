@@ -33,7 +33,7 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
-const int MAX_LEVELS = 1;
+const int MAX_LEVELS = 3;
 const int MAX_NR_OF_LIFES = 5;
 
 
@@ -110,6 +110,7 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
+	SentenceClass	*m_LifeText;
 	SentenceClass	*m_StandardInfoText;
 	ImageClass		*m_Image;
 	ImageClass		*m_Logo;

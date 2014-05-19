@@ -17,6 +17,7 @@ Application::Application()
 	m_Sound = nullptr;
 	m_Clock = nullptr;
 	m_Text = nullptr;
+	m_LifeText = nullptr;
 	m_Image = nullptr;
 	m_Logo = nullptr;
 	m_GameOverSignImage = nullptr;
@@ -144,6 +145,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	m_LifeText = new SentenceClass;
+	if (!m_LifeText)
+	{
+		return false;
+	}
+
 	// Skapa Text objekt
 	m_StandardInfoText = new SentenceClass;
 	if (!m_StandardInfoText)
@@ -164,6 +171,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Initialisera Text objekt
+	result = m_LifeText->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		WBOX(L"Could not initialize m_LifeText.");
 		return false;
 	}
 
@@ -481,7 +496,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Particles.Initialize(m_Direct3D, particleBillboard);
 
-	ChangeLevel(1);
+	ChangeLevel(0);
 	//m_Goal->SetNextLevelNumber(2);
 
 	m_Goal->SetShader(defaultShader);
@@ -835,6 +850,15 @@ void Application::RenderGraphics()
 			m_Text->SetPosition(15, 15);
 			m_Text->SetColor(0.1f, 0.5f, 1.0f);
 			m_Text->Render(m_Direct3D);
+
+			// Render text object
+			char lifeText[16];
+			_itoa_s(nrOfLifes, lifeText, 10);
+
+			m_LifeText->SetText(lifeText, m_Direct3D);
+			m_LifeText->SetPosition(15, 45);
+			m_LifeText->SetColor(0.1f, 0.5f, 1.0f);
+			m_LifeText->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_MAINMENU)
@@ -934,6 +958,14 @@ void Application::Shutdown()
 		m_Text->Shutdown();
 		delete m_Text;
 		m_Text = 0;
+	}
+
+	// Release the sentence object
+	if (m_LifeText)
+	{
+		m_LifeText->Shutdown();
+		delete m_LifeText;
+		m_LifeText = 0;
 	}
 
 	// Release the sentence object

@@ -27,6 +27,10 @@ int Clock::GetTime(bool pause)
 		int sek = difftime(nowTime, startTime);
 		result -= sek;
 	}
+	if (result < 0)
+	{
+		result = 0;
+	}
 	return result;
 }
 
