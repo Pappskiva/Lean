@@ -117,7 +117,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	return true;
 }
 
-bool Menu::Update(float deltaTime)
+int Menu::Update(float deltaTime)
 {
 	//// Kamera
 	//mCameraPtr->SetPosition(v3(0, 0, 0));
@@ -140,7 +140,6 @@ bool Menu::Update(float deltaTime)
 	// Check inputs
 	if (inputCooldown == 0.0f)
 	{
-		mInputPtr->Frame();
 		if (mInputPtr->IsDownPressed())
 		{
 			inputCooldown = 0.2f;
@@ -163,19 +162,8 @@ bool Menu::Update(float deltaTime)
 		}
 		if (mInputPtr->IsEnterPressed())
 		{
-			switch (decision)
-			{
-			case 1:
-				return false;
-				break;
-
-			case 2:
-				return false;
-				break;
-
-			default:
-				return false;
-			}
+			// Returnera valet till Application så får den avgöra vad som ska göras
+			return decision;
 		}
 	}
 
@@ -214,7 +202,8 @@ bool Menu::Update(float deltaTime)
 	}
 
 
-	return true;
+	// Måste returnera en int så -1 duger :)
+	return -1;
 }
 
 void Menu::Render(D3D* d3d)

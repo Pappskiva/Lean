@@ -485,6 +485,9 @@ bool Application::Frame(float deltaTime)
 	//m_fps.Frame();
 	//Sleep(3000);
 
+	// Updatera input
+	m_Input->Frame();
+
 	bool result = true;
 
 	// Pause
@@ -492,7 +495,6 @@ bool Application::Frame(float deltaTime)
 	{
 		bool res = false;
 
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
 			res = true;
@@ -508,39 +510,43 @@ bool Application::Frame(float deltaTime)
 	// Main Menu
 	else if (m_GameState == STATE_MAINMENU)
 	{
-		bool res = true;
+		// Hämta menyval
+		int decision;
+		decision = m_Menu->Update(deltaTime);
 
-		res = m_Menu->Update(deltaTime);
-
-		if (!res)
+		switch (decision)
 		{
+		// Play
+		case 1:
 			m_GameState = STATE_PLAYING;
-			
+			break;
+
+		// Quit
+		case 2:
+			return false;
 		}
 
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
+			ChangeLevel(1);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
 		}
 	}
 	else if (m_GameState == STATE_WON)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
+			ChangeLevel(1);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
-			//m_Goal->SetNextLevelNumber(2);
 		}
 	}
 	else if (m_GameState == STATE_SWITCHLEVEL)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PLAYING;
@@ -549,8 +555,6 @@ bool Application::Frame(float deltaTime)
 	// Playing
 	else if (m_GameState == STATE_PLAYING)
 	{
-		//Update the input object
-		result = m_Input->Frame();
 
 		//Check if the user has pressed Escape to close the program
 		if (m_Input->IsEscapePressed())
@@ -1081,7 +1085,7 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
-	levelNumber = 0;
+	//levelNumber = 0;
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;
