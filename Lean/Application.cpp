@@ -719,7 +719,7 @@ bool Application::Frame(float deltaTime)
 				if (ballPosition.y <= -20.0f)
 				{*/
 				finishedSwitch = true;
-				points += (m_Clock->GetTime(false) + 100);
+				points += (m_Clock->GetTime(true) + 100);
 
 				if (m_Goal->GetNextLevelNumber() == MAX_LEVELS)
 				{
