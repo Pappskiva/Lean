@@ -21,7 +21,7 @@ public:
 	void Update(float, float, float, float, float, Ball*, ParticleHandler*);
 
 	/*Initialisering och nedstängning*/
-	virtual bool Initialize(D3D*);
+	virtual bool Initialize(D3D*, HWND);
 	virtual void Shutdown();
 	//virtual void Update(float, float, float);
 

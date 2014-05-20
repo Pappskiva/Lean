@@ -155,6 +155,8 @@ bool Input::ReadKeyboard()
 {
 	HRESULT result;
 
+	// Save last keyboard frame
+	memcpy(m_lastKeyboardState, m_keyboardState, sizeof(m_lastKeyboardState));
 
 	// Read the keyboard device.
 	result = m_keyboard->GetDeviceState(sizeof(m_keyboardState), (LPVOID)&m_keyboardState);
@@ -243,6 +245,11 @@ bool Input::IsEnterPressed()
 	// Do a bitwise and on the keyboard state to check if the enter key is currently being pressed.
 	if (m_keyboardState[DIK_RETURN] & 0x80)
 	{
+		if (m_lastKeyboardState[DIK_RETURN] & 0x80)
+		{
+			return false;
+		}
+
 		return true;
 	}
 

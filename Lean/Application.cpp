@@ -17,12 +17,15 @@ Application::Application()
 	m_Sound = nullptr;
 	m_Clock = nullptr;
 	m_Text = nullptr;
+	m_LifeText = nullptr;
 	m_Image = nullptr;
+	m_Logo = nullptr;
 	m_GameOverSignImage = nullptr;
 	m_WinSignImage = nullptr;
 	m_StandardSignImage = nullptr;
 	m_GameState = STATE_MAINMENU;
 	m_Menu = nullptr;
+	m_Highscore = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -44,6 +47,8 @@ Application::~Application()
 
 bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight)
 {
+	m_hwnd = hwnd;
+
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	bool result;
@@ -140,6 +145,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	m_LifeText = new SentenceClass;
+	if (!m_LifeText)
+	{
+		return false;
+	}
+
 	// Skapa Text objekt
 	m_StandardInfoText = new SentenceClass;
 	if (!m_StandardInfoText)
@@ -160,6 +171,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+
+	// Initialisera Text objekt
+	result = m_LifeText->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		WBOX(L"Could not initialize m_LifeText.");
 		return false;
 	}
 
@@ -206,6 +225,24 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
+
+	// Skapa Image objekt
+	m_Logo = new ImageClass;
+	if (!m_Logo)
+	{
+		return false;
+	}
+
+	// Initialisera Image objekt
+	result = m_Logo->Initialize(m_Direct3D, L"data/LeanTitle.png", screenWidth, screenHeight, 400, 250);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the image object.");
+		return false;
+	}
+
+	m_Logo->SetPosition(screenWidth / 2 - 100, screenHeight / 2 - 125);
+
 
 	// Initialisera Image objekt
 	result = m_StandardSignImage->Initialize(m_Direct3D, L"data/NormalSign.png", screenWidth, screenHeight, 640, 400);
@@ -464,7 +501,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	m_Particles.Initialize(m_Direct3D, particleBillboard);
 
-	ChangeLevel(1);
+	ChangeLevel(0);
 	//m_Goal->SetNextLevelNumber(2);
 
 	m_Goal->SetShader(defaultShader);
@@ -475,6 +512,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 
 	CompletedFirstPass = true;
 	points = 0;
+	m_Highscore = new Highscore();
 
 	return true;
 }
@@ -486,6 +524,9 @@ bool Application::Frame(float deltaTime)
 	//m_fps.Frame();
 	//Sleep(3000);
 
+	// Updatera input
+	m_Input->Frame();
+
 	bool result = true;
 
 	// Pause
@@ -493,7 +534,6 @@ bool Application::Frame(float deltaTime)
 	{
 		bool res = false;
 
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
 			res = true;
@@ -509,39 +549,43 @@ bool Application::Frame(float deltaTime)
 	// Main Menu
 	else if (m_GameState == STATE_MAINMENU)
 	{
-		bool res = true;
+		// Hämta menyval
+		int decision;
+		decision = m_Menu->Update(deltaTime);
 
-		res = m_Menu->Update(deltaTime);
-
-		if (!res)
+		switch (decision)
 		{
+		// Play
+		case 1:
 			m_GameState = STATE_PLAYING;
-			
+			break;
+
+		// Quit
+		case 2:
+			return false;
 		}
 
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
+			ChangeLevel(1);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
 		}
 	}
 	else if (m_GameState == STATE_WON)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
+			ChangeLevel(1);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
-			//m_Goal->SetNextLevelNumber(2);
 		}
 	}
 	else if (m_GameState == STATE_SWITCHLEVEL)
 	{
-		m_Input->Frame();
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PLAYING;
@@ -550,8 +594,6 @@ bool Application::Frame(float deltaTime)
 	// Playing
 	else if (m_GameState == STATE_PLAYING)
 	{
-		//Update the input object
-		result = m_Input->Frame();
 
 		//Check if the user has pressed Escape to close the program
 		if (m_Input->IsEscapePressed())
@@ -642,14 +684,16 @@ bool Application::Frame(float deltaTime)
 		m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
 		float distance;
-		float radiusOfGoal = 3.0f;
+		float radiusOfGoal = 0.9f;
 		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 		if (!switchLevel)
 		{
 			//Titta om målet och bollen är nära nog för att kollidera
 			v3 goalPosition;
 			m_Ball->GetPosition(ballPosition);
-			m_Goal->GetPosition(goalPosition);
+			m4 ballWorld;
+			m_Goal->GetWorldMatrix(ballWorld);
+			goalPosition = ballWorld.GetPos();
 			v3 relPos = ballPosition - goalPosition;
 			distance = relPos.x * relPos.x + relPos.y * relPos.y + relPos.z * relPos.z;
 			float minDist = m_Ball->GetRadius() + radiusOfGoal;
@@ -718,6 +762,7 @@ bool Application::Frame(float deltaTime)
 			if (nrOfLifes <= -1)
 			{
 				m_GameState = STATE_GAMEOVER;
+				m_Highscore->SaveScore("tmp", points); // Ingen poäng för tid här
 			}
 
 			// Resetta rotationen på banan
@@ -807,11 +852,21 @@ void Application::RenderGraphics()
 			m_Text->SetPosition(15, 15);
 			m_Text->SetColor(0.1f, 0.5f, 1.0f);
 			m_Text->Render(m_Direct3D);
+
+			// Render text object
+			char lifeText[16];
+			_itoa_s(nrOfLifes, lifeText, 10);
+
+			m_LifeText->SetText(lifeText, m_Direct3D);
+			m_LifeText->SetPosition(15, 45);
+			m_LifeText->SetColor(0.1f, 0.5f, 1.0f);
+			m_LifeText->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_MAINMENU)
 		{
 			m_Menu->Render(m_Direct3D);
+			m_Logo->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_SWITCHLEVEL)
@@ -908,6 +963,14 @@ void Application::Shutdown()
 	}
 
 	// Release the sentence object
+	if (m_LifeText)
+	{
+		m_LifeText->Shutdown();
+		delete m_LifeText;
+		m_LifeText = 0;
+	}
+
+	// Release the sentence object
 	if (m_StandardInfoText)
 	{
 		m_StandardInfoText->Shutdown();
@@ -970,6 +1033,12 @@ void Application::Shutdown()
 		m_Direct3D->Shutdown();
 		delete m_Direct3D;
 		m_Direct3D = 0;
+	}
+	if (m_Highscore)
+	{
+		m_Highscore->Shutdown();
+		delete m_Highscore;
+		m_Highscore = 0;
 	}
 }
 
@@ -1093,6 +1162,7 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 
 void Application::ChangeLevel(int levelNumber)
 {
+	//levelNumber = 0;
 	LevelLoaderClass::ObstacleType *obstacles;
 	v3 startPos;
 	v3 goalPos;
@@ -1110,7 +1180,7 @@ void Application::ChangeLevel(int levelNumber)
 		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
 	}
 	//Reinitsiera de nya hindren
-	m_ObstacleHandler->Initialize(m_Direct3D);
+	m_ObstacleHandler->Initialize(m_Direct3D, m_hwnd);
 	m_ObstacleHandler->SetShader(obstacleShader);
 	delete[] obstacles;
 

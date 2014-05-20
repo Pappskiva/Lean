@@ -17,9 +17,9 @@ void Highscore::SaveScore(string name, int totalScore)
 	newNode->next = NULL;
 	newNode->prev = NULL;
 
-	LoadHighscoreFromText("../data/HighscoreList.txt");
+	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	
-	if (first = NULL)
+	if (first == NULL)
 	{
 		last = newNode;
 		first = newNode;
@@ -32,12 +32,12 @@ void Highscore::SaveScore(string name, int totalScore)
 		last->next = NULL;
 	}
 
-	SaveHighscoreToText("../data/HighscoreList.txt");
+	SaveHighscoreToText("../Lean/data/HighscoreList.txt");
 }
 void Highscore::PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileName, int sentenceMaxLength,
 	D3D* d3d, int screenW, int screenH, m4 baseViewMatrix)
 {
-	LoadHighscoreFromText("../data/HighscoreList.txt");
+	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	if (first == NULL)
 	{
 		//skriver ut "Highscore listan är tom"
@@ -131,7 +131,7 @@ void Highscore::SaveHighscoreToText(char* filename)
 
 	ofstream text;
 	text.open(filename);
-	if (!text.is_open())
+	if (text.is_open())
 	{
 		current = first;
 
@@ -154,7 +154,7 @@ void Highscore::SortHighscore()
 	while (lastSorted != last)
 	{
 		current = lastSorted->next;
-		while (current->prev != NULL && current->prev->value > current->value)
+		while (current->prev != NULL && current->prev->value < current->value)
 		{
 			if (current->prev == first)//if swapping with the first element 
 			{
@@ -184,7 +184,7 @@ void Highscore::SortHighscore()
 				current->next->prev = current;
 			}
 		}
-		if (lastSorted->next != NULL && lastSorted->value <= lastSorted->next->value)
+		if (lastSorted->next != NULL && lastSorted->value >= lastSorted->next->value)
 			lastSorted = lastSorted->next;
 	}
 }

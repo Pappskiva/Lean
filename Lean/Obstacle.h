@@ -18,6 +18,7 @@ Objektet i sig är billboardat så att det alltid är vänt mot kameran
 #include "Mesh.h"
 #include <fstream>
 
+#include "Sound.h"
 #include "Texture.h"
 #include "Ball.h"
 #include "ParticleHandler.h"
@@ -43,7 +44,7 @@ public:
 	virtual ~Obstacle() = 0;
 
 	/*Initalisering, shutdown, uppdatering och render funktioner, alla virtual beroende på vad som behövs*/
-	virtual bool Initialize(D3D*);
+	virtual bool Initialize(D3D*, HWND);
 	virtual void Shutdown();
 	/*Update tar deltatid, position x och z på kameran och även rotation x och y på planet*/
 	virtual void Update(float, float, float, float, float, Ball*, ParticleHandler*);
@@ -86,6 +87,8 @@ protected:
 	Mesh			*m_mesh;
 	Shader			*m_shader;
 	Texture			*m_Texture;
+	Sound			*m_Sound;
+	
 
 	/*Vilken typ som hindret är*/
 	Type m_Type;

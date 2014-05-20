@@ -24,6 +24,7 @@
 #include "SentenceClass.h"
 #include "ImageClass.h"
 #include "Menu.h"
+#include "Highscore.h"
 
 /////////////
 // GLOBALS //
@@ -32,7 +33,7 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 200.0f;
 const float SCREEN_NEAR = 0.1f;
-const int MAX_LEVELS = 1;
+const int MAX_LEVELS = 3;
 const int MAX_NR_OF_LIFES = 5;
 
 
@@ -96,6 +97,8 @@ private:
 
 	int				points;
 
+	HWND			m_hwnd;
+
 	D3D				*m_Direct3D;
 	Input			*m_Input;
 	Camera			*m_Camera;
@@ -107,8 +110,10 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
+	SentenceClass	*m_LifeText;
 	SentenceClass	*m_StandardInfoText;
 	ImageClass		*m_Image;
+	ImageClass		*m_Logo;
 	ImageClass		*m_WinSignImage;
 	ImageClass		*m_GameOverSignImage;
 	ImageClass		*m_StandardSignImage;
@@ -116,6 +121,7 @@ private:
 	ParticleHandler	m_Particles;
 	GameState		m_GameState;
 	Menu			*m_Menu;
+	Highscore		*m_Highscore;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;

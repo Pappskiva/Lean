@@ -437,6 +437,12 @@
     <Image Include="data\WinSign.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="data\64x64WaterParticle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\128x128WaterSplash.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="shader\shadowFill.vs">

@@ -133,6 +133,8 @@
     <Library Include="Bullet\LinearMath_Debug.lib" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="data\128x128WaterSplash.png" />
+    <Image Include="data\64x64WaterParticle.png" />
     <Image Include="data\ball.png" />
     <Image Include="blackGoal.png" />
     <Image Include="data\GameOverSign.png" />
