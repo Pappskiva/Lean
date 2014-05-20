@@ -26,7 +26,6 @@ void InstanceRenderer::QuickSort(Array<InstanceID> &arr, uint left, uint right)
 
 	uint L = left, R = right;
 	InstanceID tmp;
-	InstanceID pivot = arr[(left + right) / 2];
 	byte *temp = new byte[instanceMaxSize];
 
 	if(right - left < 2)
@@ -47,6 +46,8 @@ void InstanceRenderer::QuickSort(Array<InstanceID> &arr, uint left, uint right)
 
 		return;
 	}
+
+	InstanceID pivot = arr[(left + right) / 2];
 
     while (L <= R)
 	{
