@@ -702,6 +702,7 @@ bool Application::Frame(float deltaTime)
 				//Bollen är nära målet, så nu ska vi göra så att banan byts ut.
 				switchLevel = true;
 				finishedSwitch = false;
+				m_Particles.RemoveAllParticles();
 			}
 		}
 
