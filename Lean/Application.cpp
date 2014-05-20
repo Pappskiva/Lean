@@ -570,7 +570,7 @@ bool Application::Frame(float deltaTime)
 	{
 		if (m_Input->IsEnterPressed())
 		{
-			ChangeLevel(1);
+			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
 		}
@@ -579,7 +579,7 @@ bool Application::Frame(float deltaTime)
 	{
 		if (m_Input->IsEnterPressed())
 		{
-			ChangeLevel(1);
+			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
 		}
@@ -608,6 +608,15 @@ bool Application::Frame(float deltaTime)
 			m_Clock->PausClock();
 		}
 
+		// Vanlig "vinkelhastighet"
+		m_angleVelocity = 14.0f;
+
+		// Dubbla "vinkelhastigheten" om space är nedtryckt
+		if (m_Input->IsSpacePressed())
+		{
+			m_angleVelocity*=2;
+		}
+
 
 		//Check if the user is pressing buttons to rotate the level in the x-axis
 		if (m_Input->IsUpPressed() || m_Input->IsWPressed())
@@ -615,7 +624,7 @@ bool Application::Frame(float deltaTime)
 			if (!switchLevel)
 			{
 				float rotationAroundX = m_Level->GetRotationX();
-				m_Level->SetRotationX(rotationAroundX - 28.0f * deltaTime);
+				m_Level->SetRotationX(rotationAroundX - m_angleVelocity * deltaTime);
 				m_PhysicsBridge.ActivateBall();
 			}
 		}
@@ -624,7 +633,7 @@ bool Application::Frame(float deltaTime)
 			if (!switchLevel)
 			{
 				float rotationAroundX = m_Level->GetRotationX();
-				m_Level->SetRotationX(rotationAroundX + 28.0f * deltaTime);
+				m_Level->SetRotationX(rotationAroundX + m_angleVelocity * deltaTime);
 				m_PhysicsBridge.ActivateBall();
 			}
 		}
@@ -635,7 +644,7 @@ bool Application::Frame(float deltaTime)
 			if (!switchLevel)
 			{
 				float rotationAroundZ = m_Level->GetRotationZ();
-				m_Level->SetRotationZ(rotationAroundZ - 28.0f * deltaTime);
+				m_Level->SetRotationZ(rotationAroundZ - m_angleVelocity * deltaTime);
 				m_PhysicsBridge.ActivateBall();
 			}
 		}
@@ -644,14 +653,9 @@ bool Application::Frame(float deltaTime)
 			if (!switchLevel)
 			{
 				float rotationAroundZ = m_Level->GetRotationZ();
-				m_Level->SetRotationZ(rotationAroundZ + 28.0f * deltaTime);
+				m_Level->SetRotationZ(rotationAroundZ + m_angleVelocity * deltaTime);
 				m_PhysicsBridge.ActivateBall();
 			}
-		}
-
-		if (m_Input->IsSpacePressed())
-		{
-
 		}
 
 		m_Level->Update(deltaTime);
