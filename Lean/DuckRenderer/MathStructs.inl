@@ -1318,6 +1318,23 @@ Matrix4<_Type> Matrix4<_Type>::CreateOrthographicLH(const float width, const flo
 }
 
 template <typename _Type>
+Matrix4<_Type> Matrix4<_Type>::CreateOrthoOffCenterLH(const float minX, const float maxX, const float minY, const float maxY, const float minZ, const float maxZ)
+{
+	Matrix4<_Type> m;
+
+	m._11 = 2 / (maxX - minX);	m._12 = 0.0f;					m._13 = 0.0f;				m._14 = 0.0f;
+	m._21 = 0.0f;				m._22 = 2 / (maxY - minY);		m._23 = 0.0f;				m._24 = 0.0f;
+	m._31 = 0.0f;				m._32 = 0.0f;					m._33 = 1 / (maxZ - minZ);	m._34 = 0.0f;
+
+	m._41 = (minX + maxX) / (minX - maxX);
+	m._42 = (maxY + minY) / (minY - maxY);
+	m._43 = minZ / (minZ - maxZ);
+	m._44 = 1.0f;
+
+	return m;
+}
+
+template <typename _Type>
 Matrix4<_Type> Matrix4<_Type>::CreateYawPitchRoll(const float yaw, const float pitch, const float roll)
 {
 	return CreateRotateZ(roll) * CreateRotateX(pitch) * CreateRotateY(yaw);

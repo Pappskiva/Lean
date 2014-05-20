@@ -77,8 +77,6 @@ void Ball::Update(float deltaTime)
 
 void Ball::Render(D3D *direct3D)
 {
-	//direct3D->SetTexture(blabla)
-	//UpdateWorldMatrix();
 	direct3D->SetShader(m_shader);
 	Shader *currentShader = direct3D->GetCurrentShader();
 
@@ -109,6 +107,16 @@ void Ball::GetPosition(v3& pos)
 {
 	//Få positionen
 	pos = m_position;
+}
+
+void Ball::SetPosition(const v3 &pos)
+{
+	this->m_position = pos;
+}
+
+const v3& Ball::GetPosition() const
+{
+	return m_position;
 }
 
 void Ball::SetFlatPosition(float positionX, float positionY, float positionZ)

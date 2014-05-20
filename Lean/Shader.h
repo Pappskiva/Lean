@@ -129,7 +129,7 @@ public:
 	void						SetVertexShader(const Shader &shader);
 	void						SetPixelShader(const Shader &shader);
 	//not fast!
-	bool						SetVariable(const HString &name, void *data, const uint dataSize);
+	bool						SetVariable(const HString &name, const void * const data, const uint dataSize);
 	//fast :D
 	void						UpdateConstantBuffer(const uint index, void *data, const uint size);
 

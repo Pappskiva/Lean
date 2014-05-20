@@ -137,7 +137,7 @@ void Shader::UpdateConstantBuffer(const uint index, void *data, const uint size)
 	memcpy(constantBuffers[index].data, data, size);
 }
 
-bool Shader::SetVariable(const HString &name, void *data, const uint dataSize)
+bool Shader::SetVariable(const HString &name, const void * const data, const uint dataSize)
 {
 	for (uint c = 0; c < constantBuffers.Length(); ++c)
 		for (uint i = 0; i < constantBuffers[c].nrMembers; ++i)

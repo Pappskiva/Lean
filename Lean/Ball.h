@@ -33,6 +33,9 @@ public:
 	void	SetPosition(float, float, float);
 	void	GetPosition(v3&);
 
+	void	SetPosition(const v3 &pos);
+const v3&	GetPosition() const;
+
 	void	SetFlatPosition(float, float, float);
 	void	GetFlatPosition(v3&);
 

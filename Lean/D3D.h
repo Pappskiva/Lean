@@ -29,7 +29,6 @@ public:
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
 
-	void GetProjectionMatrix(m4&);
 	void GetWorldMatrix(m4&);
 	void GetOrthoMatrix(m4&);
 
@@ -101,7 +100,6 @@ private:
 
 	bool m_vsync_enabled;
 
-	m4 m_projectionMatrix;
 	m4 m_worldMatrix;
 	m4 m_orthoMatrix;
 
@@ -116,6 +114,8 @@ private:
 	Shader						*shadowFillShader;
 	ID3D11DepthStencilView		*shadowmapDSView;
 	ID3D11ShaderResourceView	*shadowmapSRView;
+	uint						shadowmapHeight, shadowmapWidth;
+	D3D11_VIEWPORT				oldViewPort;
 
 	//deferred
 	ID3D11RenderTargetView		*gBufferRenderTargetView[2], *lightRenderTargetView;

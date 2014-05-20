@@ -59,7 +59,7 @@ public:
 	void	GeneratePerspectiveProjectionMatrix();
 	void	Generate2DViewMatrix();
 	void	Generate3DViewMatrix();
-	void	GenerateDirectionalLightCamera();
+	void	GenerateDirectionalLightCamera(const v3 &lightDir, const v3 boundaryBoxCorners[8], const v3 &boxOffset = v3(0.0f));
 
 	Ray		GenerateRay(const v2 &screenCoordinate) const;
 	m3		GetOrientation() const;

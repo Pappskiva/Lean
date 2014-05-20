@@ -83,9 +83,54 @@ void Camera::Generate3DViewMatrix()
 	view.ViewAlongLH(position, orientation.GetZDir());
 }
 
-void Camera::GenerateDirectionalLightCamera()
+void Camera::GenerateDirectionalLightCamera(const v3 &lightDir, const v3 boundaryBoxCorners[8], const v3 &boxOffset)
 {
 	//http://www.gamedev.net/topic/505893-orthographic-projection-for-shadow-mapping/
+
+	v3 center(0.0f);
+	for (int i = 0; i < 8; ++i)
+		center += boundaryBoxCorners[i];
+
+
+	v3 newOffset(0);// = boxOffset;
+	newOffset.y = 0;
+	center.x /= 8;
+	center.y /= 8;
+	center.z /= 8;
+	//center += newOffset;
+	v3 viewFrustumCorners[8];
+	view.ViewAtLH(center * -lightDir * farPlane, center, v3(0, 1, 0));
+
+	viewFrustumCorners[0] = view.Transform(boundaryBoxCorners[0] + newOffset);
+	viewFrustumCorners[1] = view.Transform(boundaryBoxCorners[1] + newOffset);
+	viewFrustumCorners[2] = view.Transform(boundaryBoxCorners[2] + newOffset);
+	viewFrustumCorners[3] = view.Transform(boundaryBoxCorners[3] + newOffset);
+	viewFrustumCorners[4] = view.Transform(boundaryBoxCorners[4] + newOffset);
+	viewFrustumCorners[5] = view.Transform(boundaryBoxCorners[5] + newOffset);
+	viewFrustumCorners[6] = view.Transform(boundaryBoxCorners[6] + newOffset);
+	viewFrustumCorners[7] = view.Transform(boundaryBoxCorners[7] + newOffset);
+
+	v3 min, max;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (viewFrustumCorners[i].x > max.x)
+			max.x = viewFrustumCorners[i].x;
+		else if (viewFrustumCorners[i].x < min.x)
+			min.x = viewFrustumCorners[i].x;
+
+		if (viewFrustumCorners[i].y > max.y)
+			max.y = viewFrustumCorners[i].y;
+		else if (viewFrustumCorners[i].y < min.y)
+			min.y = viewFrustumCorners[i].y;
+
+		if (viewFrustumCorners[i].z > max.z)
+			max.z = viewFrustumCorners[i].z;
+		else if (viewFrustumCorners[i].z < min.z)
+			min.z = viewFrustumCorners[i].z;
+	}
+
+	projection = m4::CreateOrthoOffCenterLH(min.x, max.x, min.y, max.y, min.z, max.z);
 }
 
 Ray Camera::GenerateRay(const v2 &screenCoordinate) const
@@ -110,14 +155,10 @@ Ray Camera::GenerateRay(const v2 &screenCoordinate) const
 
 m4& Camera::GetViewMatrix(m4 &view)
 {
-	view = this->view;
-
-	return view;
+	return view = this->view;;
 }
 
 m4& Camera::GetProjectionMatrix(m4 &proj)
 {
-	proj = projection;
-
-	return projection;
+	return proj = this->projection;
 }

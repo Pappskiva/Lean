@@ -50,10 +50,8 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_VIEWPORT viewport;
-	float fieldOfView, screenAspect;
 	D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
 	D3D11_BLEND_DESC blendStateDescription;
-
 
 	// Store the vsync setting.
 	m_vsync_enabled = vsync;
@@ -340,13 +338,6 @@ bool D3D::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, b
 
 	// Create the viewport.
 	m_deviceContext->RSSetViewports(1, &viewport);
-
-	// Setup the projection matrix.
-	fieldOfView = (float)PI * 0.25f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
-
-	// Create the projection matrix for 3D rendering.
-	m_projectionMatrix.Projection(fieldOfView, screenNear, screenDepth, screenAspect);
 
 	// Initialize the world matrix to the identity matrix.
 	m_worldMatrix = m4::IDENTITY;
@@ -648,13 +639,6 @@ ID3D11DeviceContext* D3D::GetDeviceContext()
 }
 
 
-void D3D::GetProjectionMatrix(m4& projectionMatrix)
-{
-	projectionMatrix = m_projectionMatrix;
-	return;
-}
-
-
 void D3D::GetWorldMatrix(m4& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
@@ -775,6 +759,19 @@ void			D3D::BeginShadowPass()
 {
 	m_deviceContext->ClearDepthStencilView(shadowmapDSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	m_deviceContext->OMSetRenderTargets(0, nullptr, shadowmapDSView);
+
+	D3D11_VIEWPORT viewPort;
+	uint nrViewports = 1;
+	m_deviceContext->RSGetViewports(&nrViewports, &oldViewPort);
+
+	viewPort.Width = (float)shadowmapWidth;
+	viewPort.Height = (float)shadowmapHeight;
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+	m_deviceContext->RSSetViewports(1, &viewPort);
+
 	SetShader(shadowFillShader);
 	shadowPass = true;
 }
@@ -782,13 +779,17 @@ void			D3D::BeginShadowPass()
 void			D3D::EndShadowPass()
 {
 	shadowPass = false;
+	m_deviceContext->RSSetViewports(1, &oldViewPort);
 }
 
 bool			D3D::CreateShadowmap(const uint width, const uint height)
 {
+	shadowmapHeight = height;
+	shadowmapWidth = width;
+
 	D3D11_TEXTURE2D_DESC descDepth;
-	descDepth.Width = width;
-	descDepth.Height = height;
+	descDepth.Width = shadowmapWidth;
+	descDepth.Height = shadowmapHeight;
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;

@@ -323,35 +323,62 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	}
 
 	LevelLoaderClass loader;
-	int tempHeight, tempWidth;
+	int realHeight, realWidth;
 
 	const float LEVEL_POINT_DISTANCE = 1.0f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
 	const float LEVEL_MAX_HEIGHT = 2.5f;
 	
 	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
 
-	loader.LoadLevel(levelIndex, heightmap, tempHeight, tempWidth, goalPos, startPos, obstacles, nrOfObst);
-	uint height = (uint)tempHeight, width = (uint)tempWidth;
+	loader.LoadLevel(levelIndex, heightmap, realHeight, realWidth, goalPos, startPos, obstacles, nrOfObst);
+	uint height = (uint)realHeight, width = (uint)realWidth;
 	
 	m_width = width;
 	m_length = height;
+
+	float *newHeightmap = new float[m_width * m_length];
+	memset(newHeightmap, 0, sizeof(float) * width * height);
+
+	for (uint z = 1; z < realHeight - 1; z++)
+		for (uint x = 1; x < realWidth - 1; x++)
+		{
+			newHeightmap[(x - 1)	+ (z - 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[x			+ (z - 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[(x + 1)	+ (z - 1) * width] += heightmap[x + realWidth * z];
+
+			newHeightmap[(x - 1)	+ z * width] += heightmap[x + realWidth * z];
+			newHeightmap[x			+ z * width] += heightmap[x + realWidth * z];
+			newHeightmap[(x + 1)	+ z * width] += heightmap[x + realWidth * z];
+
+			newHeightmap[(x - 1)	+ (z + 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[x			+ (z + 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[(x + 1)	+ (z + 1) * width] += heightmap[x + realWidth * z];
+		}
+
+	for (uint z = 1; z < height - 1; z++)
+		for (uint x = 1; x < width - 1; x++)
+			newHeightmap[x + z * width] /= 9.0f;
+
+	//delete[] heightmap;
+	//heightmap = newHeightmap;
 
 	struct Vertex
 	{
 		v3 pos;
 		v3 normal;
 		v2 uv;
-	}*vertices = new Vertex[height * width];
+	}*vertices = new Vertex[width * height];
 
 	for (uint z = 0; z < height; z++)
 		for (uint x = 0; x < width; x++)
 		{
-			vertices[x + z * width].pos.x = (x - width * 0.5f) * LEVEL_POINT_DISTANCE;
-			vertices[x + z * width].pos.y = heightmap[x + z * width] *LEVEL_MAX_HEIGHT;
-			vertices[x + z * width].pos.z = (z - height * 0.5f) * LEVEL_POINT_DISTANCE;
-			vertices[x + z * width].uv.v[0] = (float)x / width;
-			vertices[x + z * width].uv.v[1] = (float)z / height;
+			vertices[x + z * width].pos.x = (x - realHeight * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].pos.y = heightmap[x + z * width] * LEVEL_MAX_HEIGHT;
+			vertices[x + z * width].pos.z = (z - realHeight * 0.5f) * LEVEL_POINT_DISTANCE;
+			vertices[x + z * width].uv.v[0] = (float)x / realWidth;
+			vertices[x + z * width].uv.v[1] = (float)z / realHeight;
 		}
+	delete[] newHeightmap;
 
 	//Calculates the normal for each triangle and adds it to the vertices 
 	//that builds it up.
@@ -406,6 +433,8 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	m_mesh->Flush();
 	m_mesh->Initialize(vertices, sizeof(Vertex), width * height, indices, (height - 1) * (width - 1) * 6);
 	direct3D->LoadMeshIntoDevice(m_mesh);
+	m_width = realWidth;
+	m_length = realHeight;
 	heightmapToPhys = heightmap;
 
 	delete[] vertices;	

@@ -243,6 +243,7 @@ struct Matrix4
 	static Matrix4				CreateRotateZ(const float a);			//rename fo sho
 	static Matrix4				CreateRotationFrom(const Quat4<_Type> &rot);
 	static Matrix4				CreateOrthographicLH(const float width, const float height, const float zNear, const float zFar);
+	static Matrix4				CreateOrthoOffCenterLH(const float minX, const float maxX, const float minY, const float maxY, const float minZ, const float maxZ);
 	static Matrix4				CreateYawPitchRoll(const float yaw, const float pitch, const float roll);
 	static Matrix4				CreateScale(const Vec3<_Type> &in);
 

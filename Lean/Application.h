@@ -30,7 +30,7 @@
 /////////////
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = false;
-const float SCREEN_DEPTH = 100.0f;
+const float SCREEN_DEPTH = 200.0f;
 const float SCREEN_NEAR = 0.1f;
 const int MAX_LEVELS = 1;
 const int MAX_NR_OF_LIFES = 5;
@@ -91,8 +91,8 @@ private:
 
 	
 private:
-	int				screenWidth;
-	int				screenHeight;
+	uint			screenWidth;
+	uint			screenHeight;
 
 	int				points;
 

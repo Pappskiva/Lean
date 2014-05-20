@@ -422,11 +422,17 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	shadowCamera.SetPosition(camPos);
 	shadowCamera.LookAt(v3(0.0f));
 	shadowCamera.SetScreenSize(1024, 1024);
-	shadowCamera.SetFarPlane(100.0f);
+	shadowCamera.SetFarPlane(40.0f);
 	shadowCamera.SetNearPlane(10.0f);
 	shadowCamera.SetFieldOfView((float)PI * 0.125f);
 	shadowCamera.GeneratePerspectiveProjectionMatrix();
 	shadowCamera.Generate3DViewMatrix();
+
+	m_Camera->SetFarPlane(SCREEN_DEPTH);
+	m_Camera->SetNearPlane(SCREEN_NEAR);
+	m_Camera->SetFieldOfView(PI * 0.25f);
+	m_Camera->SetScreenSize(screenWidth, screenHeight);
+	m_Camera->GeneratePerspectiveProjectionMatrix();
 
 	firstLightPassData.directionalLightDirection = lightDir;
 	firstLightPassData.directionalLightColor = v3(1.0f, 1.0f, 1.0f);
@@ -434,7 +440,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
 	gameTimer = 0;
-
 	
 
 	D3D11_INPUT_ELEMENT_DESC particleElem[] =
@@ -622,13 +627,12 @@ bool Application::Frame(float deltaTime)
 		v3 camPos = ballWorldM.GetPos();
 		m_Camera->LookAt(camPos);
 		//m_Camera->SetPosition(v3(camPos.x - 2.5f, camPos.y + 3.65f, camPos.z - 7.0f));
-		camPos.x = camPos.x;// -2.5f * 2;
-		camPos.y = camPos.y + 30.0f;
-		camPos.z = camPos.z - 14.0f;
+		camPos.x = camPos.x -20.0f;
+		camPos.y = camPos.y + 24.0f;
+		camPos.z = camPos.z - 50.0f;
 		m_Camera->SetPosition(camPos);
 
-		//shadowCamera.SetPosition(firstLightPassData.directionalLightDirection * 60.0f + v3(ballPosition.x, 0, ballPosition.z));
-		//shadowCamera.Generate3DViewMatrix();
+		v3 ballPosition = ballWorldM.GetPos();
 
 		float planeRotX = m_Level->GetRotationX();
 		float planeRotZ = m_Level->GetRotationZ();
@@ -637,7 +641,6 @@ bool Application::Frame(float deltaTime)
 
 		m_Goal->Update(deltaTime, planeRotX, planeRotZ);
 
-		v3 ballPosition;
 		float distance;
 		float radiusOfGoal = 3.0f;
 		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
@@ -749,9 +752,8 @@ void Application::RenderGraphics()
 
 	m_Direct3D->BeginShadowPass();
 
-		//m_Ball->Render(m_Direct3D);
+		m_Ball->Render(m_Direct3D);
 		
-
 		/*static m4 worldMatrix = m4::CreateTranslation(firstLightPassData.directionalLightDirection * 2.0f);
 		Shader *currentShader = m_Direct3D->GetCurrentShader();
 
@@ -759,7 +761,7 @@ void Application::RenderGraphics()
 
 		m_Direct3D->RenderMesh(lightSphereMesh);*/
 
-		//m_Level->Render(m_Direct3D);
+		m_Level->Render(m_Direct3D);
 
 	m_Direct3D->EndShadowPass();
 
@@ -982,10 +984,29 @@ void Application::_UpdateShaderVariables()
 
 	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
 	m_Camera->Generate3DViewMatrix();
+	const float frustumSizeHalf = 32.0f;
+	static v3 viewFrustumCorners[8] {
+			{ v3(-frustumSizeHalf, 0, frustumSizeHalf) },
+			{ v3(frustumSizeHalf, 0, frustumSizeHalf) },
+			{ v3(-frustumSizeHalf, 0, -frustumSizeHalf) },
+			{ v3(frustumSizeHalf, 0, -frustumSizeHalf) },
+
+			{ v3(-frustumSizeHalf, frustumSizeHalf, frustumSizeHalf) },
+			{ v3(frustumSizeHalf, frustumSizeHalf, frustumSizeHalf) },
+			{ v3(-frustumSizeHalf, frustumSizeHalf, -frustumSizeHalf) },
+			{ v3(frustumSizeHalf, frustumSizeHalf, -frustumSizeHalf) },
+	};
+
+
+	shadowCamera.GenerateDirectionalLightCamera(-firstLightPassData.directionalLightDirection,
+		viewFrustumCorners);
+	//shadowCamera.SetPosition(m_Ball->GetPosition() + firstLightPassData.directionalLightDirection * 30.0f);
+	//shadowCamera.Generate3DViewMatrix();
 
 	//Get the world, view, projectio nand orthographic matrices from the camera and direct3d objects
 	m_Camera->GetViewMatrix(viewMatrix);
-	m_Direct3D->GetProjectionMatrix(projectionMatrix);
+	m_Camera->GetProjectionMatrix(projectionMatrix);
+	
 
 	defaultShader->SetVariable("viewMatrix", &viewMatrix, sizeof(m4));
 	defaultShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
@@ -1011,14 +1032,18 @@ void Application::_UpdateShaderVariables()
 	shadowCamera.GetProjectionMatrix(shadowProjection);
 
 	m4 shadowViewProj = shadowView * shadowProjection;
-	directionalLightShader->SetVariable("viewProjectionInverse", &viewProjInverted, sizeof(m4));
-	directionalLightShader->SetVariable("shadowViewProjection", &shadowViewProj, sizeof(m4));
+	if (!directionalLightShader->SetVariable("viewProjectionInverse", &viewProjInverted, sizeof(m4)))
+		WBOX(L"LOL");
+	if (!directionalLightShader->SetVariable("shadowViewProjection", &shadowViewProj, sizeof(m4)))
+		WBOX(L"LOL");
 	directionalLightShader->SetVariable("cameraPosition", &camPos, sizeof(v3));
 
 	//shadowfill
 	Shader *shadowFillShader = m_Direct3D->GetShadowFill();
-	shadowFillShader->SetVariable("shadowView", &shadowView, sizeof(m4));
-	shadowFillShader->SetVariable("shadowProjection", &shadowProjection, sizeof(m4));
+	if (!shadowFillShader->SetVariable("shadowView", &shadowView, sizeof(m4)))
+		WBOX(L"LOL");
+	if (!shadowFillShader->SetVariable("shadowProjection", &shadowProjection, sizeof(m4)))
+		WBOX(L"LOL");
 
 	//ParticleShader
 	particleBillboard->SetVariable("viewProjection", &viewProj, sizeof(m4));
