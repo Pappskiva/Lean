@@ -3,9 +3,9 @@
 
 Highscore::Highscore()
 {
-	first = 0;
-	last = 0;
-	current = 0;
+	first = NULL;
+	last = NULL;
+	current = NULL;
 }
 Highscore::~Highscore(){}
 
@@ -38,11 +38,7 @@ void Highscore::PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileNam
 	D3D* d3d, int screenW, int screenH, m4 baseViewMatrix)
 {
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
-	if (first == NULL)
-	{
-		//skriver ut "Highscore listan är tom"
-	}
-	else
+	if (first != NULL)
 	{
 		int i = 1;
 		int xPos, yPos;
@@ -70,6 +66,10 @@ void Highscore::PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileNam
 			yPos += 20;
 		}
 	}
+	else
+	{
+		//skriver ut "Highscore listan är tom"
+	}
 }
 void Highscore::Shutdown()
 {
@@ -91,6 +91,8 @@ void Highscore::Shutdown()
 }
 void Highscore::LoadHighscoreFromText(char* filename)
 {
+	Shutdown();
+
 	ifstream text;
 	text.open(filename);
 	if (text.is_open())
@@ -102,6 +104,8 @@ void Highscore::LoadHighscoreFromText(char* filename)
 		while (getline(text, tName))
 		{
 			Node* node = new Node;
+			node->next = NULL;
+			node->prev = NULL;
 			node->name = tName;
 
 			getline(text, tPoint);
@@ -158,12 +162,24 @@ void Highscore::SortHighscore()
 		{
 			if (current->prev == first)//if swapping with the first element 
 			{
-				current->next->prev = first;
-				current->prev = NULL;
-				first->next = current->next;
-				first->prev = current;
-				current->next = first;
-				first = current;
+				if (current == last)
+				{
+					first->next = current->next;
+					first->prev = current;
+					current->next = first;
+					current->prev = NULL;
+					last = first;
+					first = current;
+				}
+				else
+				{
+					current->next->prev = first;
+					current->prev = NULL;
+					first->next = current->next;
+					first->prev = current;
+					current->next = first;
+					first = current;
+				}
 			}
 			else if (current == last)//if swapping with the last element 
 			{
