@@ -11,12 +11,15 @@ FontClass::~FontClass()
 
 }
 
-bool FontClass::Initialize(D3D* d3d, char* fontFileName, WCHAR* textureFileName)
+bool FontClass::Initialize(D3D* d3d, char* fontFileName, WCHAR* textureFileName, float letterScale, Alignment alignment)
 {
 	bool result;
 
+	// FontClass bryr sig bara om om Alignment är vertikalt
+	mAlignment = alignment;
+
 	// Ladda in font datan
-	result = LoadFontData(fontFileName);
+	result = LoadFontData(fontFileName, letterScale);
 	if (!result)
 	{
 		return false;
@@ -52,7 +55,7 @@ Texture* FontClass::GetTexture()
 	return this->mTexture;
 }
 
-bool FontClass::LoadFontData(char* fileName)
+bool FontClass::LoadFontData(char* fileName, float letterScale)
 {
 	// Skapa font buffer med 95 platser (har bara 95 ASCII tecken i fonten)
 	mFont = new Font[95];
@@ -87,6 +90,7 @@ bool FontClass::LoadFontData(char* fileName)
 		f >> mFont[i].right;
 		f >> mFont[i].top;
 		f >> mFont[i].size;
+		mFont[i].size = mFont[i].size * letterScale;
 	}
 
 	f.close();
@@ -108,10 +112,17 @@ void FontClass::BuildVertexArray(void* vertices, char* sentence, float drawX, fl
 	{
 		letter = ((int)sentence[i]) - 32;
 
-		// Om tecknet är ett mellanrum, flytta ett tecken fram
+		// Om tecknet är ett mellanrum, flytta ett tecken fram (eller ner om vertical)
 		if (letter == 0)
 		{
-			drawX = drawX + mFont[letter].size;
+			if (mAlignment == ALIGNMENT_VERTICAL)
+			{
+				drawY = drawY - mFont[letter].size;
+			}
+			else
+			{
+				drawX = drawX + mFont[letter].size;
+			}
 		}
 		else
 		{
@@ -141,8 +152,15 @@ void FontClass::BuildVertexArray(void* vertices, char* sentence, float drawX, fl
 			vertexPtr[index].tex = v2(mFont[letter].right, mFont[letter].top + 0.1f);
 			index++;
 
-			// Flytta x-positionen ett tecken år höger
-			drawX = drawX + mFont[letter].size;
+			// Flytta x-positionen ett tecken år höger (eller ner om vertical)
+			if (mAlignment == ALIGNMENT_VERTICAL)
+			{
+				drawY = drawY - mFont[letter].size;
+			}
+			else
+			{
+				drawX = drawX + mFont[letter].size;
+			}
 		}
 	}
 }

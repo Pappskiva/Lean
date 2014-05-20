@@ -15,15 +15,36 @@ SentenceClass::~SentenceClass()
 }
 
 
-bool SentenceClass::Initialize(char* fontInfoFileName, WCHAR* fontTextureFileName, int sentenceMaxLength, D3D* d3d, int screenW, int screenH, m4 baseViewMatrix)
+bool SentenceClass::Initialize(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight)
 {
 	bool result;
 
 	mPosX = 0;
 	mPosY = 0;
-	mScreenWidth = screenW;
-	mScreenHeight = screenH;
-	mBaseViewMatrix = baseViewMatrix;
+	mLetterScale = letterScale;
+	mScreenWidth = screenWidth;
+	mScreenHeight = screenHeight;
+	mBaseViewMatrix = m4(1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 1, 1);
+
+	if (alignment == "center")
+	{
+		mAlignment = ALIGNMENT_CENTER;
+	}
+	else if (alignment == "right")
+	{
+		mAlignment = ALIGNMENT_RIGHT;
+	}
+	else if (alignment == "vertical")
+	{
+		mAlignment = ALIGNMENT_VERTICAL;
+	}
+	else
+	{
+		mAlignment = ALIGNMENT_LEFT;	// Left som default
+	}
 
 	// Skapa font objektet
 	mFont = new FontClass;
@@ -33,7 +54,7 @@ bool SentenceClass::Initialize(char* fontInfoFileName, WCHAR* fontTextureFileNam
 	}
 
 	// Initialisera font objektet
-	result = mFont->Initialize(d3d, fontInfoFileName, fontTextureFileName);
+	result = mFont->Initialize(d3d, "data/fontdata_picross.txt", L"data/font_picross.png", letterScale, mAlignment);
 	if (!result)
 	{
 		return false;
@@ -164,6 +185,11 @@ bool SentenceClass::SetText(char* text, D3D* d3d)
 		WBOX(L"Buffer overflow! Sentence too long.");
 		return false;
 	}
+	else
+	{
+		// Spara längden på meningen
+		mSentenceLength = numLetters;
+	}
 
 	// Skapa och initialisera vertex arrayen
 	vertices = new Vertex[mSentence->vertexCount];
@@ -204,14 +230,38 @@ bool SentenceClass::SetText(char* text, D3D* d3d)
 
 void SentenceClass::SetPosition(int posX, int posY)
 {
-	this->mPosX = posX;
-	this->mPosY = posY;
+	if (mAlignment == ALIGNMENT_CENTER)
+	{
+		this->mPosX = posX - (20 * mLetterScale * mSentenceLength / 2);
+		this->mPosY = posY;
+	}
+	else if (mAlignment == ALIGNMENT_RIGHT)
+	{
+		this->mPosX = posX + (20 * mLetterScale * mSentenceLength);
+		this->mPosY = posY;
+	}
+	else if (mAlignment == ALIGNMENT_CENTER)
+	{
+		this->mPosX = posX;
+		this->mPosY = posY - (20 * mLetterScale * mSentenceLength);
+	}
+	else
+	{
+		this->mPosX = posX;
+		this->mPosY = posY;
+	}
 }
+
 void SentenceClass::SetColor(float r, float g, float b)
 {
 	this->mSentence->red = r;
 	this->mSentence->green = g;
 	this->mSentence->blue = b;
+}
+
+float SentenceClass::GetLetterScale() const
+{
+	return this->mLetterScale;
 }
 
 bool SentenceClass::InitializeSentence(int maxLength, D3D* d3d)

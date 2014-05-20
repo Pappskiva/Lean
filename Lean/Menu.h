@@ -15,7 +15,7 @@ public:
 	Menu();
 	~Menu();
 
-	bool Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWidth, int screenHeight, m4 baseViewMatrix);
+	bool Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWidth, int screenHeight);
 	int Update(float deltaTime);
 	void Render(D3D* d3d);
 	void Shutdown();

@@ -15,7 +15,7 @@ Menu::~Menu()
 
 }
 
-bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWidth, int screenHeight, m4 baseViewMatrix)
+bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWidth, int screenHeight)
 {
 	bool result;
 
@@ -37,7 +37,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	}
 
 	// Initialisera text klass 1
-	result = mOption1->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, d3d, screenWidth, screenHeight, baseViewMatrix);
+	result = mOption1->Initialize(d3d, "left", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;
@@ -56,7 +56,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	}
 
 	// Initialisera text klass 2
-	result = mOption2->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, d3d, screenWidth, screenHeight, baseViewMatrix);
+	result = mOption2->Initialize(d3d, "left", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;

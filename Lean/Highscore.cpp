@@ -34,8 +34,8 @@ void Highscore::SaveScore(string name, int totalScore)
 
 	SaveHighscoreToText("../Lean/data/HighscoreList.txt");
 }
-void Highscore::PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileName, int sentenceMaxLength,
-	D3D* d3d, int screenW, int screenH, m4 baseViewMatrix)
+
+void Highscore::PrintHighscore(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight)
 {
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	if (first != NULL)
@@ -54,7 +54,7 @@ void Highscore::PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileNam
 			string temp = i + ": " + name + "    " + points;
 
 			sentence = new SentenceClass;
-			sentence->Initialize(fontInfoFileName, fontTextureFileName, sentenceMaxLength, d3d, screenW, screenH, baseViewMatrix);
+			sentence->Initialize(d3d, alignment, letterScale, sentenceMaxLength, screenWidth, screenHeight);
 
 			//Skriver ut namn
 			char* textToSend = (char*)temp.c_str();

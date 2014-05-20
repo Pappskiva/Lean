@@ -12,14 +12,15 @@ public:
 	SentenceClass();
 	~SentenceClass();
 
-	bool Initialize(char* fontInfoFileName, WCHAR* fontTextureFileName, int sentenceMaxLength,
-		D3D* d3d, int screenW, int screenH, m4 baseViewMatrix);
+	bool Initialize(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight);
 	void Shutdown();
 	void Render(D3D* d3d);
 
 	bool SetText(char* text, D3D* d3d);
 	void SetPosition(int posX, int posY);
 	void SetColor(float r, float g, float b);
+
+	float GetLetterScale() const;
 
 private:
 
@@ -40,7 +41,11 @@ private:
 	Sentence*	mSentence;
 	FontClass*	mFont;
 	Shader*		mFontShader;
-	int			mScreenWidth, mScreenHeight, mPosX, mPosY;
+	Alignment	mAlignment;
+	int			mScreenWidth, mScreenHeight;
+	int			mPosX, mPosY;
+	int			mSentenceLength;
+	float		mLetterScale;
 	m4			mBaseViewMatrix;
 
 	bool InitializeSentence(int maxLength, D3D* d3d);

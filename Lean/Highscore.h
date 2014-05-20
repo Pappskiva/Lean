@@ -20,8 +20,7 @@ public:
 	Highscore();
 	~Highscore();
 	void SaveScore(string name, int totalScore);
-	void PrintHighscore(char* fontInfoFileName, WCHAR* fontTextureFileName, int sentenceMaxLength,
-		D3D* d3d, int screenW, int screenH, m4 baseViewMatrix);
+	void PrintHighscore(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight);
 	void Shutdown();
 
 private:

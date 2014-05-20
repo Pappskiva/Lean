@@ -158,16 +158,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	// Skapa baseViewMatrix för text objekt
-	v3 prevCamPos = m_Camera->GetPosition();
-	m4 baseViewMatrix;
-	m_Camera->SetPosition(v3(0.0f, 0.0f, -1.0f));
-	m_Camera->Generate3DViewMatrix();
-	m_Camera->GetViewMatrix(baseViewMatrix);
-	m_Camera->SetPosition(prevCamPos);
-
 	// Initialisera Text objekt
-	result = m_Text->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	result = m_Text->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
@@ -175,7 +167,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Text objekt
-	result = m_LifeText->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	result = m_LifeText->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize m_LifeText.");
@@ -183,7 +175,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Text objekt
-	result = m_StandardInfoText->Initialize("data/fontdata_picross.txt", L"data/font_picross.png", 16, m_Direct3D, screenWidth, screenHeight, baseViewMatrix);
+	result = m_StandardInfoText->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
@@ -198,7 +190,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera meny objekt
-	result = m_Menu->Initialize(m_Direct3D, m_Input, m_Camera, screenWidth, screenHeight, baseViewMatrix);
+	result = m_Menu->Initialize(m_Direct3D, m_Input, m_Camera, screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;
