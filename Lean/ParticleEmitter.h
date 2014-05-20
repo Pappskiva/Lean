@@ -49,6 +49,8 @@ public:
 	void						SetParticleBase(const ParticleBase & particleBase);
 	void						SetParticleRenderer(InstanceRenderer *particleRenderer);
 
+
+	
 	void						Flush();
 
 	//void Set
@@ -81,6 +83,7 @@ public:
 	void						SetParticleEmitterBase(ParticleEmitterBase &base);
 	//virtual void				InitializeParticleEmitter(const ParticleEmitterInitialize &iniData);
 	bool						Update(const float deltaTimeSeconds);
+	void						Reset();
 	void						Flush();
 
 	const ParticleEmitterBase*	GetBase() const;

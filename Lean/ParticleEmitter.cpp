@@ -184,8 +184,14 @@ void ParticleEmitter::Flush()
 	particles.Clear();
 
 	delete[] renderData;
+	renderData = nullptr; 
 }
 
+void ParticleEmitter::Reset()
+{
+	particles.Clear();
+}
+ 
 void ParticleEmitterBase::Flush()
 {
 	delete[] layout;
