@@ -67,11 +67,8 @@ private:
 	btCollisionShape* fallShape;
 	btDefaultMotionState* fallMotionState;
 	btRigidBody* fallRigidBody;
-
-	// TEST STUFF
-	float rotation;
-	float rotplus;
-	float switchRot;
-	int iteration;
+	
+	btScalar mass;
+	btVector3 fallInertia;
 };
 

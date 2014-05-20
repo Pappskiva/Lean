@@ -71,8 +71,8 @@ void PhysicsBridge::Initialize(Level* level, Ball* ball)
 	v3 ballStartPos;
 	ball->GetPosition(ballStartPos);
 	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(ballStartPos.x, ballStartPos.y, ballStartPos.z)));
-	btScalar mass = 2;
-	btVector3 fallInertia(9, 9, 9);
+	mass = 2;
+	fallInertia = btVector3(9, 9, 9);
 	//fallShape->calculateLocalInertia(mass, fallInertia);
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
@@ -144,8 +144,6 @@ void PhysicsBridge::ReInitialize(Level* level, Ball* ball)
 	v3 ballStartPos;
 	ball->GetPosition(ballStartPos);
 	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(ballStartPos.x, ballStartPos.y, ballStartPos.z)));
-	btScalar mass = 2;
-	btVector3 fallInertia(9, 9, 9);
 	fallShape->calculateLocalInertia(mass, fallInertia);
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
@@ -229,8 +227,6 @@ void PhysicsBridge::ResetBall(Ball* ball)
 	delete fallRigidBody;
 
 	fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), startPos));
-	btScalar mass = 2;
-	btVector3 fallInertia(9, 9, 9);
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
 	fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	dynamicsWorld->addRigidBody(fallRigidBody);
