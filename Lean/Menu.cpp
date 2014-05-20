@@ -5,6 +5,7 @@ Menu::Menu()
 	mLogo = 0;
 	mOption1 = 0;
 	mOption2 = 0;
+	mOption3 = 0;
 	mInputPtr = 0;
 	mCameraPtr = 0;
 	colors = 0;
@@ -24,7 +25,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	mScreenWidth = screenWidth;
 	mScreenHeight = screenHeight;
 	decision = 1;
-	nrOfOptions = 2;
+	nrOfOptions = 3;
 	inputCooldown = 0.0f;
 
 	colorIndex = 0;
@@ -37,7 +38,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	}
 
 	// Initialisera text klass 1
-	result = mOption1->Initialize(d3d, "left", 1.0f, 16, screenWidth, screenHeight);
+	result = mOption1->Initialize(d3d, "center", 1.5f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;
@@ -46,7 +47,7 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	// Sätt värden
 	mOption1->SetText("Play", d3d);
 	mOption1->SetColor(1, 1, 1);
-	mOption1->SetPosition(50, 300);
+	mOption1->SetPosition(screenWidth / 2, (screenHeight / 2));
 
 	// Skapa text klass 2
 	mOption2 = new SentenceClass;
@@ -56,16 +57,35 @@ bool Menu::Initialize(D3D* d3d, Input* inputPtr, Camera* cameraPtr, int screenWi
 	}
 
 	// Initialisera text klass 2
-	result = mOption2->Initialize(d3d, "left", 1.0f, 16, screenWidth, screenHeight);
+	result = mOption2->Initialize(d3d, "center", 1.5f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Sätt värden
-	mOption2->SetText("Quit", d3d);
+	mOption2->SetText("Highscore", d3d);
 	mOption2->SetColor(1, 1, 1);
-	mOption2->SetPosition(50, 330);
+	mOption2->SetPosition(screenWidth / 2, (screenHeight / 2) + 35);
+
+	// Skapa text klass 3
+	mOption3 = new SentenceClass;
+	if (!mOption3)
+	{
+		return false;
+	}
+
+	// Initialisera text klass 3
+	result = mOption3->Initialize(d3d, "center", 1.5f, 16, screenWidth, screenHeight);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Sätt värden
+	mOption3->SetText("Quit", d3d);
+	mOption3->SetColor(1, 1, 1);
+	mOption3->SetPosition(screenWidth / 2, (screenHeight / 2) + 70);
 
 	// Sätt färgvärden
 	colors = new Color[7];
@@ -136,6 +156,7 @@ int Menu::Update(float deltaTime)
 	// Reset colors
 	mOption1->SetColor(1, 1, 1);
 	mOption2->SetColor(1, 1, 1);
+	mOption3->SetColor(1, 1, 1);
 
 	// Check inputs
 	if (inputCooldown == 0.0f)
@@ -197,8 +218,13 @@ int Menu::Update(float deltaTime)
 		mOption2->SetColor(currentColor.r / 255.0f, currentColor.g / 255.0f, currentColor.b / 255.0f);
 		break;
 
+	case 3:
+		//mOption2->SetColor(1, 1, 0);
+		mOption3->SetColor(currentColor.r / 255.0f, currentColor.g / 255.0f, currentColor.b / 255.0f);
+		break;
+
 	default:
-		mOption1->SetColor(1, 1, 0);
+		mOption1->SetColor(currentColor.r / 255.0f, currentColor.g / 255.0f, currentColor.b / 255.0f);
 	}
 
 
@@ -210,6 +236,7 @@ void Menu::Render(D3D* d3d)
 {
 	mOption1->Render(d3d);
 	mOption2->Render(d3d);
+	mOption3->Render(d3d);
 }
 
 void Menu::Shutdown()
@@ -230,6 +257,11 @@ void Menu::Shutdown()
 	{
 		mOption2->Shutdown();
 		mOption2 = 0;
+	}
+	if (mOption3)
+	{
+		mOption3->Shutdown();
+		mOption3 = 0;
 	}
 }
 

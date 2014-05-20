@@ -30,6 +30,7 @@ private:
 	ImageClass*		mLogo;
 	SentenceClass*	mOption1;
 	SentenceClass*	mOption2;
+	SentenceClass*	mOption3;
 	Input*			mInputPtr;
 	Camera*			mCameraPtr;
 

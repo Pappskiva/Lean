@@ -233,7 +233,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	m_Logo->SetPosition(screenWidth / 2 - 100, screenHeight / 2 - 125);
+	m_Logo->SetPosition(screenWidth / 2 - 200, screenHeight / 2 - 250);
 
 
 	// Initialisera Image objekt
@@ -552,8 +552,12 @@ bool Application::Frame(float deltaTime)
 			m_GameState = STATE_PLAYING;
 			break;
 
-		// Quit
+		// Highscore
 		case 2:
+			return false;
+
+		// Quit
+		case 3:
 			return false;
 		}
 
@@ -1001,6 +1005,13 @@ void Application::Shutdown()
 	{
 		m_GameOverSignImage->Shutdown();
 		m_GameOverSignImage = 0;
+	}
+
+	// Release the image object
+	if (m_Logo)
+	{
+		m_Logo->Shutdown();
+		m_Logo = 0;
 	}
 
 	// Release the menu object
