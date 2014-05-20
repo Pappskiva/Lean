@@ -227,8 +227,9 @@ void ParticleHandler::RemoveAllParticles()
 {
 	for (int i = 0; i < emitters.Length(); i++)
 	{
-		emitters[i].Reset();
+		emitters[i].Flush();
 	}
+	emitters.Clear();
 }
 
 

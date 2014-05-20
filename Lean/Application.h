@@ -130,6 +130,7 @@ private:
 
 	uint			gameTimer;
 	int				nrOfLifes;
+	float			m_angleVelocity;
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;
