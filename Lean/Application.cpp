@@ -159,7 +159,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Text objekt
-	result = m_Text->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
+	result = m_Text->Initialize(m_Direct3D, "center", 2.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
@@ -167,7 +167,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Text objekt
-	result = m_LifeText->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
+	result = m_LifeText->Initialize(m_Direct3D, "center", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize m_LifeText.");
@@ -175,7 +175,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	// Initialisera Text objekt
-	result = m_StandardInfoText->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
+	result = m_StandardInfoText->Initialize(m_Direct3D, "center", 1.0f, 16, screenWidth, screenHeight);
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
@@ -280,9 +280,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	m_GameOverSignImage->SetPosition(screenWidth / 2 - 320, screenHeight/2 - 200);
+	m_GameOverSignImage->SetPosition(screenWidth / 2, screenHeight/2 - 200);
 
-	m_StandardInfoText->SetPosition(screenWidth / 2 - 90, screenHeight / 2 - 160);
+	m_StandardInfoText->SetPosition(screenWidth / 2, screenHeight / 2 - 160);
 
 	//Loads the PointLight mesh into vram
 	lightSphereMesh = m_Direct3D->LoadMeshFromOBJ("data//LightSphere.obj");
@@ -850,7 +850,7 @@ void Application::RenderGraphics()
 			_itoa_s(m_Clock->GetTime(m_GameState != STATE_PAUSE), timeText, 10);
 
 			m_Text->SetText(timeText, m_Direct3D);
-			m_Text->SetPosition(15, 15);
+			m_Text->SetPosition(screenWidth / 2, 15);
 			m_Text->SetColor(0.1f, 0.5f, 1.0f);
 			m_Text->Render(m_Direct3D);
 
@@ -859,7 +859,7 @@ void Application::RenderGraphics()
 			_itoa_s(nrOfLifes, lifeText, 10);
 
 			m_LifeText->SetText(lifeText, m_Direct3D);
-			m_LifeText->SetPosition(15, 45);
+			m_LifeText->SetPosition(screenWidth / 2, 55);
 			m_LifeText->SetColor(0.1f, 0.5f, 1.0f);
 			m_LifeText->Render(m_Direct3D);
 		}

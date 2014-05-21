@@ -154,7 +154,18 @@ void SentenceClass::Render(D3D* d3d)
 	pixelColor = q4(1.0f, mSentence->red, mSentence->green, mSentence->blue);	// ARGB i q4 ????
 
 	// Translatera texten
-	worldMatrix = worldMatrix * m4::CreateTranslation(v3(mPosX, -mPosY, 0));
+	if (mAlignment == ALIGNMENT_CENTER)
+	{
+		worldMatrix = worldMatrix * m4::CreateTranslation(v3(mPosX - (20 * mLetterScale * mSentenceLength / 2), -mPosY, 0));
+	}
+	else if (mAlignment == ALIGNMENT_RIGHT)
+	{
+		worldMatrix = worldMatrix * m4::CreateTranslation(v3(mPosX - (20 * mLetterScale * mSentenceLength), -mPosY, 0));
+	}
+	else
+	{
+		worldMatrix = worldMatrix * m4::CreateTranslation(v3(mPosX, -mPosY, 0));
+	}
 
 	// Sätt shader variabler
 	mFontShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
@@ -225,31 +236,16 @@ bool SentenceClass::SetText(char* text, D3D* d3d)
 	delete[] vertices;
 	vertices = 0;
 
+	// Sätt den nya positionen
+	//SetPosition(mPosX, mPosY);
+
 	return true;
 }
 
 void SentenceClass::SetPosition(int posX, int posY)
 {
-	if (mAlignment == ALIGNMENT_CENTER)
-	{
-		this->mPosX = posX - (20 * mLetterScale * mSentenceLength / 2);
-		this->mPosY = posY;
-	}
-	else if (mAlignment == ALIGNMENT_RIGHT)
-	{
-		this->mPosX = posX + (20 * mLetterScale * mSentenceLength);
-		this->mPosY = posY;
-	}
-	else if (mAlignment == ALIGNMENT_CENTER)
-	{
-		this->mPosX = posX;
-		this->mPosY = posY - (20 * mLetterScale * mSentenceLength);
-	}
-	else
-	{
-		this->mPosX = posX;
-		this->mPosY = posY;
-	}
+	this->mPosX = posX;
+	this->mPosY = posY;
 }
 
 void SentenceClass::SetColor(float r, float g, float b)
