@@ -97,6 +97,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	//Create the ball object
 	m_Ball = new Ball;
 
+	//Create the box object
+	m_Box = new Box;
+
 	//Create the level object
 	m_Level = new Level;
 
@@ -116,6 +119,14 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
+
+	//Initialize the box object
+	result = m_Box->Initialize(m_Direct3D, L"data//box.png");
+	if (!result)
+	{
+		return false;
+	}
+
 
 	//Initialize the goal object
 	result = m_Goal->Initialize(m_Direct3D, L"data//blackGoal.png");
@@ -280,7 +291,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	m_GameOverSignImage->SetPosition(screenWidth / 2, screenHeight/2 - 200);
+	m_GameOverSignImage->SetPosition(screenWidth / 2 - 320, screenHeight / 2 - 200);
 
 	m_StandardInfoText->SetPosition(screenWidth / 2, screenHeight / 2 - 160);
 
@@ -415,6 +426,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_fps.Initialize();
 
 	m_Ball->SetShader(defaultShader);
+	m_Box->SetShader(defaultShader);
 	m_Level->SetShader(levelShader);
 	m_ObstacleHandler = new ObstacleHandler();
 
@@ -682,6 +694,7 @@ bool Application::Frame(float deltaTime)
 		m_ObstacleHandler->Update(deltaTime, camPos.x, camPos.z, planeRotX, planeRotZ, m_Ball, &m_Particles);
 
 		m_Goal->Update(deltaTime, planeRotX, planeRotZ);
+		m_Box->Update(deltaTime, planeRotX, planeRotZ);
 
 		float distance;
 		float radiusOfGoal = 0.9f;
@@ -820,6 +833,8 @@ void Application::RenderGraphics()
 		{
 			m_Ball->Render(m_Direct3D);
 
+			m_Box->Render(m_Direct3D);
+
 			m_Level->Render(m_Direct3D);
 
 			m_Goal->Render(m_Direct3D);
@@ -946,6 +961,13 @@ void Application::Shutdown()
 	{
 		m_Ball->Shutdown();
 		m_Ball = 0;
+	}
+
+	//Release the box object
+	if (m_Box)
+	{
+		m_Box->Shutdown();
+		m_Box = 0;
 	}
 
 	//Release the skybox object
@@ -1179,6 +1201,8 @@ void Application::ChangeLevel(int levelNumber)
 
 	m_Level->SetRotationX(0.0f);
 	m_Level->SetRotationZ(0.0f);
+	
+	m_Box->SetScale( (m_Level->GetWidth() / 3.2));
 
 	//Ta bort alla tidigare hinder
 	m_ObstacleHandler->RemoveAllObstacles();

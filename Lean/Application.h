@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Ball.h"
 #include "Level.h"
+#include "Box.h"
 #include "ObstacleHandler.h"
 #include "Goal.h"
 #include "Skybox.h"
@@ -103,6 +104,7 @@ private:
 	Input			*m_Input;
 	Camera			*m_Camera;
 	Ball			*m_Ball;
+	Box				*m_Box;
 	Level			*m_Level;
 	Skybox			*m_Skybox;
 	ObstacleHandler	*m_ObstacleHandler;
