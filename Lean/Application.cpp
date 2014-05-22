@@ -511,6 +511,11 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	points = 0;
 	m_Highscore = new Highscore();
 
+	m_PauseText.Initialize(m_Direct3D, "center", 1.0f, sizeof("Game Paused"), screenWidth, screenHeight);
+	m_PauseText.SetColor(1, 1, 1);
+	m_PauseText.SetPosition(screenWidth / 2, screenHeight / 2);
+	m_PauseText.SetText("Game Paused", m_Direct3D);
+
 	return true;
 }
 
@@ -906,6 +911,8 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetColor(0.7f, 0.1f, 0.1f);
 			m_StandardInfoText->Render(m_Direct3D);
 		}
+		if (m_GameState == STATE_PAUSE)
+			m_PauseText.Render(m_Direct3D);
 
 		m_Direct3D->TurnOffAlphaBlending();
 		m_Direct3D->TurnZBufferOn();

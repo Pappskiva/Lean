@@ -367,7 +367,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 		v3 pos;
 		v3 normal;
 		v2 uv;
-	}*vertices = new Vertex[width * height];
+	}*vertices = new Vertex[width * height + 8];
 
 	for (uint z = 0; z < height; z++)
 		for (uint x = 0; x < width; x++)
@@ -378,6 +378,26 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 			vertices[x + z * width].uv.v[0] = (float)x / realWidth;
 			vertices[x + z * width].uv.v[1] = (float)z / realHeight;
 		}
+
+	const float thickness = 2.0f;
+	vertices[width * height].pos = v3(width * -.5f, 0.0f, height * .5f - 1);
+	vertices[width * height].normal = v3(-1, 0, 0);
+	vertices[width * height + 1].pos = v3(width * -.5f, -thickness, height * .5f - 1);
+	vertices[width * height + 1].normal = v3(-1, 0, 0);
+	vertices[width * height + 2].pos = v3(width * -.5f, 0.0f, height * -.5f);
+	vertices[width * height + 2].normal = v3(-1, 0, 0);
+	vertices[width * height + 3].pos = v3(width * -.5f, -thickness, height * -.5f);
+	vertices[width * height + 3].normal = v3(-1, 0, 0);
+
+	vertices[width * height + 4].pos = v3(width * -.5f, 0.0f, height * -.5f);
+	vertices[width * height + 4].normal = v3(0, 0, -1);
+	vertices[width * height + 5].pos = v3(width * -.5f, -thickness, height * -.5f);
+	vertices[width * height + 5].normal = v3(0, 0, -1);
+	vertices[width * height + 6].pos = v3(width * .5f - 1, 0.0f, height * -.5f);
+	vertices[width * height + 6].normal = v3(0, 0, -1);
+	vertices[width * height + 7].pos = v3(width * .5f - 1, -thickness, height * -.5f);
+	vertices[width * height + 7].normal = v3(0, 0, -1);
+
 	delete[] newHeightmap;
 
 	//Calculates the normal for each triangle and adds it to the vertices 
@@ -412,7 +432,7 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 			vertices[x + (z + 1) * width].normal += normal;
 		}
 
-	uint *indices = new uint[(height - 1) * (width - 1) * 6];
+	uint *indices = new uint[(height - 1) * (width - 1) * 6 + 2 * 6];
 
 	for (uint z = 0; z < height - 1; z++)
 		for (uint x = 0; x < width - 1; x++)
@@ -430,8 +450,25 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 			indices[(x + z * (width - 1)) * 6 + 5] = x + (z + 1) * width;
 		}
 
+	indices[(height - 1) * (width - 1) * 6] = width * height;
+	indices[(height - 1) * (width - 1) * 6 + 1] = width * height + 2;
+	indices[(height - 1) * (width - 1) * 6 + 2] = width * height + 1;
+
+	indices[(height - 1) * (width - 1) * 6 + 3] = width * height + 2;
+	indices[(height - 1) * (width - 1) * 6 + 4] = width * height + 3;
+	indices[(height - 1) * (width - 1) * 6 + 5] = width * height + 1; 
+
+
+	indices[(height - 1) * (width - 1) * 6 + 6] = width * height + 4;
+	indices[(height - 1) * (width - 1) * 6 + 7] = width * height + 6;
+	indices[(height - 1) * (width - 1) * 6 + 8] = width * height + 5;
+
+	indices[(height - 1) * (width - 1) * 6 + 9] = width * height + 6;
+	indices[(height - 1) * (width - 1) * 6 + 10] = width * height + 7;
+	indices[(height - 1) * (width - 1) * 6 + 11] = width * height + 5;
+
 	m_mesh->Flush();
-	m_mesh->Initialize(vertices, sizeof(Vertex), width * height, indices, (height - 1) * (width - 1) * 6);
+	m_mesh->Initialize(vertices, sizeof(Vertex), width * height + 8, indices, (height - 1) * (width - 1) * 6 + 2 * 6);
 	direct3D->LoadMeshIntoDevice(m_mesh);
 	m_width = realWidth;
 	m_length = realHeight;

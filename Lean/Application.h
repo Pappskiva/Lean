@@ -122,6 +122,7 @@ private:
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
 	SentenceClass	*m_StandardInfoText;
+	SentenceClass	m_PauseText;
 	ImageClass		**m_Image;
 	ImageClass		*m_Logo;
 	ImageClass		*m_WinSignImage;

@@ -80,7 +80,10 @@ void Ball::Render(D3D *direct3D)
 	direct3D->SetShader(m_shader);
 	Shader *currentShader = direct3D->GetCurrentShader();
 
-	currentShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
+	m4 newWorld = worldMatrix;
+	static const v3 offset(0, -0.2f, 0);
+	newWorld.Translate(offset);
+	currentShader->SetVariable("worldMatrix", &newWorld, sizeof(m4));
 	direct3D->ApplyConstantBuffers();
 	direct3D->ApplyTexture(m_Texture, 0);
 
