@@ -555,6 +555,7 @@ bool Application::Frame(float deltaTime)
 		// Play
 		case 1:
 			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
 			break;
 
 		// Highscore
@@ -1212,14 +1213,8 @@ void Application::ChangeLevel(int levelNumber)
 
 	m_Ball->SetPosition(startPos.x, 10, startPos.z);
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
-	if (m_Goal->GetNextLevelNumber() < MAX_LEVELS)
-	{
-		m_Goal->SetNextLevelNumber(m_Goal->GetNextLevelNumber() + 1);
-	}
-	else
-	{
-		m_Goal->SetNextLevelNumber(1);
-	}
+
+	m_Goal->SetNextLevelNumber(levelNumber+1);
 
 	if (CompletedFirstPass)
 	{
