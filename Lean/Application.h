@@ -35,7 +35,7 @@ const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 200.0f;
 const float SCREEN_NEAR = 0.1f;
 const int MAX_LEVELS = 4;
-const int MAX_NR_OF_LIFES = 5;
+const int MAX_NR_OF_LIVES = 9;
 
 
 enum GameState
@@ -47,6 +47,15 @@ enum GameState
 	STATE_GAMEOVER,
 	STATE_WON,
 };
+
+
+enum GameMode
+{
+	MODE_ENDLESS,
+	MODE_CLASSIC,
+	MODE_EASY,
+};
+
 
 enum LightType : char
 {
@@ -121,6 +130,7 @@ private:
 
 	ParticleHandler	m_Particles;
 	GameState		m_GameState;
+	GameMode		m_GameMode;
 	Menu			*m_Menu;
 	Highscore		*m_Highscore;
 
@@ -130,8 +140,7 @@ private:
 	Shader			*defaultShader, *levelShader, *obstacleShader, *particleBillboard;
 
 	uint			gameTimer;
-	int				maxNrOfLives = 10;
-	int				nrOfLifes;
+	int				nrOfLives;
 	float			m_angleVelocity;
 
 	//Variabler för att byta bana på rätt sätt

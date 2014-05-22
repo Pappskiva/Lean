@@ -23,13 +23,14 @@ Application::Application()
 	m_WinSignImage = nullptr;
 	m_StandardSignImage = nullptr;
 	m_GameState = STATE_MAINMENU;
+	m_GameMode = MODE_CLASSIC;
 	m_Menu = nullptr;
 	m_Highscore = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
 	obstacleShader = nullptr;
-	nrOfLifes = MAX_NR_OF_LIFES;
+	nrOfLives = MAX_NR_OF_LIVES;
 
 	switchLevel = false;
 	finishedSwitch = true;
@@ -192,9 +193,9 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	int x = 102;
-	m_Image = new ImageClass*[maxNrOfLives];
-	for (int i = 0; i < maxNrOfLives; i++)
+	int x = 20 + ((float)(MAX_NR_OF_LIVES / 2) * 40);
+	m_Image = new ImageClass*[MAX_NR_OF_LIVES];
+	for (int i = 0; i < MAX_NR_OF_LIVES; i++)
 	{
 		// Skapa Image objekt
 		m_Image[i] = new ImageClass;
@@ -572,7 +573,7 @@ bool Application::Frame(float deltaTime)
 		{
 			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
-			nrOfLifes = MAX_NR_OF_LIFES;
+			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
 		}
 	}
@@ -582,7 +583,7 @@ bool Application::Frame(float deltaTime)
 		{
 			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
-			nrOfLifes = MAX_NR_OF_LIFES;
+			nrOfLives = MAX_NR_OF_LIVES;
 		}
 	}
 	else if (m_GameState == STATE_SWITCHLEVEL)
@@ -764,10 +765,12 @@ bool Application::Frame(float deltaTime)
 			wcharstr = (WCHAR*)wstr.c_str();
 
 			WBOX(wcharstr);*/
+			if (m_GameMode == MODE_CLASSIC || m_GameMode == MODE_EASY)
+			{
+				nrOfLives--;
+			}			
 
-			nrOfLifes--;
-
-			if (nrOfLifes <= -1)
+			if (nrOfLives <= -1)
 			{
 				m_GameState = STATE_GAMEOVER;
 				m_Highscore->SaveScore("tmp", points); // Ingen poäng för tid här
@@ -854,9 +857,12 @@ void Application::RenderGraphics()
 		{
 			m_Particles.Render();
 
-			for (int i = 0; i < nrOfLifes; i++)
+			if (m_GameMode == MODE_CLASSIC || m_GameMode == MODE_EASY)
 			{
-				m_Image[i]->Render(m_Direct3D);
+				for (int i = 0; i < nrOfLives; i++)
+				{
+					m_Image[i]->Render(m_Direct3D);
+				}
 			}
 			
 			// Render text object
@@ -985,7 +991,7 @@ void Application::Shutdown()
 		m_StandardInfoText = 0;
 	}
 
-	for (int i = 0; i < maxNrOfLives; i++)
+	for (int i = 0; i < MAX_NR_OF_LIVES; i++)
 	{
 		// Release the image object
 		if (m_Image[i])
@@ -1219,5 +1225,11 @@ void Application::ChangeLevel(int levelNumber)
 	{
 		m_PhysicsBridge.ReInitialize(m_Level, m_Ball);
 	}
+
+	if (m_GameMode == MODE_EASY)
+	{
+		nrOfLives = MAX_NR_OF_LIVES;
+	}
+
 	m_Clock->RestartClock();
 }
