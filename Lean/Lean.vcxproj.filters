@@ -162,6 +162,9 @@
     <ClCompile Include="Highscore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -305,6 +308,9 @@
     <ClInclude Include="Highscore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Box.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DuckRenderer\MathStructs.inl">
@@ -441,6 +447,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="data\128x128WaterSplash.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\box.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -14,6 +14,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="D3D.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="Box.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="D3D Includes.h" />
@@ -137,6 +139,7 @@
     <Image Include="data\64x64WaterParticle.png" />
     <Image Include="data\ball.png" />
     <Image Include="blackGoal.png" />
+    <Image Include="data\box.png" />
     <Image Include="data\GameOverSign.png" />
     <Image Include="data\LeanTitle.png" />
     <Image Include="data\NormalSign.png" />
