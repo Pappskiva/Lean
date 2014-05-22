@@ -573,6 +573,7 @@ bool Application::Frame(float deltaTime)
 			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
 			nrOfLifes = MAX_NR_OF_LIFES;
+			points = 0;
 		}
 	}
 	else if (m_GameState == STATE_WON)
@@ -725,6 +726,7 @@ bool Application::Frame(float deltaTime)
 				if (m_Goal->GetNextLevelNumber() == MAX_LEVELS)
 				{
 					m_GameState = STATE_WON;
+					m_Highscore->SaveScore("ttt", points); // "ttt" ska bytas ut mot variabel
 				}
 				else
 				{
