@@ -17,7 +17,6 @@ Application::Application()
 	m_Sound = nullptr;
 	m_Clock = nullptr;
 	m_Text = nullptr;
-	m_LifeText = nullptr;
 	m_Image = nullptr;
 	m_Logo = nullptr;
 	m_GameOverSignImage = nullptr;
@@ -156,12 +155,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	m_LifeText = new SentenceClass;
-	if (!m_LifeText)
-	{
-		return false;
-	}
-
 	// Skapa Text objekt
 	m_StandardInfoText = new SentenceClass;
 	if (!m_StandardInfoText)
@@ -174,14 +167,6 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	if (!result)
 	{
 		WBOX(L"Could not initialize the sentence object.");
-		return false;
-	}
-
-	// Initialisera Text objekt
-	result = m_LifeText->Initialize(m_Direct3D, "center", 1.0f, 16, screenWidth, screenHeight);
-	if (!result)
-	{
-		WBOX(L"Could not initialize m_LifeText.");
 		return false;
 	}
 
@@ -207,20 +192,27 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
-	// Skapa Image objekt
-	m_Image = new ImageClass;
-	if (!m_Image)
+	int x = 102;
+	m_Image = new ImageClass*[maxNrOfLives];
+	for (int i = 0; i < maxNrOfLives; i++)
 	{
-		return false;
-	}
+		// Skapa Image objekt
+		m_Image[i] = new ImageClass;
+		if (!m_Image[i])
+		{
+			return false;
+		}
 
-	// Initialisera Image objekt
-	result = m_Image->Initialize(m_Direct3D, L"data/testAutumnGround.png", screenWidth, screenHeight, 200, 200);
-	if (!result)
-	{
-		WBOX(L"Could not initialize the image object.");
-		return false;
+		// Initialisera Image objekt
+		result = m_Image[i]->Initialize(m_Direct3D, L"data/Heart.png", x, screenHeight - 110, 20, 20);
+		if (!result)
+		{
+			WBOX(L"Could not initialize the heart image object.");
+			return false;
+		}
+		x -= 40;
 	}
+	
 
 	// Skapa Image objekt
 	m_StandardSignImage = new ImageClass;
@@ -860,6 +852,11 @@ void Application::RenderGraphics()
 		{
 			m_Particles.Render();
 
+			for (int i = 0; i < nrOfLifes; i++)
+			{
+				m_Image[i]->Render(m_Direct3D);
+			}
+			
 			// Render text object
 			char timeText[16];
 			_itoa_s(m_Clock->GetTime(m_GameState != STATE_PAUSE), timeText, 10);
@@ -869,14 +866,6 @@ void Application::RenderGraphics()
 			m_Text->SetColor(0.1f, 0.5f, 1.0f);
 			m_Text->Render(m_Direct3D);
 
-			// Render text object
-			char lifeText[16];
-			_itoa_s(nrOfLifes, lifeText, 10);
-
-			m_LifeText->SetText(lifeText, m_Direct3D);
-			m_LifeText->SetPosition(screenWidth / 2, 55);
-			m_LifeText->SetColor(0.1f, 0.5f, 1.0f);
-			m_LifeText->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_MAINMENU)
@@ -985,13 +974,6 @@ void Application::Shutdown()
 		m_Text = 0;
 	}
 
-	// Release the sentence object
-	if (m_LifeText)
-	{
-		m_LifeText->Shutdown();
-		delete m_LifeText;
-		m_LifeText = 0;
-	}
 
 	// Release the sentence object
 	if (m_StandardInfoText)
@@ -1001,12 +983,16 @@ void Application::Shutdown()
 		m_StandardInfoText = 0;
 	}
 
-	// Release the image object
-	if (m_Image)
+	for (int i = 0; i < maxNrOfLives; i++)
 	{
-		m_Image->Shutdown();
-		m_Image = 0;
+		// Release the image object
+		if (m_Image[i])
+		{
+			m_Image[i]->Shutdown();
+			m_Image[i] = 0;
+		}
 	}
+	delete [] m_Image;
 
 	// Release the image object
 	if (m_StandardSignImage)

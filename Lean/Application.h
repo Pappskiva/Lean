@@ -112,9 +112,8 @@ private:
 	Sound			*m_Sound;
 	Clock			*m_Clock;
 	SentenceClass	*m_Text;
-	SentenceClass	*m_LifeText;
 	SentenceClass	*m_StandardInfoText;
-	ImageClass		*m_Image;
+	ImageClass		**m_Image;
 	ImageClass		*m_Logo;
 	ImageClass		*m_WinSignImage;
 	ImageClass		*m_GameOverSignImage;
@@ -131,6 +130,7 @@ private:
 	Shader			*defaultShader, *levelShader, *obstacleShader, *particleBillboard;
 
 	uint			gameTimer;
+	int				maxNrOfLives = 10;
 	int				nrOfLifes;
 	float			m_angleVelocity;
 
