@@ -602,6 +602,7 @@ bool Application::Frame(float deltaTime)
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
 		}
 	}
 	// Playing
