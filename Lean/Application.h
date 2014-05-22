@@ -46,6 +46,7 @@ enum GameState
 	STATE_SWITCHLEVEL,
 	STATE_GAMEOVER,
 	STATE_WON,
+	STATE_HIGHSCORE,
 };
 
 
@@ -142,6 +143,7 @@ private:
 	uint			gameTimer;
 	int				nrOfLives;
 	float			m_angleVelocity;
+	bool			m_highscorePrinted;
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;
