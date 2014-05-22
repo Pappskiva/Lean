@@ -35,6 +35,7 @@ Application::Application()
 	switchLevel = false;
 	finishedSwitch = true;
 	CompletedFirstPass = false;
+	m_highscorePrinted = false;
 }
 
 Application::Application(const Application& other)
@@ -565,13 +566,21 @@ bool Application::Frame(float deltaTime)
 
 		// Highscore
 		case 2:
-			return false;
+			m_GameState = STATE_HIGHSCORE;
+			break;
 
 		// Quit
 		case 3:
 			return false;
 		}
 
+	}
+	else if (m_GameState == STATE_HIGHSCORE)
+	{
+		if (m_Input->IsEnterPressed())
+		{
+			m_GameState = STATE_MAINMENU;
+		}
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
@@ -581,6 +590,7 @@ bool Application::Frame(float deltaTime)
 			m_GameState = STATE_MAINMENU;
 			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
+			//m_highscorePrinted = false;
 		}
 	}
 	else if (m_GameState == STATE_WON)
@@ -597,6 +607,7 @@ bool Application::Frame(float deltaTime)
 		if (m_Input->IsEnterPressed())
 		{
 			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
 		}
 	}
 	// Playing
@@ -697,7 +708,7 @@ bool Application::Frame(float deltaTime)
 		m_Box->Update(deltaTime, planeRotX, planeRotZ);
 
 		float distance;
-		float radiusOfGoal = 0.9f;
+		float radiusOfGoal = 1.8f;
 		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 		if (!switchLevel)
 		{
@@ -882,6 +893,10 @@ void Application::RenderGraphics()
 
 		}
 
+		if (m_GameState == STATE_HIGHSCORE)
+		{
+			m_Highscore->PrintHighscore(m_Direct3D, screenWidth, screenHeight);
+		}
 		if (m_GameState == STATE_MAINMENU)
 		{
 			m_Menu->Render(m_Direct3D);
@@ -910,6 +925,8 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetText("Game Over", m_Direct3D);
 			m_StandardInfoText->SetColor(0.7f, 0.1f, 0.1f);
 			m_StandardInfoText->Render(m_Direct3D);
+
+			m_Highscore->PrintHighscore(m_Direct3D, screenWidth, screenHeight);
 		}
 		if (m_GameState == STATE_PAUSE)
 			m_PauseText.Render(m_Direct3D);

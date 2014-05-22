@@ -133,9 +133,10 @@ void WaterObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, 
 		cooldown = 5;
 		dripParticleCounter = 0.2f;
 	}
-	if (cooldown > 0 && dripParticleCounter <= 0)
+	if (cooldown > 0 && dripParticleCounter <= 0 && ball->GetFriction() != 1)
 	{
 		particles->AddParticles(4, ballPos.x, ballPos.y + 1.0f, ballPos.z);
 		dripParticleCounter = 0.2f;
 	}
+	
 }

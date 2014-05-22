@@ -102,11 +102,11 @@ void ParticleHandler::AddParticles(int type, float x, float y, float z)
 		particleBase.scaleXOutTime = 200;
 		particleBase.scaleYInTime = 100;
 		particleBase.scaleYOutTime = 200;
-		particleBase.speed = 4.0f;
+		particleBase.speed = 1.0f;
 		particleBase.timeToLive = 1700;
 		particleBase.weight = 0;
-		particleBase.xSize = 5.0f;
-		particleBase.ySize = 5.0f;
+		particleBase.xSize = 7.0f;
+		particleBase.ySize = 7.0f;
 
 		emitterBase.SetTimeToLive(7000);
 		emitterBase.SetSpawnFrequency(35);
@@ -114,7 +114,7 @@ void ParticleHandler::AddParticles(int type, float x, float y, float z)
 		emitterBase.SetStartPosition(v3(0, 12, 0));
 		emitterBase.SetStartVariation(v2(80, 80)); //För stunden kan inget av värdena vara 0
 		emitterBase.SetRandomVariation(true);
-		emitterBase.SetParticleMove(v3(-1, -1, -1));
+		emitterBase.SetParticleMove(v3(-20, 5, -50));
 		emitterBase.SetRandomMove(false);
 		emitterBase.SetShader(particleBillboard);
 		emitterBase.SetTexture(leaf);
