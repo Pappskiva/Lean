@@ -6,6 +6,7 @@ Highscore::Highscore()
 	first = NULL;
 	last = NULL;
 	current = NULL;
+	Initialized = false;
 }
 Highscore::~Highscore(){}
 
@@ -18,7 +19,7 @@ void Highscore::SaveScore(string name, int totalScore)
 	newNode->prev = NULL;
 
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
-	
+
 	if (first == NULL)
 	{
 		last = newNode;
@@ -35,35 +36,46 @@ void Highscore::SaveScore(string name, int totalScore)
 	SaveHighscoreToText("../Lean/data/HighscoreList.txt");
 }
 
-void Highscore::PrintHighscore(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight)
+void Highscore::PrintHighscore(D3D* d3d, int screenWidth, int screenHeight)
 {
+	
+	if (!Initialized)
+	{
+		const char* alignment = "left";
+		float letterScale = 1.0f;
+		int sentenceMaxLength = 16;
+		sentence = new SentenceClass;
+		sentence->Initialize(d3d, alignment, letterScale, sentenceMaxLength, screenWidth, screenHeight);
+		sentence->SetColor(0.5f, 0.5f, 0.5f);
+		Initialized = true;
+	}
+
+	bool result = false;;
+
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	if (first != NULL)
 	{
-		int i = 1;
+		int i = 0;
 		int xPos, yPos;
-		xPos = 75;
-		yPos = 50;
+		xPos = screenWidth /3;
+		yPos = screenHeight / 3;
 		current = first;
-		while (current->next != NULL)
+		while (current->next != NULL && i < 11)
 		{
-			string name = current->name;		
+			i++;
+			yPos += 20;
+			string name = current->name;		//Prep for print
 			char points[16];
 			_itoa_s(current->value, points, 10);
 
-			string temp = i + ": " + name + "    " + points;
+			string printString = to_string(i) + ": " + name + " " + points;//Put everything into one line
+			char* textToSend = (char*)printString.c_str();//Convert to char*
 
-			sentence = new SentenceClass;
-			sentence->Initialize(d3d, alignment, letterScale, sentenceMaxLength, screenWidth, screenHeight);
-
-			//Skriver ut namn
-			char* textToSend = (char*)temp.c_str();
 			sentence->SetText(textToSend, d3d);
 			sentence->SetPosition(xPos, yPos);
 			sentence->Render(d3d);
 
-			i++;
-			yPos += 20;
+			current = current->next;
 		}
 	}
 	else
@@ -73,6 +85,9 @@ void Highscore::PrintHighscore(D3D* d3d, const char* alignment, float letterScal
 }
 void Highscore::Shutdown()
 {
+	sentence->Shutdown();
+	delete sentence;
+	sentence = 0;
 	while (first != NULL)
 	{
 		current = first;

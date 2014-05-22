@@ -20,7 +20,7 @@ public:
 	Highscore();
 	~Highscore();
 	void SaveScore(string name, int totalScore);
-	void PrintHighscore(D3D* d3d, const char* alignment, float letterScale, int sentenceMaxLength, int screenWidth, int screenHeight);
+	void PrintHighscore(D3D* d3d, int screenWidth, int screenHeight);
 	void Shutdown();
 
 private:
@@ -34,7 +34,8 @@ private:
 	Node* first;
 	Node* last;
 	Node* current;
-	//2 dimensionell array = 2* antal som finns i highscore listan +1
-	
+
+	bool Initialized;
+
 };
 
