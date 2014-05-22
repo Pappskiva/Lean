@@ -37,7 +37,7 @@ bool LeafObstacle::Initialize(D3D* direct3D, HWND hwnd)
 		return false;
 	}
 	m_Sound = new Sound;
-	m_Sound->Initialize2DSound(hwnd, "data/musik/LövHinder/vindMono.wav");
+	m_Sound->Initialize2DSound(hwnd, "data/musik/LövHinder/vindMono.wav", 0, 0, 0);
 
 	return true;
 }

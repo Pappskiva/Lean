@@ -37,7 +37,7 @@ bool MagnetObstacle::Initialize(D3D* direct3D, HWND hwnd)
 		return false;
 	}
 	m_Sound = new Sound;
-	m_Sound->Initialize2DSound(hwnd, "data/musik/MagnetHinder/MagnetMono.wav");
+	m_Sound->Initialize2DSound(hwnd, "data/musik/MagnetHinder/MagnetMono.wav", 0, 0, 0);
 
 	return true;
 }
@@ -109,16 +109,25 @@ return true;
 void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles)
 {
 	Obstacle::Update(deltaTime, cameraPosX, cameraPosZ, planeRotationX, planeRotationZ, ball, particles);
-
 	// Räknar ut avstånd till boll
 	v3 ballPos;
 	ball->GetPosition(ballPos);
 	v3 vectorToBall = ballPos - m_position;
 	vectorToBall.y = 0;
+
+	v3 soundV;
+	soundV.x = ballPos.x;
+	soundV.y = ballPos.y;
+	soundV.z = ballPos.z + 1;
+
+	m_Sound->UpdateListener(ballPos.x, ballPos.y, ballPos.z, soundV);
+
+
 	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
 
 	if (squaredDistance < 100) // Använder inte cooldown
 	{
+		m_Sound->PlayOnce();
 		if (squaredDistance >= 0.2f) //Så att squaredDistance inte blir ett nollvärde, eller vad det nu är som får det att bugga ur. 
 		{
 		v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig

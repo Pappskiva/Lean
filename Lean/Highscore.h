@@ -20,12 +20,12 @@ public:
 	Highscore();
 	~Highscore();
 	void SaveScore(string name, int totalScore);
-	void PrintHighscore(D3D* d3d, int screenWidth, int screenHeight);
+	void PrintHighscore(SentenceClass* sentence, D3D* d3d, int screenWidth, int screenHeight);
 	void Shutdown();
 
 private:
 
-	SentenceClass* sentence;
+	//SentenceClass* sentence;
 
 	void LoadHighscoreFromText(char* filename);
 	void SaveHighscoreToText(char* filename);
@@ -35,7 +35,6 @@ private:
 	Node* last;
 	Node* current;
 
-	bool Initialized;
-
+	char* m_filename;
 };
 

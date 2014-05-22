@@ -6,7 +6,7 @@ Highscore::Highscore()
 	first = NULL;
 	last = NULL;
 	current = NULL;
-	Initialized = false;
+	m_filename = "../Lean/data/HighscoreList.txt";
 }
 Highscore::~Highscore(){}
 
@@ -18,7 +18,7 @@ void Highscore::SaveScore(string name, int totalScore)
 	newNode->next = NULL;
 	newNode->prev = NULL;
 
-	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
+	LoadHighscoreFromText(m_filename);
 
 	if (first == NULL)
 	{
@@ -33,35 +33,26 @@ void Highscore::SaveScore(string name, int totalScore)
 		last->next = NULL;
 	}
 
-	SaveHighscoreToText("../Lean/data/HighscoreList.txt");
+	SaveHighscoreToText(m_filename);
 }
 
-void Highscore::PrintHighscore(D3D* d3d, int screenWidth, int screenHeight)
+void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth, int screenHeight)
 {
-	
-	if (!Initialized)
-	{
-		const char* alignment = "left";
-		float letterScale = 1.0f;
-		int sentenceMaxLength = 16;
-		sentence = new SentenceClass;
-		sentence->Initialize(d3d, alignment, letterScale, sentenceMaxLength, screenWidth, screenHeight);
-		sentence->SetColor(0.5f, 0.5f, 0.5f);
-		Initialized = true;
-	}
 
-	bool result = false;;
 
+	//sentence = new SentenceClass;
+	//sentence->Initialize(m_D3D, "left", 1.0f, 16, m_SW, m_SH);
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	if (first != NULL)
 	{
 		int i = 0;
 		int xPos, yPos;
-		xPos = screenWidth /3;
+		xPos = screenWidth / 3;
 		yPos = screenHeight / 3;
 		current = first;
-		while (current->next != NULL && i < 11)
+		while (current != NULL && i < 11)
 		{
+
 			i++;
 			yPos += 20;
 			string name = current->name;		//Prep for print
@@ -71,23 +62,29 @@ void Highscore::PrintHighscore(D3D* d3d, int screenWidth, int screenHeight)
 			string printString = to_string(i) + ": " + name + " " + points;//Put everything into one line
 			char* textToSend = (char*)printString.c_str();//Convert to char*
 
+			sentence->SetColor(1.0f, 1.0f, 1.0f);
 			sentence->SetText(textToSend, d3d);
 			sentence->SetPosition(xPos, yPos);
 			sentence->Render(d3d);
 
 			current = current->next;
+
 		}
 	}
 	else
 	{
 		//skriver ut "Highscore listan är tom"
 	}
+	//sentence->Shutdown();
+	//delete sentence;
+	//sentence = 0;
 }
 void Highscore::Shutdown()
 {
-	sentence->Shutdown();
-	delete sentence;
-	sentence = 0;
+	//sentence->Shutdown();
+	//delete sentence;
+	//sentence = 0;
+
 	while (first != NULL)
 	{
 		current = first;

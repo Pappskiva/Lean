@@ -124,6 +124,12 @@ private:
 	SentenceClass	*m_Text;
 	SentenceClass	*m_StandardInfoText;
 	SentenceClass	m_PauseText;
+
+	SentenceClass	*m_HSSentence;
+
+
+
+
 	ImageClass		**m_Image;
 	ImageClass		*m_Logo;
 	ImageClass		*m_WinSignImage;
@@ -144,7 +150,8 @@ private:
 	uint			gameTimer;
 	int				nrOfLives;
 	float			m_angleVelocity;
-	bool			m_highscorePrinted;
+
+
 
 	//Variabler för att byta bana på rätt sätt
 	bool			switchLevel;

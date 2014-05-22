@@ -14,7 +14,11 @@
 #include <dsound.h>
 #include <stdio.h>
 #include <cmath>
+#include <D3DX10Math.h>
+#include <fstream>
 
+
+#include "DuckRenderer\DMath.h"
 class Sound
 {
 private:
@@ -39,33 +43,33 @@ public:
 	Sound();
 	~Sound();
 
-	bool Initialize3DSound(HWND hwnd, char* filename, int xPosition, int yPosition, int zPosition);
-	bool Initialize2DSound(HWND, char* filename);
+	bool Initialize2DSound(HWND, char* filename, int xPosition, int yPosition, int zPosition);
 	void Shutdown();
 	void PlayOnce();
-	void PlayLoop();
+	void PlayLoop(double VolumePercentage);
 	void Play3DSound();
-	void UpdateListener(int xListPos, int yListPos, int zListPos);
+	void UpdateListener(int xListPos, int yListPos, int zListPos, v3 lookAT);
 
 private:
 	bool InitializeDirectSound3D(HWND);
 	bool InitializeDirectSound2D(HWND);
 	void ShutdownDirectSound();
 
-	bool LoadWaveFile3D(char*, IDirectSoundBuffer8**, IDirectSound3DBuffer8**);
 	bool LoadWaveFile2D(char*, IDirectSoundBuffer8**);
-	void ShutdownWaveFile(IDirectSoundBuffer8**, IDirectSound3DBuffer8**);
+	void ShutdownWaveFile(IDirectSoundBuffer8**);
 	long CalculateDistance();
+	long CalculateOrientation();
+	float CalculateAngle(D3DXVECTOR3 v1, D3DXVECTOR3 v2);
 
 
 	IDirectSound8* m_DirectSound;
 	IDirectSoundBuffer* m_PrimaryBuffer;
-	IDirectSound3DListener8* m_Listener;
 	IDirectSoundBuffer8* m_SecondaryBuffer1;
-	IDirectSound3DBuffer8* m_secondary3DBuffer1;
 
 	int xPos, yPos, zPos;
 	int xListPos, yListPos, zListPos;
+	D3DXVECTOR3 m_lookAt;
+
 };
 
 #endif

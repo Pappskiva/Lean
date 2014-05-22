@@ -26,6 +26,7 @@ Application::Application()
 	m_GameMode = MODE_CLASSIC;
 	m_Menu = nullptr;
 	m_Highscore = nullptr;
+	m_HSSentence = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -35,7 +36,7 @@ Application::Application()
 	switchLevel = false;
 	finishedSwitch = true;
 	CompletedFirstPass = false;
-	m_highscorePrinted = false;
+
 }
 
 Application::Application(const Application& other)
@@ -59,13 +60,13 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
-	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/LONELY_ROLLING_STAR.wav");
+	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/LONELY_ROLLING_STAR.wav", 0, 0, 0);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
 		return false;
 	}
-	m_Sound->PlayLoop();
+	//m_Sound->PlayLoop(0.7f);
 
 	m_Clock = new Clock();
 
@@ -511,6 +512,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	CompletedFirstPass = true;
 	points = 0;
 	m_Highscore = new Highscore();
+	m_HSSentence = new SentenceClass;
+	m_HSSentence->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
 
 	m_PauseText.Initialize(m_Direct3D, "center", 1.0f, sizeof("Game Paused"), screenWidth, screenHeight);
 	m_PauseText.SetColor(1, 1, 1);
@@ -590,7 +593,6 @@ bool Application::Frame(float deltaTime)
 			m_GameState = STATE_MAINMENU;
 			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
-			//m_highscorePrinted = false;
 		}
 	}
 	else if (m_GameState == STATE_WON)
@@ -895,7 +897,12 @@ void Application::RenderGraphics()
 
 		if (m_GameState == STATE_HIGHSCORE)
 		{
-			m_Highscore->PrintHighscore(m_Direct3D, screenWidth, screenHeight);
+			m_StandardSignImage->Render(m_Direct3D);
+			m_StandardInfoText->SetText("Top Players", m_Direct3D);
+			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
+			m_StandardInfoText->Render(m_Direct3D);
+			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
+			
 		}
 		if (m_GameState == STATE_MAINMENU)
 		{
@@ -926,7 +933,7 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetColor(0.7f, 0.1f, 0.1f);
 			m_StandardInfoText->Render(m_Direct3D);
 
-			m_Highscore->PrintHighscore(m_Direct3D, screenWidth, screenHeight);
+			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
 		}
 		if (m_GameState == STATE_PAUSE)
 			m_PauseText.Render(m_Direct3D);
@@ -948,6 +955,20 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	// Release the sentence object
+	if (m_HSSentence)
+	{
+		m_HSSentence->Shutdown();
+		delete m_HSSentence;
+		m_HSSentence = 0;
+	}
+
+	if (m_Highscore)
+	{
+		m_Highscore->Shutdown();
+		delete m_Highscore;
+		m_Highscore = 0;
+	}
 	// Release the sound object
 	if (m_Sound)
 	{
@@ -1006,7 +1027,6 @@ void Application::Shutdown()
 		delete m_Text;
 		m_Text = 0;
 	}
-
 
 	// Release the sentence object
 	if (m_StandardInfoText)
@@ -1082,12 +1102,6 @@ void Application::Shutdown()
 		m_Direct3D->Shutdown();
 		delete m_Direct3D;
 		m_Direct3D = 0;
-	}
-	if (m_Highscore)
-	{
-		m_Highscore->Shutdown();
-		delete m_Highscore;
-		m_Highscore = 0;
 	}
 }
 

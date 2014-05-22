@@ -40,7 +40,7 @@ bool TrampolineObstacle::Initialize(D3D* direct3D, HWND hwnd)
 	}
 
 	m_Sound = new Sound;
-	m_Sound->Initialize2DSound(hwnd, "data/musik/StudsmattaHindret/SpringMono.wav");
+	m_Sound->Initialize2DSound(hwnd, "data/musik/StudsmattaHindret/SpringMono.wav", 0, 0, 0);
 
 	return true;
 }
