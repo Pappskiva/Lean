@@ -692,7 +692,7 @@ bool Application::Frame(float deltaTime)
 		m_Box->Update(deltaTime, planeRotX, planeRotZ);
 
 		float distance;
-		float radiusOfGoal = 0.9f;
+		float radiusOfGoal = 1.8f;
 		//Håller man på med att byta banan? Om man inte gör det ska man kolla med kollisionen, se om bollet är tillräckligt nära målet
 		if (!switchLevel)
 		{

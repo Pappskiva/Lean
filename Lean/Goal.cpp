@@ -132,7 +132,7 @@ void Goal::UpdateWorldMatrix()
 	m4 rotationMatrix;
 	rotationMatrix = m4::CreateYawPitchRoll(m_rotationY * 0.0174532925f, m_rotationX * 0.0174532925f, m_rotationZ * 0.0174532925f);
 	m4 scaleMatrix;
-	scaleMatrix = m4::CreateScale(v3(1.0f, 0.005f, 1.0f));
+	scaleMatrix = m4::CreateScale(v3(2.0f, 0.005f, 2.0f));
 	m4 localSpace;
 	localSpace = m4::CreateTranslation(m_position);
 
