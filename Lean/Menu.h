@@ -9,6 +9,12 @@
 #include "SentenceClass.h"
 #include "ImageClass.h"
 
+enum SubMenu
+{
+	SUB_MAIN,
+	SUB_PLAY
+};
+
 class Menu
 {
 public:
@@ -33,6 +39,7 @@ private:
 	SentenceClass*	mOption3;
 	Input*			mInputPtr;
 	Camera*			mCameraPtr;
+	SubMenu			mSubMenu;
 
 	int mScreenWidth, mScreenHeight, decision, nrOfOptions;
 	float inputCooldown;

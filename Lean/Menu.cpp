@@ -184,7 +184,32 @@ int Menu::Update(float deltaTime)
 		if (mInputPtr->IsEnterPressed())
 		{
 			// Returnera valet till Application så får den avgöra vad som ska göras
-			return decision;
+			if (mSubMenu == SUB_PLAY)
+			{
+				return decision + 3;	// ugly, I know
+			}
+			else if (mSubMenu == SUB_MAIN)
+			{
+				if (decision == 1)
+				{
+					mSubMenu = SUB_PLAY;
+				}
+				else
+				{
+					return decision;
+				}
+			}
+		}
+		if (mInputPtr->IsEscapePressed())
+		{
+			if (mSubMenu != SUB_MAIN)
+			{
+				mSubMenu = SUB_MAIN;
+			}
+			else
+			{
+				return 3;	//quit
+			}
 		}
 	}
 
@@ -234,6 +259,20 @@ int Menu::Update(float deltaTime)
 
 void Menu::Render(D3D* d3d)
 {
+	// Set Text depending on which submenu you're currently on
+	if (mSubMenu == SUB_MAIN)
+	{
+		mOption1->SetText("Play", d3d);
+		mOption2->SetText("Highscore", d3d);
+		mOption3->SetText("Quit", d3d);
+	}
+	else if (mSubMenu == SUB_PLAY)
+	{
+		mOption1->SetText("Endless", d3d);
+		mOption2->SetText("Classic", d3d);
+		mOption3->SetText("Easy", d3d);
+	}
+
 	mOption1->Render(d3d);
 	mOption2->Render(d3d);
 	mOption3->Render(d3d);

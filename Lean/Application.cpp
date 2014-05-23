@@ -576,12 +576,6 @@ bool Application::Frame(float deltaTime)
 
 		switch (decision)
 		{
-		// Play
-		case 1:
-			m_GameState = STATE_PLAYING;
-			m_Clock->RestartClock();
-			break;
-
 		// Highscore
 		case 2:
 			m_GameState = STATE_HIGHSCORE;
@@ -590,6 +584,27 @@ bool Application::Frame(float deltaTime)
 		// Quit
 		case 3:
 			return false;
+
+		// Play Endless
+		case 4:
+			m_GameMode = MODE_ENDLESS;
+			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
+			break;
+
+		// Play Classic
+		case 5:
+			m_GameMode = MODE_CLASSIC;
+			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
+			break;
+
+		// Play Easy
+		case 6:
+			m_GameMode = MODE_EASY;
+			m_GameState = STATE_PLAYING;
+			m_Clock->RestartClock();
+			break;
 		}
 
 	}
