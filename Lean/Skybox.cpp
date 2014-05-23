@@ -153,7 +153,7 @@ void Skybox::UpdateShaderVariables(v3 cameraPos, m4 viewMatrix, m4 projectionMat
 	mShader->SetVariable("projectionMatrix", &projectionMatrix, sizeof(m4));
 
 	// Translatera skyboxen till kamerans position, sätt skala, och rotera om nödvändigt
-	m4 worldMatrix = m4::CreateScale(v3(100, 100, 100)) *
+	m4 worldMatrix = m4::CreateScale(v3(150, 150, 150)) *
 		m4::CreateYawPitchRoll(mYaw, mPitch, mRoll) *
 		m4::CreateTranslation(cameraPos);
 	mShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
