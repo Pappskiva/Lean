@@ -22,6 +22,8 @@ public:
 
 	float GetLetterScale() const;
 
+	void OffsetPosition(int xOffset, int yOffset);
+
 private:
 
 	// Varje mening har en vertexbuffer, indexbuffer och RGB färg

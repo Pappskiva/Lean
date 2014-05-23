@@ -260,6 +260,12 @@ float SentenceClass::GetLetterScale() const
 	return this->mLetterScale;
 }
 
+void SentenceClass::OffsetPosition(int xOffset, int yOffset)
+{
+	this->mPosX += xOffset;
+	this->mPosY += yOffset;
+}
+
 bool SentenceClass::InitializeSentence(int maxLength, D3D* d3d)
 {
 	Vertex* vertices;

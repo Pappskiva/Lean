@@ -27,6 +27,7 @@ Application::Application()
 	m_Menu = nullptr;
 	m_Highscore = nullptr;
 	m_HSSentence = nullptr;
+	m_NameInput = nullptr;
 
 	defaultShader = nullptr;
 	levelShader = nullptr;
@@ -520,6 +521,20 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_PauseText.SetPosition(screenWidth / 2, screenHeight / 2);
 	m_PauseText.SetText("Game Paused", m_Direct3D);
 
+	// Skapa NameInput objekt
+	m_NameInput = new NameInput;
+	if (!m_NameInput)
+	{
+		return false;
+	}
+
+	// Initialisera NameInput objekt
+	result = m_NameInput->Initialize(m_Direct3D, screenWidth, screenHeight);
+	if (!result)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -587,18 +602,26 @@ bool Application::Frame(float deltaTime)
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
+		m_NameInput->Update(deltaTime);
+		string name = m_NameInput->InputName();
+
 		if (m_Input->IsEnterPressed())
 		{
+			m_Highscore->SaveScore(name, points); // Ingen poäng för tid här
 			ChangeLevel(0);
-			m_GameState = STATE_MAINMENU;
+			m_GameState = STATE_HIGHSCORE;
 			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
 		}
 	}
 	else if (m_GameState == STATE_WON)
 	{
+		m_NameInput->Update(deltaTime);
+		string name = m_NameInput->InputName();
+
 		if (m_Input->IsEnterPressed())
 		{
+			m_Highscore->SaveScore(name, points);
 			ChangeLevel(0);
 			m_GameState = STATE_MAINMENU;
 			nrOfLives = MAX_NR_OF_LIVES;
@@ -746,7 +769,6 @@ bool Application::Frame(float deltaTime)
 				if (m_Goal->GetNextLevelNumber() == MAX_LEVELS)
 				{
 					m_GameState = STATE_WON;
-					m_Highscore->SaveScore("ttt", points); // "ttt" ska bytas ut mot variabel
 				}
 				else
 				{
@@ -792,7 +814,6 @@ bool Application::Frame(float deltaTime)
 			if (nrOfLives <= -1)
 			{
 				m_GameState = STATE_GAMEOVER;
-				m_Highscore->SaveScore("tmp", points); // Ingen poäng för tid här
 			}
 
 			// Resetta rotationen på banan
@@ -924,6 +945,7 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetText("Victory", m_Direct3D);
 			m_StandardInfoText->SetColor(0.1f, 0.8f, 0.8f);
 			m_StandardInfoText->Render(m_Direct3D);
+			m_NameInput->Render(m_Direct3D);
 		}
 
 		if (m_GameState == STATE_GAMEOVER)
@@ -932,8 +954,7 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetText("Game Over", m_Direct3D);
 			m_StandardInfoText->SetColor(0.7f, 0.1f, 0.1f);
 			m_StandardInfoText->Render(m_Direct3D);
-
-			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
+			m_NameInput->Render(m_Direct3D);
 		}
 		if (m_GameState == STATE_PAUSE)
 			m_PauseText.Render(m_Direct3D);
@@ -969,6 +990,14 @@ void Application::Shutdown()
 		delete m_Highscore;
 		m_Highscore = 0;
 	}
+
+	// Release the NameInput object
+	if (m_NameInput)
+	{
+		m_NameInput->Shutdown();
+		m_NameInput = 0;
+	}
+
 	// Release the sound object
 	if (m_Sound)
 	{

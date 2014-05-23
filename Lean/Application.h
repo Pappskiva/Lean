@@ -26,6 +26,7 @@
 #include "ImageClass.h"
 #include "Menu.h"
 #include "Highscore.h"
+#include "NameInput.h"
 
 /////////////
 // GLOBALS //
@@ -141,6 +142,7 @@ private:
 	GameMode		m_GameMode;
 	Menu			*m_Menu;
 	Highscore		*m_Highscore;
+	NameInput		*m_NameInput;
 
 	FPSClass		m_fps;
 	PhysicsBridge m_PhysicsBridge;
