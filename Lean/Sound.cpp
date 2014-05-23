@@ -252,7 +252,7 @@ long Sound::CalculateDistance()
 long Sound::CalculateOrientation()
 {
 	float ans = 0, angle = 0;
-	D3DXVECTOR3 vTarget, vAim;
+	v3 vTarget, vAim;
 	vTarget.x = xPos - xListPos;//Create vector from camera to object
 	vTarget.y = yPos - yListPos;
 	vTarget.z = zPos - zListPos;
@@ -283,33 +283,35 @@ long Sound::CalculateOrientation()
 
 	return ans;
 }
-float Sound::CalculateAngle(D3DXVECTOR3 vTarg, D3DXVECTOR3 vA)
+float Sound::CalculateAngle(v3 vTarg, v3 vA)
 {
 	float ans, dot, checkRight;
-	D3DXVECTOR3 v1, v2, up, cross;
+	v3 v1, v2, up, cross;
 	bool IsRight = false;
 
 	v1 = vTarg;
 	v2 = vA;
-	up = D3DXVECTOR3(0, 1, 0);
+	up = v3(0, 1, 0);
+	
 
-	dot = D3DXVec3Dot(&v1, &v2);
-	float vAbs1 = D3DXVec3Length(&v1);
-	float vAbs2 = D3DXVec3Length(&v2);
+	dot = v1.Dot(v2);	
+	float vAbs1 = v1.Length();
+	float vAbs2 = v2.Length();
 	float Abs = vAbs1 * vAbs2;
 	ans = dot / Abs;
 	ans = acos(ans);
 
-	ans = D3DXToDegree(ans);
+	ans = ans* ONE80PI;
 
-	D3DXVec3Cross(&cross, &up, &v2);
+	cross = v2.Cross(up);
 
-	float dot2 = D3DXVec3Dot(&cross, &v1);
-	float abs1 = D3DXVec3Length(&cross);
-	float abs2 = D3DXVec3Length(&v1);
+
+	float dot2 = cross.Dot(v1);
+	float abs1 = cross.Length();
+	float abs2 = v1.Length();
 	float abs = abs1 * abs2;
 	checkRight = dot2 / abs;
-	checkRight = D3DXToDegree(acos(checkRight));
+	checkRight = acos(checkRight)*ONE80PI;;
 
 
 	if (checkRight <= 90)

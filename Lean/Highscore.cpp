@@ -38,10 +38,6 @@ void Highscore::SaveScore(string name, int totalScore)
 
 void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth, int screenHeight)
 {
-
-
-	//sentence = new SentenceClass;
-	//sentence->Initialize(m_D3D, "left", 1.0f, 16, m_SW, m_SH);
 	LoadHighscoreFromText("../Lean/data/HighscoreList.txt");
 	if (first != NULL)
 	{
@@ -73,18 +69,14 @@ void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth
 	}
 	else
 	{
-		//skriver ut "Highscore listan är tom"
+		sentence->SetColor(1.0f, 1.0f, 1.0f);
+		sentence->SetText("No Highscore", d3d);
+		sentence->SetPosition(screenWidth / 3, screenHeight / 3);
+		sentence->Render(d3d);
 	}
-	//sentence->Shutdown();
-	//delete sentence;
-	//sentence = 0;
 }
 void Highscore::Shutdown()
 {
-	//sentence->Shutdown();
-	//delete sentence;
-	//sentence = 0;
-
 	while (first != NULL)
 	{
 		current = first;
@@ -99,7 +91,6 @@ void Highscore::Shutdown()
 	first = NULL;
 	last = NULL;
 	current = NULL;
-
 }
 void Highscore::LoadHighscoreFromText(char* filename)
 {

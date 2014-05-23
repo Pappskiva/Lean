@@ -14,7 +14,7 @@
 #include <dsound.h>
 #include <stdio.h>
 #include <cmath>
-#include <D3DX10Math.h>
+//#include <D3DX10Math.h>
 #include <fstream>
 
 
@@ -59,7 +59,7 @@ private:
 	void ShutdownWaveFile(IDirectSoundBuffer8**);
 	long CalculateDistance();
 	long CalculateOrientation();
-	float CalculateAngle(D3DXVECTOR3 v1, D3DXVECTOR3 v2);
+	float CalculateAngle(v3 v1, v3 v2);
 
 
 	IDirectSound8* m_DirectSound;
@@ -68,7 +68,7 @@ private:
 
 	int xPos, yPos, zPos;
 	int xListPos, yListPos, zListPos;
-	D3DXVECTOR3 m_lookAt;
+	v3 m_lookAt;
 
 };
 
