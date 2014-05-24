@@ -112,7 +112,7 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	// Räknar ut avstånd till boll
 	v3 ballPos;
 	ball->GetPosition(ballPos);
-	v3 vectorToBall = ballPos - m_position;
+	v3 vectorToBall = (ballPos - m_position) * 0.7; // Vill öka hindrets range
 	vectorToBall.y = 0;
 
 	v3 soundV;
@@ -122,16 +122,24 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 
 	m_Sound->UpdateListener(ballPos.x, ballPos.y, ballPos.z, soundV);
 
-
 	float squaredDistance = vectorToBall.x * vectorToBall.x + vectorToBall.z * vectorToBall.z;
-
 	if (squaredDistance < 100) // Använder inte cooldown
 	{
 		m_Sound->PlayOnce();
-		if (squaredDistance >= 0.2f) //Så att squaredDistance inte blir ett nollvärde, eller vad det nu är som får det att bugga ur. 
+
+		if (squaredDistance > 1)
 		{
-		v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig
-		ball->AddForce(forceToAdd);
+			v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig
+			ball->AddForce(forceToAdd);
+		}
+		else //if(squaredDistance >= 0.2f)
+		{
+			//float konstant = (-vectorToBall / squaredDistance).Length() * 75 + vectorToBall.Length(); // Konstant för att få samma värde i övergång mellan zoner
+
+			float length = vectorToBall.Length();
+			vectorToBall.Normalize();
+			v3 forceToAdd = (-vectorToBall) * (76.438 - length) * deltaTime;
+			ball->AddForce(forceToAdd);
 		}
 	}
 }
