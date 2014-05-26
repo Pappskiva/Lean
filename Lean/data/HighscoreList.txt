@@ -10,10 +10,14 @@ REM
 392
 tmp
 388
+PAP
+386
 ttt
 197
 REM
 197
+LAD
+196
 tmp
 0
 tmp
