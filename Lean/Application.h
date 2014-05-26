@@ -67,18 +67,31 @@ enum LightType : char
 	LT_UserDefined,
 };
 
-struct LightPack
+class LightPack
 {
+public:
+
+	void SetPosition(const v3 &pos);
+	void SetColor(const v3 &color);
+	void SetRange(const float range);
+	void SetIntensity(const float intensity);
+
+private:
 	v3 pos;
 	float padding;
 	v3 color;
 	float range;
 	float intensity;
 
+protected:
+
 	Mesh *mesh;//for padding purpose
 	Shader *shader;
 	LightType lightType;
+
+	friend class Application;
 };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: Application
@@ -98,7 +111,9 @@ private:
 	void			RenderGraphics();
 	void			_UpdateShaderVariables();
 	void			_RenderLights();
-	void			AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
+	LightPack&		AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity);
+	LightPack&		AddPointLight();
+
 
 	void			ChangeLevel(int);
 
@@ -181,6 +196,14 @@ private:
 		float padding3;
 		v3 cameraPos;
 		float padding4;
+		v2 offsets1;
+		float padding5[2];
+		v2 offsets2;
+		float padding6[2];
+		v2 offsets3;
+		float padding7[2];
+		v2 offsets4;
+		float padding8[2];
 	}firstLightPassData;
 };
 #endif

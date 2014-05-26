@@ -17,7 +17,7 @@ Level::Level()
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
 
-	m_scale = 1.0f;
+	m_scale = 0.5f;
 
 	heightmap = nullptr;
 
@@ -53,6 +53,10 @@ bool Level::Initialize(D3D* direct3D, WCHAR* textureFileName1, WCHAR* textureFil
 
 	m_Texture2 = direct3D->LoadTextureFromFile(textureFileName2);
 	if (!m_Texture2)
+		return false;
+
+	m_mask = direct3D->LoadTextureFromFile("Data//randomHeightmap.png");
+	if (!m_mask)
 		return false;
 
 	return true;
@@ -99,10 +103,12 @@ void Level::Render(D3D* direct3D)
 
 	direct3D->SetShader(m_shader);
 	Shader *currentShader = direct3D->GetCurrentShader();
-	currentShader->SetVariable("worldMatrix", &worldMatrix, sizeof(m4));
+	m4 newWorld = m4::CreateScale(v3(m_scale, 1.0f, m_scale)) * worldMatrix;
+	currentShader->SetVariable("worldMatrix", &newWorld, sizeof(m4));
 	direct3D->ApplyConstantBuffers();
 	direct3D->ApplyTexture(m_Texture1, 0);
 	direct3D->ApplyTexture(m_Texture2, 1);
+	direct3D->ApplyTexture(m_mask, 2);
 
 	direct3D->RenderMesh(m_mesh);
 
@@ -325,153 +331,157 @@ void Level::LoadLevel(const uint levelIndex, D3D* direct3D, LevelLoaderClass::Ob
 	LevelLoaderClass loader;
 	int realHeight, realWidth;
 
-	const float LEVEL_POINT_DISTANCE = 1.0f; //Större heightmap gjorde det lättare att få ut hindrena så nu används dubbla storleken på heightmap mot vad man vill ha.
-	const float LEVEL_MAX_HEIGHT = 2.5f;
-	
+	m_scale = 0.5f;	
 	//Ohanterade variabler för att matcha ändring i parameterlistan i LevelLoaderClass::LoadLevel.
 
-	loader.LoadLevel(levelIndex, heightmap, realHeight, realWidth, goalPos, startPos, obstacles, nrOfObst);
-	uint height = (uint)realHeight, width = (uint)realWidth;
-	
-	m_width = width;
-	m_length = height;
+	loader.LoadLevel(levelIndex, heightmap, realHeight, realWidth, goalPos, startPos, obstacles, nrOfObst);	
+	m_width = realWidth * 2;
+	m_length = realWidth * 2;
 
 	float *newHeightmap = new float[m_width * m_length];
-	memset(newHeightmap, 0, sizeof(float) * width * height);
+	memset(newHeightmap, 0, sizeof(float) * m_width * m_length);
 
-	for (uint z = 1; z < realHeight - 1; z++)
-		for (uint x = 1; x < realWidth - 1; x++)
+	//
+	for (uint z = 1, nz = 1; z < realHeight - 1; ++z, nz += 2)
+		for (uint x = 1, nx = 1; x < realWidth - 1; ++x, nx += 2)
 		{
-			newHeightmap[(x - 1)	+ (z - 1) * width] += heightmap[x + realWidth * z];
-			newHeightmap[x			+ (z - 1) * width] += heightmap[x + realWidth * z];
-			newHeightmap[(x + 1)	+ (z - 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[(nx - 1) + (nz - 1) * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[nx		  + (nz - 1) * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[(nx + 1) + (nz - 1) * m_width] = heightmap[x + realWidth * z];
 
-			newHeightmap[(x - 1)	+ z * width] += heightmap[x + realWidth * z];
-			newHeightmap[x			+ z * width] += heightmap[x + realWidth * z];
-			newHeightmap[(x + 1)	+ z * width] += heightmap[x + realWidth * z];
+			newHeightmap[(nx - 1) + nz * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[nx		  +	nz * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[(nx + 1) + nz * m_width] = heightmap[x + realWidth * z];
 
-			newHeightmap[(x - 1)	+ (z + 1) * width] += heightmap[x + realWidth * z];
-			newHeightmap[x			+ (z + 1) * width] += heightmap[x + realWidth * z];
-			newHeightmap[(x + 1)	+ (z + 1) * width] += heightmap[x + realWidth * z];
+			newHeightmap[(nx - 1) + (nz + 1) * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[nx		  +	(nz + 1) * m_width] = heightmap[x + realWidth * z];
+			newHeightmap[(nx + 1) + (nz + 1) * m_width] = heightmap[x + realWidth * z];
 		}
+	delete[] heightmap;
+	heightmap = newHeightmap;
 
-	for (uint z = 1; z < height - 1; z++)
-		for (uint x = 1; x < width - 1; x++)
-			newHeightmap[x + z * width] /= 9.0f;
+	_FilterHeightMap(heightmap, m_length, m_width);
+	_FilterHeightMap(heightmap, m_length, m_width);
 
-	//delete[] heightmap;
-	//heightmap = newHeightmap;
+	/*for (uint z = 1; z < m_length - 1; ++z)
+		for (uint x = 1; x < m_width - 1; ++x)
+			newHeightmap[x + z * m_width] /= 9.0f;*/
+	
+	//m_scale = LEVEL_POINT_DISTANCE;
+
+	
+
+
+	//m_width = realWidth;
+	//m_length = realWidth;
+
 
 	struct Vertex
 	{
 		v3 pos;
 		v3 normal;
 		v2 uv;
-	}*vertices = new Vertex[width * height + 8];
+	}*vertices = new Vertex[m_width * m_length + 8];
 
-	for (uint z = 0; z < height; z++)
-		for (uint x = 0; x < width; x++)
+	for (uint z = 0; z < m_length; z++)
+		for (uint x = 0; x < m_width; x++)
 		{
-			vertices[x + z * width].pos.x = (x - realHeight * 0.5f) * LEVEL_POINT_DISTANCE;
-			vertices[x + z * width].pos.y = heightmap[x + z * width] * LEVEL_MAX_HEIGHT;
-			vertices[x + z * width].pos.z = (z - realHeight * 0.5f) * LEVEL_POINT_DISTANCE;
-			vertices[x + z * width].uv.v[0] = (float)x / realWidth;
-			vertices[x + z * width].uv.v[1] = (float)z / realHeight;
+			vertices[x + z * m_width].pos.x = (x - m_width * 0.5f);
+			vertices[x + z * m_width].pos.y = heightmap[x + z * m_width] * LEVEL_MAX_HEIGHT;
+			vertices[x + z * m_width].pos.z = (z - m_width * 0.5f);
+			vertices[x + z * m_width].uv.v[0] = (float)x / m_width;
+			vertices[x + z * m_width].uv.v[1] = (float)z / m_length;
 		}
 
 	const float thickness = 2.0f;
-	vertices[width * height].pos = v3(width * -.5f, 0.0f, height * .5f - 1);
-	vertices[width * height].normal = v3(-1, 0, 0);
-	vertices[width * height + 1].pos = v3(width * -.5f, -thickness, height * .5f - 1);
-	vertices[width * height + 1].normal = v3(-1, 0, 0);
-	vertices[width * height + 2].pos = v3(width * -.5f, 0.0f, height * -.5f);
-	vertices[width * height + 2].normal = v3(-1, 0, 0);
-	vertices[width * height + 3].pos = v3(width * -.5f, -thickness, height * -.5f);
-	vertices[width * height + 3].normal = v3(-1, 0, 0);
+	vertices[m_width * m_length].pos = v3(m_width * -.5f, 0.0f, m_length * .5f - 1);
+	vertices[m_width * m_length].normal = v3(-1, 0, 0);
+	vertices[m_width * m_length + 1].pos = v3(m_width * -.5f, -thickness, m_length * .5f - 1);
+	vertices[m_width * m_length + 1].normal = v3(-1, 0, 0);
+	vertices[m_width * m_length + 2].pos = v3(m_width * -.5f, 0.0f, m_length * -.5f);
+	vertices[m_width * m_length + 2].normal = v3(-1, 0, 0);
+	vertices[m_width * m_length + 3].pos = v3(m_width * -.5f, -thickness, m_length * -.5f);
+	vertices[m_width * m_length + 3].normal = v3(-1, 0, 0);
 
-	vertices[width * height + 4].pos = v3(width * -.5f, 0.0f, height * -.5f);
-	vertices[width * height + 4].normal = v3(0, 0, -1);
-	vertices[width * height + 5].pos = v3(width * -.5f, -thickness, height * -.5f);
-	vertices[width * height + 5].normal = v3(0, 0, -1);
-	vertices[width * height + 6].pos = v3(width * .5f - 1, 0.0f, height * -.5f);
-	vertices[width * height + 6].normal = v3(0, 0, -1);
-	vertices[width * height + 7].pos = v3(width * .5f - 1, -thickness, height * -.5f);
-	vertices[width * height + 7].normal = v3(0, 0, -1);
-
-	delete[] newHeightmap;
+	vertices[m_width * m_length + 4].pos = v3(m_width * -.5f, 0.0f, m_length * -.5f);
+	vertices[m_width * m_length + 4].normal = v3(0, 0, -1);
+	vertices[m_width * m_length + 5].pos = v3(m_width * -.5f, -thickness, m_length * -.5f);
+	vertices[m_width * m_length + 5].normal = v3(0, 0, -1);
+	vertices[m_width * m_length + 6].pos = v3(m_width * .5f - 1, 0.0f, m_length * -.5f);
+	vertices[m_width * m_length + 6].normal = v3(0, 0, -1);
+	vertices[m_width * m_length + 7].pos = v3(m_width * .5f - 1, -thickness, m_length * -.5f);
+	vertices[m_width * m_length + 7].normal = v3(0, 0, -1);
 
 	//Calculates the normal for each triangle and adds it to the vertices 
 	//that builds it up.
-	for (uint x = 0; x < width - 1; ++x)	
-		for (uint z = 0; z < height - 1; ++z)
+	for (uint x = 0; x < m_width - 1; ++x)	
+		for (uint z = 0; z < m_length - 1; ++z)
 		{
-			v3 vec1 = vertices[(z + 1) * width + (x + 1)].pos
+			v3 vec1 = vertices[(z + 1) * m_width + (x + 1)].pos
 				-
-				vertices[z * width + x].pos;
+				vertices[z * m_width + x].pos;
 
-			v3 vec2 = vertices[z * width + (x + 1)].pos
+			v3 vec2 = vertices[z * m_width + (x + 1)].pos
 				-
-				vertices[z * width + x].pos;
+				vertices[z * m_width + x].pos;
 
 			v3 normal = vec1.Cross(vec2);
-			vertices[z * width + x].normal += normal;
-			vertices[(x + 1) + z * width].normal += normal;
-			vertices[(x + 1) + (z + 1) * width].normal += normal;
+			vertices[z * m_width + x].normal += normal;
+			vertices[(x + 1) + z * m_width].normal += normal;
+			vertices[(x + 1) + (z + 1) * m_width].normal += normal;
 
-			vec1 = vertices[(z + 1) * width + x].pos
+			vec1 = vertices[(z + 1) * m_width + x].pos
 				-
-				vertices[z * width + x].pos;
+				vertices[z * m_width + x].pos;
 
-			vec2 = vertices[(z + 1) * width + (x + 1)].pos
+			vec2 = vertices[(z + 1) * m_width + (x + 1)].pos
 				-
-				vertices[z * width + x].pos;
+				vertices[z * m_width + x].pos;
 
 			normal = vec1.Cross(vec2);
-			vertices[(x + 1) + (z + 1) * width].normal += normal;
-			vertices[x + z * width].normal += normal;
-			vertices[x + (z + 1) * width].normal += normal;
+			vertices[(x + 1) + (z + 1) * m_width].normal += normal;
+			vertices[x + z * m_width].normal += normal;
+			vertices[x + (z + 1) * m_width].normal += normal;
 		}
 
-	uint *indices = new uint[(height - 1) * (width - 1) * 6 + 2 * 6];
+	uint *indices = new uint[(m_length - 1) * (m_width - 1) * 6 + 2 * 6];
 
-	for (uint z = 0; z < height - 1; z++)
-		for (uint x = 0; x < width - 1; x++)
+	for (uint z = 0; z < m_length - 1; z++)
+		for (uint x = 0; x < m_width - 1; x++)
 		{
 			//Calculating the normalized normal
-			vertices[z * width + x].normal.Normalize();
+			vertices[z * m_width + x].normal.Normalize();
 
 			//Calculating the indices
-			indices[(x + z * (width - 1)) * 6] = (x + 1) + (z + 1) * width;
-			indices[(x + z * (width - 1)) * 6 + 1] = (x + 1) + z * width;
-			indices[(x + z * (width - 1)) * 6 + 2] = x + z * width;
+			indices[(x + z * (m_width - 1)) * 6] = (x + 1) + (z + 1) * m_width;
+			indices[(x + z * (m_width - 1)) * 6 + 1] = (x + 1) + z * m_width;
+			indices[(x + z * (m_width - 1)) * 6 + 2] = x + z * m_width;
 
-			indices[(x + z * (width - 1)) * 6 + 3] = (x + 1) + (z + 1) * width;
-			indices[(x + z * (width - 1)) * 6 + 4] = x + z * width;
-			indices[(x + z * (width - 1)) * 6 + 5] = x + (z + 1) * width;
+			indices[(x + z * (m_width - 1)) * 6 + 3] = (x + 1) + (z + 1) * m_width;
+			indices[(x + z * (m_width - 1)) * 6 + 4] = x + z * m_width;
+			indices[(x + z * (m_width - 1)) * 6 + 5] = x + (z + 1) * m_width;
 		}
 
-	indices[(height - 1) * (width - 1) * 6] = width * height;
-	indices[(height - 1) * (width - 1) * 6 + 1] = width * height + 2;
-	indices[(height - 1) * (width - 1) * 6 + 2] = width * height + 1;
+	indices[(m_length - 1) * (m_width - 1) * 6] = m_width * m_length;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 1] = m_width * m_length + 2;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 2] = m_width * m_length + 1;
 
-	indices[(height - 1) * (width - 1) * 6 + 3] = width * height + 2;
-	indices[(height - 1) * (width - 1) * 6 + 4] = width * height + 3;
-	indices[(height - 1) * (width - 1) * 6 + 5] = width * height + 1; 
+	indices[(m_length - 1) * (m_width - 1) * 6 + 3] = m_width * m_length + 2;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 4] = m_width * m_length + 3;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 5] = m_width * m_length + 1; 
 
 
-	indices[(height - 1) * (width - 1) * 6 + 6] = width * height + 4;
-	indices[(height - 1) * (width - 1) * 6 + 7] = width * height + 6;
-	indices[(height - 1) * (width - 1) * 6 + 8] = width * height + 5;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 6] = m_width * m_length + 4;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 7] = m_width * m_length + 6;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 8] = m_width * m_length + 5;
 
-	indices[(height - 1) * (width - 1) * 6 + 9] = width * height + 6;
-	indices[(height - 1) * (width - 1) * 6 + 10] = width * height + 7;
-	indices[(height - 1) * (width - 1) * 6 + 11] = width * height + 5;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 9] = m_width * m_length + 6;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 10] = m_width * m_length + 7;
+	indices[(m_length - 1) * (m_width - 1) * 6 + 11] = m_width * m_length + 5;
 
 	m_mesh->Flush();
-	m_mesh->Initialize(vertices, sizeof(Vertex), width * height + 8, indices, (height - 1) * (width - 1) * 6 + 2 * 6);
+	m_mesh->Initialize(vertices, sizeof(Vertex), m_width * m_length + 8, indices, (m_length - 1) * (m_width - 1) * 6 + 2 * 6);
 	direct3D->LoadMeshIntoDevice(m_mesh);
-	m_width = realWidth;
-	m_length = realHeight;
 	heightmapToPhys = heightmap;
 
 	delete[] vertices;	
@@ -506,6 +516,7 @@ void Level::SetTextureBasedOnNumber(int levelIndex, D3D* direct3D)
 	}
 	
 }
+
 void Level::SetWorldMatrix(m4& world)
 {
 	worldMatrix = world;
@@ -524,4 +535,41 @@ uint Level::GetWidth()
 uint Level::GetLength()
 {
 	return m_length;
+}
+
+float Level::GetMaxHeight() const
+{
+	return LEVEL_MAX_HEIGHT;
+}
+
+void Level::_FilterHeightMap(float *floatArray, const uint arrayHeight, const uint arrayWidth)
+{
+	float *temp = new float[arrayWidth * arrayHeight];
+	memcpy(temp, floatArray, sizeof(float) * arrayHeight * arrayWidth);
+
+	const float div = 1.0f / 9.0f;
+	const float div2 = 1.0f / 6.0f;
+
+	for (uint x = 1; x < arrayWidth - 1; ++x)
+	{
+		for (uint y = 1; y < arrayHeight - 1; ++y)
+		{
+			floatArray[x + y * arrayWidth] =
+				temp[x - 1 + (y - 1) * arrayWidth] +
+				temp[x + (y - 1) * arrayWidth] +
+				temp[x + 1 + (y - 1) * arrayWidth] +
+
+				temp[x - 1 + y * arrayWidth] +
+				temp[x + y * arrayWidth] +
+				temp[x + 1 + y * arrayWidth] +
+
+				temp[x - 1 + (y + 1) * arrayWidth] +
+				temp[x + (y + 1) * arrayWidth] +
+				temp[x + 1 + (y + 1) * arrayWidth];
+
+			floatArray[x + y * arrayWidth] *= div;
+		}
+	}
+
+	delete[] temp;
 }

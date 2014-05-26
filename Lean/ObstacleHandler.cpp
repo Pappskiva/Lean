@@ -12,7 +12,7 @@ ObstacleHandler::~ObstacleHandler()
 	
 }
 
-void ObstacleHandler::AddObstacle(string type, v3 pos)
+void ObstacleHandler::AddObstacle(string type, v3 pos, LightPack *light)
 {
 	if (nrOfObst == maxNrOfObst)
 	{
@@ -25,6 +25,7 @@ void ObstacleHandler::AddObstacle(string type, v3 pos)
 		delete[] obstacles;
 		obstacles = temp;
 	}
+
 	if (type == "l")
 	{
 		obstacles[nrOfObst] = new LeafObstacle();
@@ -45,6 +46,8 @@ void ObstacleHandler::AddObstacle(string type, v3 pos)
 		obstacles[nrOfObst] = new TrampolineObstacle();
 		obstacles[nrOfObst]->SetPosition(pos.x, pos.y, pos.z);
 	}
+	
+	obstacles[nrOfObst]->SetLight(light);
 	nrOfObst++;
 }
 

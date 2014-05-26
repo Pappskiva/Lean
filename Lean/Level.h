@@ -45,6 +45,8 @@ public:
 	void SetRotationZ(float);
 	float GetRotationZ();
 
+	float GetMaxHeight() const;
+
 	void SetScale(float);
 	float GetScale();
 
@@ -69,10 +71,12 @@ private:
 
 	void	SetTextureBasedOnNumber(int, D3D*);
 
+	void	_FilterHeightMap(float *floatArray, const uint arrayHeight, const uint arrayWidth);
+
 private:
 	Mesh *m_mesh;
 	Shader *m_shader;
-	Texture *m_Texture1, *m_Texture2;
+	Texture *m_Texture1, *m_Texture2, *m_mask;
 
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
@@ -91,6 +95,8 @@ private:
 
 	uint m_width;
 	uint m_length;
+
+	const float LEVEL_MAX_HEIGHT = 2.5f;
 
 };
 

@@ -36,6 +36,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="NameInput.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="ObstacleHandler.cpp" />
     <ClCompile Include="Particle.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="MagnetObstacle.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="NameInput.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="ObstacleHandler.h" />
     <ClInclude Include="Particle.h" />

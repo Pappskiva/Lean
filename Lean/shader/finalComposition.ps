@@ -17,5 +17,6 @@ float4 PS(PixelInput input) : SV_Target
     float3 diffuseLight = lightData.rgb;
 	float specularLight = lightData.a;
 
+	//return float4(diffuseLight , 0.0f);
 	return float4(diffuseColor * diffuseLight + specularLight, 1.0f);
 }

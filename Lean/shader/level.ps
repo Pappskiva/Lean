@@ -4,6 +4,7 @@
 
 Texture2D shaderTexture1 : register (t0);
 Texture2D shaderTexture2 : register (t1);
+Texture2D maskTexture : register (t2);
 SamplerState SampleType;
 
 SamplerState linearSampler //Tillagd för att jag inte kunde lista ut hur man lade till en samplerstate rätt i Shader klassen
@@ -36,12 +37,22 @@ struct PixelOutput
 ////////////////////////////////////////////////////////////////////////////////
 PixelOutput LevelPixelShader(PixelInputType input)
 {
-	float lowestBlendHeight = 0.65f; //The lowest height, everything below this only uses the dark grimy texture
-	float highestBlendHeight = 1.8f; //The heighest height, everything above this only uses the nature texture
-	int natureTextureWrapAmount = 4;
-	int grimyTextureWrapAmount = 1;
+	PixelOutput outColors;
+	float heightDef = maskTexture.Sample(linearSampler, input.tex * 0.75f).r * 1.5f;
+	
+	const float natureTextureWrapAmount = 4.0f;
+	const float grimyTextureWrapAmount = 0.5f;
+	const float blendHeight = 0.5f + heightDef;
 
-    PixelOutput outColors;
+	if (input.height >= blendHeight)
+		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex * natureTextureWrapAmount).rgb;
+	else
+		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex * grimyTextureWrapAmount).rgb;
+
+	/*float lowestBlendHeight = 0.65f; //The lowest height, everything below this only uses the dark grimy texture
+	float highestBlendHeight = 1.8f; //The heighest height, everything above this only uses the nature texture
+	
+   
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location,
 	// based on the height the original vertex was localy at, the texture used is changed as well
@@ -61,7 +72,7 @@ PixelOutput LevelPixelShader(PixelInputType input)
 	else
 	{
 		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex * grimyTextureWrapAmount).rgb;
-	}
+	}*/
 
 	outColors.normal.rgb =  0.5f * (normalize(input.normal) + 1.0f);
 	

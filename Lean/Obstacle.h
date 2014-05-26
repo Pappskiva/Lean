@@ -34,6 +34,7 @@ enum Type //Jag är inte säker på om den behövs, men det kanske är bättre att låt
 	TRAMPOLINE
 };
 
+class LightPack;
 
 class Obstacle
 {
@@ -68,6 +69,8 @@ public:
 	void	UpdateWorldMatrix();
 	void	GetWorldMatrix(m4&);
 
+	void	SetLight(LightPack *light);
+
 	/*Få ut vilken typ det är*/
 	Type	GetType();
 
@@ -88,6 +91,7 @@ protected:
 	Shader			*m_shader;
 	Texture			*m_Texture;
 	Sound			*m_Sound;
+	LightPack		*m_Light;
 	
 
 	/*Vilken typ som hindret är*/
@@ -116,6 +120,11 @@ inline Mesh* Obstacle::GetMesh()
 inline void Obstacle::SetShader(const Shader *shader)
 {
 	this->m_shader = (Shader *)shader;
+}
+
+inline void Obstacle::SetLight(LightPack *light)
+{
+	this->m_Light = light;
 }
 
 #endif

@@ -446,19 +446,16 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Goal->SetPosition(goalPos.x, goalPos.y, goalPos.z);
 	m_Goal->SetNextLevelNumber(1);*/
 
-	AddPointLight(v3(-1.0f, 0.5f, -1.0f), 2.0f, v3(0, 0, 1), 1.0f);
-	AddPointLight(v3(-1.0f, 0.5f, 1.0f), 2.0f, v3(0, 1, 0), 1.0f);
-	AddPointLight(v3(1.0f, 0.5f, -1.0f), 2.0f, v3(1, 0, 0), 1.0f);
-	AddPointLight(v3(1.0f, 0.5f, 1.0f), 2.0f, v3(1, 1, 0), 1.0f);
 	
 
-	m_Direct3D->CreateShadowmap(1024, 1024);
+	const uint shadowMapResolution = 1024;
+	m_Direct3D->CreateShadowmap(shadowMapResolution, shadowMapResolution);
 
-	v3 lightDir = v3(5, 10, -3).GetNormalized();
+	v3 lightDir = v3(5, 20, -3).GetNormalized();
 	v3 camPos = lightDir * 40.0f;
 	shadowCamera.SetPosition(camPos);
 	shadowCamera.LookAt(v3(0.0f));
-	shadowCamera.SetScreenSize(1024, 1024);
+	shadowCamera.SetScreenSize(shadowMapResolution, shadowMapResolution);
 	shadowCamera.SetFarPlane(40.0f);
 	shadowCamera.SetNearPlane(10.0f);
 	shadowCamera.SetFieldOfView((float)PI * 0.125f);
@@ -472,8 +469,12 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Camera->GeneratePerspectiveProjectionMatrix();
 
 	firstLightPassData.directionalLightDirection = lightDir;
-	firstLightPassData.directionalLightColor = v3(1.0f, 1.0f, 1.0f);
-	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
+	firstLightPassData.directionalLightColor = v3(0.9f, 0.8f, 0.1f);
+	firstLightPassData.ambientColor = v3(0.3f, 0.2f, 0.2f);
+	firstLightPassData.offsets1 = v2(1.0f / shadowMapResolution, 1.0f / shadowMapResolution);
+	firstLightPassData.offsets2 = v2(1.0f / shadowMapResolution, -1.0f / shadowMapResolution);
+	firstLightPassData.offsets3 = v2(-1.0f / shadowMapResolution, 1.0f / shadowMapResolution);
+	firstLightPassData.offsets4 = v2(-1.0f / shadowMapResolution, -1.0f / shadowMapResolution);
 	directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 
 	gameTimer = 0;
@@ -803,7 +804,6 @@ bool Application::Frame(float deltaTime)
 		// Har bollen fallit av banan?
 		v3 ballPos;
 		m_Ball->GetFlatPosition(ballPos);
-
 		if (ballPos.y <= 1.0f)
 		{
 
@@ -1255,7 +1255,7 @@ void Application::_RenderLights()
 	m_Direct3D->RenderFullScreenQuad();
 }
 
-void Application::AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity)
+LightPack& Application::AddPointLight(const v3 &center, const float radius, const v3 &color, const float intensity)
 {
 	LightPack &light = lights.Append();
 	light.pos = center;
@@ -1265,6 +1265,13 @@ void Application::AddPointLight(const v3 &center, const float radius, const v3 &
 	light.mesh = lightSphereMesh;
 	light.shader = pointLightShader;
 	light.lightType = LT_Point;
+
+	return light;
+}
+
+LightPack& Application::AddPointLight()
+{
+	return lights.Append();
 }
 
 void Application::ChangeLevel(int levelNumber)
@@ -1279,14 +1286,33 @@ void Application::ChangeLevel(int levelNumber)
 	m_Level->SetRotationX(0.0f);
 	m_Level->SetRotationZ(0.0f);
 	
-	m_Box->SetScale( (m_Level->GetWidth() / 3.2));
+	m_Box->SetScale( (m_Level->GetWidth() / 3.2) * 0.5f);
 
 	//Ta bort alla tidigare hinder
 	m_ObstacleHandler->RemoveAllObstacles();
+	lights.Clear();
 	//Lägg in de nya hindren
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos);
+		LightPack &light = AddPointLight(obstacles[i].pos + v3(0.0f, 0.5f, 0.0f), 2.5f, v3(0.0f), 3.0f);
+		switch (obstacles[i].type[0])
+		{
+		case 'l':
+			light.color = v3(1.0f, 0.7f, 0.15f);
+			break;
+		case 'i':
+			light.color = v3(0.2f, 0.2f, 1.0f);
+			break;
+
+		case 'm':
+			light.color = v3(1.0f, 0.2f, 0.2f);
+			break;
+		case 't':
+			light.color = v3(0.2f, 0.4f, 0.4f);
+			break;
+		}
+
+		m_ObstacleHandler->AddObstacle(obstacles[i].type, obstacles[i].pos, &light);
 	}
 	//Reinitsiera de nya hindren
 	m_ObstacleHandler->Initialize(m_Direct3D, m_hwnd);
@@ -1309,4 +1335,9 @@ void Application::ChangeLevel(int levelNumber)
 	}
 
 	m_Clock->RestartClock();
+}
+
+void LightPack::SetPosition(const v3 &pos)
+{
+	this->pos = pos;
 }

@@ -17,7 +17,7 @@ class ObstacleHandler
 public:
 	ObstacleHandler();
 	~ObstacleHandler();
-	void AddObstacle(string type, v3 pos);
+	void AddObstacle(string type, v3 pos, LightPack *light);
 	void Render(D3D *direct3D);
 	void Update(float deltaTime, float cameraPosX, float cameraPosZ, float planeRotationX, float planeRotationZ, Ball *ball, ParticleHandler *particles);
 	void RemoveAllObstacles();

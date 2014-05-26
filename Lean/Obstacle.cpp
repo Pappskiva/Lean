@@ -2,6 +2,7 @@
 // Filename: Obstacle.cpp
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "Application.h"
 #include "Obstacle.h"
 
 Obstacle::Obstacle()
@@ -148,6 +149,9 @@ void Obstacle::UpdateWorldMatrix()
 
 	/*Matriserna multipliceras ihop*/
 	worldMatrix = scaleMatrix * billBoardRotationMatrix * localSpace * worldRotationMatrix;
+
+	static const v3 lightOffset(0.0f, 0.5f, 0.0f);
+	m_Light->SetPosition(worldMatrix.GetPos() + lightOffset);
 }
 
 void Obstacle::GetWorldMatrix(m4& worldMatrix)
