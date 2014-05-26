@@ -117,7 +117,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Initialize the ball object
-	result = m_Ball->Initialize(m_Direct3D, L"data//ball.png");
+	result = m_Ball->Initialize(m_Direct3D, L"data//MetalBall.png");
 	if (!result)
 	{
 		return false;

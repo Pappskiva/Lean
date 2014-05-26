@@ -144,8 +144,12 @@
     <Image Include="data\box.png" />
     <Image Include="data\GameOverSign.png" />
     <Image Include="data\LeanTitle.png" />
+    <Image Include="data\MetalBall.png" />
     <Image Include="data\NormalSign.png" />
+    <Image Include="data\SoccerBall.png" />
+    <Image Include="data\TennisBall.png" />
     <Image Include="data\WinSign.png" />
+    <Image Include="data\WorldBall.png" />
     <Image Include="leaf.png" />
     <Image Include="magnet.png" />
     <Image Include="testAutumnGround.png" />
