@@ -589,6 +589,9 @@ bool Application::Frame(float deltaTime)
 		case 4:
 			m_GameMode = MODE_ENDLESS;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 
@@ -596,6 +599,9 @@ bool Application::Frame(float deltaTime)
 		case 5:
 			m_GameMode = MODE_CLASSIC;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 
@@ -603,6 +609,9 @@ bool Application::Frame(float deltaTime)
 		case 6:
 			m_GameMode = MODE_EASY;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 		}
