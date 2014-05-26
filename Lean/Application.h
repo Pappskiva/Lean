@@ -36,7 +36,7 @@ const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 250.0f;
 const float SCREEN_NEAR = 0.1f;
 const int MAX_LEVELS = 4;
-const int MAX_NR_OF_LIVES = 9;
+const int MAX_NR_OF_LIVES = 7;
 
 
 enum GameState
