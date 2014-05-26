@@ -206,10 +206,6 @@ int Menu::Update(float deltaTime)
 			{
 				mSubMenu = SUB_MAIN;
 			}
-			else
-			{
-				return 3;	//quit
-			}
 		}
 	}
 

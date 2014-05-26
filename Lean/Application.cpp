@@ -657,7 +657,7 @@ bool Application::Frame(float deltaTime)
 		//Check if the user has pressed Escape to close the program
 		if (m_Input->IsEscapePressed())
 		{
-			return false;
+			m_GameState = STATE_MAINMENU;
 		}
 
 		//Check if the user has pressed Enter to pause
