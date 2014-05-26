@@ -117,7 +117,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	}
 
 	//Initialize the ball object
-	result = m_Ball->Initialize(m_Direct3D, L"data//ball.png");
+	result = m_Ball->Initialize(m_Direct3D, L"data//MetalBall.png");
 	if (!result)
 	{
 		return false;
@@ -165,6 +165,20 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
+
+	m_CLPoints = new SentenceClass;
+	if (!m_CLPoints)
+	{
+		return false;
+	}
+	result = m_CLPoints->Initialize(m_Direct3D, "center", 1.0f, 20, screenWidth, screenHeight);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+	m_CLPoints->SetPosition(screenWidth / 2, screenHeight / 2);
+	m_CLPoints->SetColor(1.0f, 1.0f, 1.0f);
 
 	// Initialisera Text objekt
 	result = m_Text->Initialize(m_Direct3D, "center", 2.0f, 16, screenWidth, screenHeight);
@@ -590,6 +604,9 @@ bool Application::Frame(float deltaTime)
 		case 4:
 			m_GameMode = MODE_ENDLESS;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 
@@ -597,6 +614,9 @@ bool Application::Frame(float deltaTime)
 		case 5:
 			m_GameMode = MODE_CLASSIC;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 
@@ -604,6 +624,9 @@ bool Application::Frame(float deltaTime)
 		case 6:
 			m_GameMode = MODE_EASY;
 			m_GameState = STATE_PLAYING;
+			ChangeLevel(0);
+			points = 0;
+			nrOfLives = MAX_NR_OF_LIVES;
 			m_Clock->RestartClock();
 			break;
 		}
@@ -618,17 +641,28 @@ bool Application::Frame(float deltaTime)
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
-		m_NameInput->Update(deltaTime);
-		string name = m_NameInput->InputName();
-
-		if (m_Input->IsEnterPressed())
+		if (points > m_Highscore->CheckTopTen())
 		{
-			m_Highscore->SaveScore(name, points); // Ingen poäng för tid här
+			m_NameInput->Update(deltaTime);
+			string name = m_NameInput->InputName();
+
+			if (m_Input->IsEnterPressed())
+			{
+				m_Highscore->SaveScore(name, points); // Ingen poäng för tid här
+				ChangeLevel(0);
+				m_GameState = STATE_HIGHSCORE;
+				nrOfLives = MAX_NR_OF_LIVES;
+				points = 0;
+			}
+		}
+		else
+		{
 			ChangeLevel(0);
 			m_GameState = STATE_HIGHSCORE;
 			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
 		}
+
 	}
 	else if (m_GameState == STATE_WON)
 	{
@@ -658,7 +692,7 @@ bool Application::Frame(float deltaTime)
 		//Check if the user has pressed Escape to close the program
 		if (m_Input->IsEscapePressed())
 		{
-			return false;
+			m_GameState = STATE_MAINMENU;
 		}
 
 		//Check if the user has pressed Enter to pause
@@ -935,8 +969,9 @@ void Application::RenderGraphics()
 		{
 			m_StandardSignImage->Render(m_Direct3D);
 			m_StandardInfoText->SetText("Top Players", m_Direct3D);
-			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
+			m_StandardInfoText->SetColor(0.1f, 0.5f, 1.0f);
 			m_StandardInfoText->Render(m_Direct3D);
+			m_HSSentence->SetColor(0.1f, 0.8f, 0.8f);
 			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
 			
 		}
@@ -953,6 +988,12 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetText("Level Cleared", m_Direct3D);
 			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
 			m_StandardInfoText->Render(m_Direct3D);
+
+			string printString = "Current score: " + to_string(points);//Put everything into one line
+			char* textToSend = (char*)printString.c_str();//Convert to char*
+
+			m_CLPoints->SetText(textToSend, m_Direct3D);
+			m_CLPoints->Render(m_Direct3D);
 		}
 		if (m_GameState == STATE_WON)
 		{
@@ -991,6 +1032,12 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	if (m_CLPoints)
+	{
+		m_CLPoints->Shutdown();
+		delete m_CLPoints;
+		m_CLPoints = 0;
+	}
 	// Release the sentence object
 	if (m_HSSentence)
 	{

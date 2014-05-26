@@ -46,20 +46,20 @@ bool LevelLoaderClass::LoadLevel(int level, float *&heightMap, int &height, int 
 		{
 			in >> goalPos.x;
 			in >> goalPos.z;
-			goalPos.y = 2.55;
+			goalPos.y = 3.80;
 		}
 		else if (str == "s")
 		{
 			in >> startPos.x;
 			in >> startPos.z;
-			startPos.y = 2.55;
+			startPos.y = 3.80;
 		}
 		else
 		{
 			obstacles[obstPos].type = str;
 			in >> obstacles[obstPos].pos.x;
 			in >> obstacles[obstPos].pos.z;
-			obstacles[obstPos].pos.y = 2.55;
+			obstacles[obstPos].pos.y = 3.80;
 			obstPos++;
 		}
 	}

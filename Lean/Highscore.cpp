@@ -44,13 +44,13 @@ void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth
 		int i = 0;
 		int xPos, yPos;
 		xPos = screenWidth / 3;
-		yPos = screenHeight / 3;
+		yPos = screenHeight / 4;
 		current = first;
-		while (current != NULL && i < 11)
-		{
 
+		while (current != NULL && i < 10)
+		{
 			i++;
-			yPos += 20;
+			yPos += 30;
 			string name = current->name;		//Prep for print
 			char points[16];
 			_itoa_s(current->value, points, 10);
@@ -58,13 +58,11 @@ void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth
 			string printString = to_string(i) + ": " + name + " " + points;//Put everything into one line
 			char* textToSend = (char*)printString.c_str();//Convert to char*
 
-			sentence->SetColor(1.0f, 1.0f, 1.0f);
 			sentence->SetText(textToSend, d3d);
 			sentence->SetPosition(xPos, yPos);
 			sentence->Render(d3d);
 
 			current = current->next;
-
 		}
 	}
 	else
@@ -91,6 +89,23 @@ void Highscore::Shutdown()
 	first = NULL;
 	last = NULL;
 	current = NULL;
+}
+int Highscore::CheckTopTen()
+{
+	if (first == NULL)
+		LoadHighscoreFromText("../HighscoreList.txt");
+
+	int i = 0;
+	int ans = 0;
+	current = first;
+	while (i < 10 && current != NULL)
+	{
+		i++;
+		ans = current->value;
+		current = current->next;
+	}
+
+	return ans;
 }
 void Highscore::LoadHighscoreFromText(char* filename)
 {

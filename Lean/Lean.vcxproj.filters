@@ -458,6 +458,18 @@
     <Image Include="data\box.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="data\MetalBall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\SoccerBall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\TennisBall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="data\WorldBall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="shader\shadowFill.vs">
