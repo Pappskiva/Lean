@@ -116,9 +116,9 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	vectorToBall.y = 0;
 
 	v3 soundV;
-	soundV.x = ballPos.x;
-	soundV.y = ballPos.y;
-	soundV.z = ballPos.z + 1;
+	soundV.x = 1;
+	soundV.y = 1;
+	soundV.z = 1;
 
 	m_Sound->UpdateListener(ballPos.x, ballPos.y, ballPos.z, soundV);
 

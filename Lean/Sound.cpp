@@ -202,7 +202,7 @@ void Sound::PlayOnce()
 {
 	m_SecondaryBuffer1->SetCurrentPosition(0);
 
-	m_SecondaryBuffer1->SetVolume(DSBVOLUME_MAX);
+	m_SecondaryBuffer1->SetVolume(-2500);
 
 	m_SecondaryBuffer1->Play(0, 0, 0);
 }
