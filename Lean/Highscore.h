@@ -22,10 +22,9 @@ public:
 	void SaveScore(string name, int totalScore);
 	void PrintHighscore(SentenceClass* sentence, D3D* d3d, int screenWidth, int screenHeight);
 	void Shutdown();
+	int CheckTopTen();
 
 private:
-
-	//SentenceClass* sentence;
 
 	void LoadHighscoreFromText(char* filename);
 	void SaveHighscoreToText(char* filename);

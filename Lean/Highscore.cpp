@@ -90,6 +90,23 @@ void Highscore::Shutdown()
 	last = NULL;
 	current = NULL;
 }
+int Highscore::CheckTopTen()
+{
+	if (first == NULL)
+		LoadHighscoreFromText("../HighscoreList.txt");
+
+	int i = 0;
+	int ans = 0;
+	current = first;
+	while (i < 10 && current != NULL)
+	{
+		i++;
+		ans = current->value;
+		current = current->next;
+	}
+
+	return ans;
+}
 void Highscore::LoadHighscoreFromText(char* filename)
 {
 	Shutdown();

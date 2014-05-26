@@ -626,17 +626,28 @@ bool Application::Frame(float deltaTime)
 	}
 	else if (m_GameState == STATE_GAMEOVER)
 	{
-		m_NameInput->Update(deltaTime);
-		string name = m_NameInput->InputName();
-
-		if (m_Input->IsEnterPressed())
+		if (points > m_Highscore->CheckTopTen())
 		{
-			m_Highscore->SaveScore(name, points); // Ingen poäng för tid här
+			m_NameInput->Update(deltaTime);
+			string name = m_NameInput->InputName();
+
+			if (m_Input->IsEnterPressed())
+			{
+				m_Highscore->SaveScore(name, points); // Ingen poäng för tid här
+				ChangeLevel(0);
+				m_GameState = STATE_HIGHSCORE;
+				nrOfLives = MAX_NR_OF_LIVES;
+				points = 0;
+			}
+		}
+		else
+		{
 			ChangeLevel(0);
 			m_GameState = STATE_HIGHSCORE;
 			nrOfLives = MAX_NR_OF_LIVES;
 			points = 0;
 		}
+
 	}
 	else if (m_GameState == STATE_WON)
 	{
