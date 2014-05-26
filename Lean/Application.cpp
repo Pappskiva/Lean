@@ -166,6 +166,20 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 		return false;
 	}
 
+	m_CLPoints = new SentenceClass;
+	if (!m_CLPoints)
+	{
+		return false;
+	}
+	result = m_CLPoints->Initialize(m_Direct3D, "center", 1.0f, 20, screenWidth, screenHeight);
+	if (!result)
+	{
+		WBOX(L"Could not initialize the sentence object.");
+		return false;
+	}
+	m_CLPoints->SetPosition(screenWidth / 2, screenHeight / 2);
+	m_CLPoints->SetColor(1.0f, 1.0f, 1.0f);
+
 	// Initialisera Text objekt
 	result = m_Text->Initialize(m_Direct3D, "center", 2.0f, 16, screenWidth, screenHeight);
 	if (!result)
@@ -974,6 +988,12 @@ void Application::RenderGraphics()
 			m_StandardInfoText->SetText("Level Cleared", m_Direct3D);
 			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
 			m_StandardInfoText->Render(m_Direct3D);
+
+			string printString = "Current score: " + to_string(points);//Put everything into one line
+			char* textToSend = (char*)printString.c_str();//Convert to char*
+
+			m_CLPoints->SetText(textToSend, m_Direct3D);
+			m_CLPoints->Render(m_Direct3D);
 		}
 		if (m_GameState == STATE_WON)
 		{
@@ -1012,6 +1032,12 @@ void Application::RenderGraphics()
 
 void Application::Shutdown()
 {
+	if (m_CLPoints)
+	{
+		m_CLPoints->Shutdown();
+		delete m_CLPoints;
+		m_CLPoints = 0;
+	}
 	// Release the sentence object
 	if (m_HSSentence)
 	{

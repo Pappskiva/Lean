@@ -127,6 +127,7 @@ private:
 	SentenceClass	m_PauseText;
 
 	SentenceClass	*m_HSSentence;
+	SentenceClass	*m_CLPoints;
 
 
 
