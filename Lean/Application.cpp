@@ -657,7 +657,7 @@ bool Application::Frame(float deltaTime)
 		//Check if the user has pressed Escape to close the program
 		if (m_Input->IsEscapePressed())
 		{
-			return false;
+			m_GameState = STATE_MAINMENU;
 		}
 
 		//Check if the user has pressed Enter to pause
@@ -935,8 +935,9 @@ void Application::RenderGraphics()
 		{
 			m_StandardSignImage->Render(m_Direct3D);
 			m_StandardInfoText->SetText("Top Players", m_Direct3D);
-			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
+			m_StandardInfoText->SetColor(0.1f, 0.5f, 1.0f);
 			m_StandardInfoText->Render(m_Direct3D);
+			m_HSSentence->SetColor(0.1f, 0.8f, 0.8f);
 			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
 			
 		}
