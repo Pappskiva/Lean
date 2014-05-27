@@ -483,8 +483,8 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	m_Camera->GeneratePerspectiveProjectionMatrix();
 
 	firstLightPassData.directionalLightDirection = lightDir;
-	firstLightPassData.directionalLightColor = v3(0.9f, 0.8f, 0.1f);
-	firstLightPassData.ambientColor = v3(0.3f, 0.2f, 0.2f);
+	firstLightPassData.directionalLightColor = v3(1.0f, 0.9f, 0.7f);
+	firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
 	firstLightPassData.offsets1 = v2(1.0f / shadowMapResolution, 1.0f / shadowMapResolution);
 	firstLightPassData.offsets2 = v2(1.0f / shadowMapResolution, -1.0f / shadowMapResolution);
 	firstLightPassData.offsets3 = v2(-1.0f / shadowMapResolution, 1.0f / shadowMapResolution);
@@ -529,7 +529,7 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	points = 0;
 	m_Highscore = new Highscore();
 	m_HSSentence = new SentenceClass;
-	m_HSSentence->Initialize(m_Direct3D, "left", 1.0f, 16, screenWidth, screenHeight);
+	m_HSSentence->Initialize(m_Direct3D, "center", 1.0f, 16, screenWidth, screenHeight);
 
 	m_PauseText.Initialize(m_Direct3D, "center", 1.0f, sizeof("Game Paused"), screenWidth, screenHeight);
 	m_PauseText.SetColor(1, 1, 1);
@@ -960,7 +960,7 @@ void Application::RenderGraphics()
 
 			m_Text->SetText(timeText, m_Direct3D);
 			m_Text->SetPosition(screenWidth / 2, 15);
-			m_Text->SetColor(0.1f, 0.5f, 1.0f);
+			m_Text->SetColor(0.0f, 0.3f, 1.0f);
 			m_Text->Render(m_Direct3D);
 
 		}
@@ -969,9 +969,9 @@ void Application::RenderGraphics()
 		{
 			m_StandardSignImage->Render(m_Direct3D);
 			m_StandardInfoText->SetText("Top Players", m_Direct3D);
-			m_StandardInfoText->SetColor(0.1f, 0.5f, 1.0f);
+			m_StandardInfoText->SetColor(1.0f, 0.8f, 0.0f);
 			m_StandardInfoText->Render(m_Direct3D);
-			m_HSSentence->SetColor(0.1f, 0.8f, 0.8f);
+			m_HSSentence->SetColor(1.0f, 0.8f, 0.0f);
 			m_Highscore->PrintHighscore(m_HSSentence, m_Direct3D, screenWidth, screenHeight);
 			
 		}
@@ -986,13 +986,14 @@ void Application::RenderGraphics()
 			// Render image object
 			m_StandardSignImage->Render(m_Direct3D);
 			m_StandardInfoText->SetText("Level Cleared", m_Direct3D);
-			m_StandardInfoText->SetColor(1.0f, 1.0f, 1.0f);
+			m_StandardInfoText->SetColor(1.0f, 0.8f, 0.0f);
 			m_StandardInfoText->Render(m_Direct3D);
 
 			string printString = "Current score: " + to_string(points);//Put everything into one line
 			char* textToSend = (char*)printString.c_str();//Convert to char*
 
 			m_CLPoints->SetText(textToSend, m_Direct3D);
+			m_CLPoints->SetColor(1.0f, 0.8f, 0.0f);
 			m_CLPoints->Render(m_Direct3D);
 		}
 		if (m_GameState == STATE_WON)
@@ -1330,6 +1331,16 @@ void Application::ChangeLevel(int levelNumber)
 	int nrOfObst;
 	m_Level->LoadLevel(levelNumber, m_Direct3D, obstacles, startPos, goalPos, nrOfObst);
 
+	// Ändra skybox beroende på bana
+	if (levelNumber == 0 || levelNumber == 1)
+	{
+		m_Skybox->SwitchSkybox(m_Direct3D, "data/skybox_abovesea.dds");
+	}
+	else if (levelNumber == 2 || levelNumber == 3)
+	{
+		m_Skybox->SwitchSkybox(m_Direct3D, "data/skybox_stormy.dds");
+	}
+
 	m_Level->SetRotationX(0.0f);
 	m_Level->SetRotationZ(0.0f);
 	
@@ -1341,21 +1352,20 @@ void Application::ChangeLevel(int levelNumber)
 	//Lägg in de nya hindren
 	for (int i = 0; i < nrOfObst; i++)
 	{
-		LightPack &light = AddPointLight(obstacles[i].pos + v3(0.0f, 0.5f, 0.0f), 2.5f, v3(0.0f), 3.0f);
+		LightPack &light = AddPointLight(obstacles[i].pos + v3(0.0f, 0.5f, 0.0f), 8.5f, v3(0.0f), 5.0f);
 		switch (obstacles[i].type[0])
 		{
 		case 'l':
 			light.color = v3(1.0f, 0.7f, 0.15f);
 			break;
 		case 'i':
-			light.color = v3(0.2f, 0.2f, 1.0f);
+			light.color = v3(0.0f, 0.0f, 1.0f);
 			break;
-
 		case 'm':
-			light.color = v3(1.0f, 0.2f, 0.2f);
+			light.color = v3(1.0f, 0.0f, 0.0f);
 			break;
 		case 't':
-			light.color = v3(0.2f, 0.4f, 0.4f);
+			light.color = v3(0.0f, 1.0f, 0.0f);
 			break;
 		}
 

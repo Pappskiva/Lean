@@ -16,6 +16,7 @@ public:
 	void Render(D3D* d3d);
 	void UpdateShaderVariables(v3 cameraPos, m4 viewMatrix, m4 projectionMatrix);
 	void SetYawPitchRoll(float yaw, float pitch, float roll);	// Om man vill rotera skyboxen
+	bool SwitchSkybox(D3D* d3d, const HString &textureFilePath);
 
 	Texture* GetTextureCube();
 

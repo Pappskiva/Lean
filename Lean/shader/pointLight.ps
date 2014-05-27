@@ -45,19 +45,11 @@ float4 PointLightPixelShader(PixelInput input) : SV_Target0
 
     float attenuation = saturate(1.0f - length(lightVector) / lightRadius); 
 
+	attenuation *= attenuation;
     lightVector = normalize(lightVector); 
 
     float NdL = max(0, dot(normal, lightVector));
     float3 diffuseLight = NdL * lightColor.rgb;
-	
-	//return gBufferDepth.Sample(fullscreenQuadSampler, texCoord);
-	//return normalData;
-	//return float4(attenuation, attenuation, attenuation, 0.0f);
-
-	/*float light = 1 - (length(lightVector) / lightRadius);
-	diffuseLight.r = 1;
-	diffuseLight.g = min(light * 1.5f, 1.0f);
-	diffuseLight.b = saturate((light - 0.5f) * light * 2.0f + 1.0f);*/
 
 	return attenuation * lightIntensity * float4(diffuseLight.rgb, 0.0f);
 }

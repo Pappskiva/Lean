@@ -43,8 +43,8 @@ void Highscore::PrintHighscore(SentenceClass* sentence,D3D* d3d, int screenWidth
 	{
 		int i = 0;
 		int xPos, yPos;
-		xPos = screenWidth / 3;
-		yPos = screenHeight / 4;
+		xPos = screenWidth / 2;
+		yPos = screenHeight / 2 - 160;
 		current = first;
 
 		while (current != NULL && i < 10)

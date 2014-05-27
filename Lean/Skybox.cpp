@@ -166,6 +166,22 @@ void Skybox::SetYawPitchRoll(float yaw, float pitch, float roll)
 	this->mRoll = roll;
 }
 
+bool Skybox::SwitchSkybox(D3D* d3d, const HString &textureFilePath)
+{
+	if (mTextureCube)
+	{
+		mTextureCube->Shutdown();
+		mTextureCube = 0;
+	}
+
+	// Ladda in texturen för skyboxen
+	mTextureCube = d3d->LoadTextureFromFile(textureFilePath);
+	if (!mTextureCube)
+	{
+		return false;
+	}
+}
+
 Texture* Skybox::GetTextureCube()
 {
 	return this->mTextureCube;

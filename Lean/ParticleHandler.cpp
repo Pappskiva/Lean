@@ -145,7 +145,7 @@ void ParticleHandler::AddParticles(int type, float x, float y, float z)
 		emitterBase.SetStartPosition(v3(x, y, z));
 		//emitterBase.SetStartVariation(v2(1, 1)); //För stunden kan inget av värdena vara 0
 		//emitterBase.SetRandomVariation(false);
-		emitterBase.SetParticleMove(v3(0, 2, 0));
+		emitterBase.SetParticleMove(v3(-2, 2, -5));
 		emitterBase.SetRandomMove(true);
 		emitterBase.SetShader(particleBillboard);
 		emitterBase.SetTexture(leaf);

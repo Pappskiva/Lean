@@ -38,14 +38,14 @@ struct PixelOutput
 PixelOutput LevelPixelShader(PixelInputType input)
 {
 	PixelOutput outColors;
-	float heightDef = maskTexture.Sample(linearSampler, input.tex * 0.5f).r * 1.5f;
+	float heightDef = maskTexture.Sample(linearSampler, input.tex * 0.85f).r * 0.75f;
 	
 	const float natureTextureWrapAmount = 4.0f;
 	const float grimyTextureWrapAmount = 0.5f;
 	const float blendHeight = 0.5f + heightDef;
 
 	if (input.height >= blendHeight)
-		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex * natureTextureWrapAmount).rgb;
+		outColors.diffuse.rgb = shaderTexture1.Sample(linearSampler, input.tex * natureTextureWrapAmount).rgb * float3(.9f, .7f, .5f);
 	else
 		outColors.diffuse.rgb = shaderTexture2.Sample(linearSampler, input.tex * grimyTextureWrapAmount).rgb;
 
