@@ -46,7 +46,9 @@ bool TrampolineObstacle::Initialize(D3D* direct3D, HWND hwnd)
 }
 void TrampolineObstacle::Shutdown()
 {
-
+	m_Sound->Shutdown();
+	delete m_Sound;
+	m_Sound = 0;
 }
 //void TrampolineObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ)
 //{

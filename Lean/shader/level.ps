@@ -38,7 +38,7 @@ struct PixelOutput
 PixelOutput LevelPixelShader(PixelInputType input)
 {
 	PixelOutput outColors;
-	float heightDef = maskTexture.Sample(linearSampler, input.tex * 0.75f).r * 1.5f;
+	float heightDef = maskTexture.Sample(linearSampler, input.tex * 0.5f).r * 1.5f;
 	
 	const float natureTextureWrapAmount = 4.0f;
 	const float grimyTextureWrapAmount = 0.5f;

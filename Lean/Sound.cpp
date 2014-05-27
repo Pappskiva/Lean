@@ -247,6 +247,9 @@ long Sound::CalculateDistance()
 	temp = temp1 + temp2 + temp3;
 	ans = sqrt(temp);
 
+	if (ans > 2500)
+		ans = 2500;
+
 	return ans ;
 }
 long Sound::CalculateOrientation()

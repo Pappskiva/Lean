@@ -61,13 +61,13 @@ bool Application::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, in
 	{
 		return false;
 	}
-	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/LONELY_ROLLING_STAR.wav", 0, 0, 0);
+	result = m_Sound->Initialize2DSound(hwnd, "../Lean/Data/Musik/TestljudFiler/2.wav", 0, 0, 0);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Couldn't Initialize Direct Sound.", L"Error", MB_OK);
 		return false;
 	}
-	//m_Sound->PlayLoop(0.7f);
+	m_Sound->PlayLoop(0.7f);
 
 	m_Clock = new Clock();
 

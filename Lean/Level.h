@@ -96,7 +96,7 @@ private:
 	uint m_width;
 	uint m_length;
 
-	const float LEVEL_MAX_HEIGHT = 2.5f;
+	const float LEVEL_MAX_HEIGHT = 3.7f;
 
 };
 
