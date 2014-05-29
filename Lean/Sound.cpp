@@ -217,7 +217,8 @@ void Sound::Play3DSound()
 {
 	m_SecondaryBuffer1->SetCurrentPosition(0);
 	long temp = CalculateDistance();
-	m_SecondaryBuffer1->SetVolume(temp);
+	m_SecondaryBuffer1->SetVolume(temp - 1000);
+	//m_SecondaryBuffer1->SetPan(CalculateOrientation());
 	m_SecondaryBuffer1->Play(0, 0, 0);
 
 }
@@ -228,12 +229,6 @@ void Sound::UpdateListener(int xListenerPosition, int yListenerPosition, int zLi
 	zListPos = zListenerPosition;
 
 	this->m_lookAt = lookAT;
-
-
-	//m_SecondaryBuffer1->SetVolume(CalculateDistance());
-
-	//m_SecondaryBuffer1->SetPan(CalculateOrientation());
-
 }
 long Sound::CalculateDistance()
 {
@@ -241,16 +236,15 @@ long Sound::CalculateDistance()
 
 	long temp, temp1, temp2, temp3;
 	temp1 = (xListPos - xPos) * (xListPos - xPos);
-	temp2 = (yListPos - yPos) * (yListPos - yPos);
 	temp3 = (zListPos - zPos) * (zListPos - zPos);
-	temp = temp1 + temp2 + temp3;
+	temp = temp1 + temp3;
 	long distance = sqrt(temp);
 
 	if (distance >= 22)//22 max 0 min
 		return -10000;
 	else
 	{
-		ans =  distance* -454;
+		ans =  distance* -200;
 		return ans;
 	}
 }

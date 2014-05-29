@@ -37,7 +37,7 @@ bool MagnetObstacle::Initialize(D3D* direct3D, HWND hwnd)
 		return false;
 	}
 	m_Sound = new Sound;
-	m_Sound->Initialize2DSound(hwnd, "data/musik/MagnetHinder/MagnetMono2.wav", 0, 0, 0);
+	m_Sound->Initialize2DSound(hwnd, "data/musik/MagnetHinder/MagnetMono2.wav", m_position.x, m_position.y, m_position.z);
 
 	return true;
 }
@@ -118,9 +118,9 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	vectorToBall.y = 0;
 
 	v3 soundV;
-	soundV.x = ballPos.x;
+	soundV.x = ballPos.x + 1;
 	soundV.y = ballPos.y;
-	soundV.z = ballPos.z - 5;
+	soundV.z = ballPos.z - 1;
 
 	m_Sound->UpdateListener(ballPos.x, ballPos.y, ballPos.z, soundV);
 
@@ -128,11 +128,11 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	if (squaredDistance < 100) // Använder inte cooldown
 	{
 
-		m_Sound->Play3DSound();
 		if (squaredDistance > 1)
 		{
 			v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig
 			ball->AddForce(forceToAdd);
+			m_Sound->Play3DSound();
 		}
 		else //if(squaredDistance >= 0.2f)
 		{
@@ -142,6 +142,7 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 			vectorToBall.Normalize();
 			v3 forceToAdd = (-vectorToBall) * (76.438 - length) * deltaTime;
 			ball->AddForce(forceToAdd);
+			m_Sound->Play3DSound();
 		}
 	}
 }
