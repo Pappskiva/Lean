@@ -118,9 +118,9 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	vectorToBall.y = 0;
 
 	v3 soundV;
-	soundV.x = ballPos.x + 0;
-	soundV.y = ballPos.y + 1;
-	soundV.z = ballPos.z + 1;
+	soundV.x = ballPos.x;
+	soundV.y = ballPos.y;
+	soundV.z = ballPos.z - 5;
 
 	m_Sound->UpdateListener(ballPos.x, ballPos.y, ballPos.z, soundV);
 
@@ -128,11 +128,11 @@ void MagnetObstacle::Update(float deltaTime, float cameraPosX, float cameraPosZ,
 	if (squaredDistance < 100) // Använder inte cooldown
 	{
 
+		m_Sound->Play3DSound();
 		if (squaredDistance > 1)
 		{
 			v3 forceToAdd = (-vectorToBall / squaredDistance) * deltaTime * 75; // drar bollen till sig
 			ball->AddForce(forceToAdd);
-			m_Sound->PlayOnce();
 		}
 		else //if(squaredDistance >= 0.2f)
 		{

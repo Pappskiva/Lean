@@ -14,11 +14,11 @@
 #include <dsound.h>
 #include <stdio.h>
 #include <cmath>
-//#include <D3DX10Math.h>
+#include "DuckRenderer\DMath.h"
 #include <fstream>
 
 
-#include "DuckRenderer\DMath.h"
+
 class Sound
 {
 private:
@@ -62,9 +62,12 @@ private:
 	float CalculateAngle(v3 v1, v3 v2);
 
 
+	LPDWORD temp;
 	IDirectSound8* m_DirectSound;
 	IDirectSoundBuffer* m_PrimaryBuffer;
 	IDirectSoundBuffer8* m_SecondaryBuffer1;
+
+
 
 	int xPos, yPos, zPos;
 	int xListPos, yListPos, zListPos;

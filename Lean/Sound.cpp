@@ -5,10 +5,6 @@
 #include "Sound.h"
 #define MINSOUNDDIST	10
 #define DBPERANGLE		50
-#define HALFPI			1.57079
-#define PI				3.14159
-#define THREEQUATPI		4.71239
-#define TWOPI			6.28318
 #define ONE80PI			57.29577951308
 
 
@@ -58,12 +54,13 @@ bool Sound::InitializeDirectSound2D(HWND hwnd)
 	if (FAILED(result))
 		return false;
 
+
 	result = m_DirectSound->SetCooperativeLevel(hwnd, DSSCL_PRIORITY);
 	if (FAILED(result))
 		return false;
 
 	bufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	bufferDesc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRLVOLUME;
+	bufferDesc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN;
 	bufferDesc.dwBufferBytes = 0;
 	bufferDesc.dwReserved = 0;
 	bufferDesc.lpwfxFormat = NULL;
@@ -84,6 +81,7 @@ bool Sound::InitializeDirectSound2D(HWND hwnd)
 	result = m_PrimaryBuffer->SetFormat(&waveFormat);
 	if (FAILED(result))
 		return false;
+
 
 
 	return true;
@@ -211,14 +209,17 @@ void Sound::PlayLoop(double VolumePercentage)
 	double temp = 10000 * VolumePercentage;
 	long volume = -10000 + (long)temp;
 	m_SecondaryBuffer1->SetCurrentPosition(0);
-	m_SecondaryBuffer1->SetVolume(volume);
 	m_SecondaryBuffer1->Play(0, 0, DSBPLAY_LOOPING);
+	m_SecondaryBuffer1->SetVolume(volume);
+
 }
 void Sound::Play3DSound()
 {
 	m_SecondaryBuffer1->SetCurrentPosition(0);
-	m_SecondaryBuffer1->SetVolume(DSBVOLUME_MAX);
-	m_SecondaryBuffer1->Play(0, 0, DSBPLAY_LOOPING);
+	long temp = CalculateDistance();
+	m_SecondaryBuffer1->SetVolume(temp);
+	m_SecondaryBuffer1->Play(0, 0, 0);
+
 }
 void Sound::UpdateListener(int xListenerPosition, int yListenerPosition, int zListenerPosition, v3 lookAT)
 {
@@ -226,14 +227,12 @@ void Sound::UpdateListener(int xListenerPosition, int yListenerPosition, int zLi
 	yListPos = yListenerPosition;
 	zListPos = zListenerPosition;
 
+	this->m_lookAt = lookAT;
 
-	this->m_lookAt.x = lookAT.x;
-	this->m_lookAt.y = lookAT.y;
-	this->m_lookAt.z = lookAT.z;
 
-	m_SecondaryBuffer1->SetVolume(0 - CalculateDistance());
+	//m_SecondaryBuffer1->SetVolume(CalculateDistance());
 
-	m_SecondaryBuffer1->SetPan(CalculateOrientation());
+	//m_SecondaryBuffer1->SetPan(CalculateOrientation());
 
 }
 long Sound::CalculateDistance()
@@ -245,49 +244,32 @@ long Sound::CalculateDistance()
 	temp2 = (yListPos - yPos) * (yListPos - yPos);
 	temp3 = (zListPos - zPos) * (zListPos - zPos);
 	temp = temp1 + temp2 + temp3;
-	ans = sqrt(temp);
+	long distance = sqrt(temp);
 
-	if (ans > 2500)
-		ans = 2500;
-
-	return ans ;
+	if (distance >= 22)//22 max 0 min
+		return -10000;
+	else
+	{
+		ans =  distance* -454;
+		return ans;
+	}
 }
 long Sound::CalculateOrientation()
 {
-	float ans = 0, angle = 0;
+	float ans = 0;
 	v3 vTarget, vAim;
 	vTarget.x = xPos - xListPos;//Create vector from camera to object
-	vTarget.y = yPos - yListPos;
+	vTarget.y = 0;
 	vTarget.z = zPos - zListPos;
 
 	vAim = m_lookAt;
 
-	angle = CalculateAngle(vTarget, vAim);
-	if (angle <= 90 && angle >= -90)//Ljud källan finns i första eller andra kvadranten
-	{
-		ans = angle;
-	}
-	else if (angle <= -90)//Ljud källan finns i tredje kvadranten
-	{
-		ans = 170 + angle;
-		ans = ans*-1;
-	}
-	else//Ljud källan finns i fjärde kvadranten
-	{
-		ans = 170 - angle;
-	}
-
-	ans = ans*DBPERANGLE;
-
-	if (ans < -10000)//Fixar så att det inte överskrider -10 000 till 10 000 intervallet
-		ans = -10000;
-	if (ans > 10000)
-		ans = 10000;
+	ans = CalculateAngle(vTarget, vAim);
 
 	return ans;
 }
 float Sound::CalculateAngle(v3 vTarg, v3 vA)
-{
+{//Returns angle in RADIANS
 	float ans, dot, checkRight;
 	v3 v1, v2, up, cross;
 	bool IsRight = false;
@@ -295,9 +277,8 @@ float Sound::CalculateAngle(v3 vTarg, v3 vA)
 	v1 = vTarg;
 	v2 = vA;
 	up = v3(0, 1, 0);
-	
 
-	dot = v1.Dot(v2);	
+	dot = v1.Dot(v2);
 	float vAbs1 = v1.Length();
 	float vAbs2 = v2.Length();
 	float Abs = vAbs1 * vAbs2;
@@ -321,7 +302,27 @@ float Sound::CalculateAngle(v3 vTarg, v3 vA)
 		IsRight = true;
 
 	if (!IsRight)//returns negative if speaker is to the right of lookAt vector
-		return ans * -1;
-	else
-		return ans;
+		ans = ans* -1;
+
+	if (ans <= 90 && ans >= -90)//Ljud källan finns i första eller andra kvadranten
+	{
+	}
+	else if (ans <= -90)//Ljud källan finns i tredje kvadranten
+	{
+		ans = 170 + ans;
+		ans = ans*-1;
+	}
+	else//Ljud källan finns i fjärde kvadranten
+	{
+		ans = 170 - ans;
+	}
+
+	ans = ans*DBPERANGLE;
+
+	if (ans < -10000)//Fixar så att det inte överskrider -10 000 till 10 000 intervallet
+		ans = -10000;
+	if (ans > 10000)
+		ans = 10000;
+
+	return ans;
 }
