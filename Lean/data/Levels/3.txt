@@ -1,5 +1,5 @@
 Heightmaps\3.bmp
-6
+5
 g
 29
 23

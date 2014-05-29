@@ -1335,10 +1335,20 @@ void Application::ChangeLevel(int levelNumber)
 	if (levelNumber == 0 || levelNumber == 1)
 	{
 		m_Skybox->SwitchSkybox(m_Direct3D, "data/skybox_abovesea.dds");
+		v3 lightDir = v3(5, 20, -3).GetNormalized();
+		firstLightPassData.directionalLightDirection = lightDir;
+		firstLightPassData.directionalLightColor = v3(1.0f, 0.9f, 0.9f);
+		firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
+		directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 	}
 	else if (levelNumber == 2 || levelNumber == 3)
 	{
 		m_Skybox->SwitchSkybox(m_Direct3D, "data/skybox_stormy.dds");
+		v3 lightDir = v3(6, 14, -4).GetNormalized();
+		firstLightPassData.directionalLightDirection = lightDir;
+		firstLightPassData.directionalLightColor = v3(1.0f, 0.75f, 0.8f);
+		firstLightPassData.ambientColor = v3(0.3f, 0.3f, 0.3f);
+		directionalLightShader->UpdateConstantBuffer(0, &firstLightPassData, sizeof(firstLightPassData));
 	}
 
 	m_Level->SetRotationX(0.0f);
